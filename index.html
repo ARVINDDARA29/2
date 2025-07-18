@@ -43,7 +43,7 @@
         #profile-screen.screen.active,
         #withdrawal-scheme-screen.screen.active,
         #upi-input-screen.screen.active,
-        #scoreboard-screen.screen.active, /* स्कोरबोर्ड स्क्रीन के लिए */
+        #scoreboard-screen.screen.active, /* स्कोरboard स्क्रीन के लिए */
         #color-prediction-game-screen.screen.active { /* कलर प्रेडिक्शन गेम स्क्रीन के लिए */
             background: linear-gradient(135deg, #e0e7ff, #c7d2fe); /* हल्का नीला-बैंगनी ग्रेडिएंट */
             border-radius: 1.5rem; /* कंटेनर के समान गोल कोने */
@@ -617,8 +617,8 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">सिक्के कमाएँ</h2>
             <p class="text-lg text-gray-700 mb-4">विज्ञापन देखकर सिक्के कमाएँ!</p>
             <button id="show-ad-btn" class="button-primary">विज्ञापन देखें</button>
-            <!-- Ad container for Diclotrans ad - not strictly needed for interstitial but good for consistency -->
-            <div id="diclotrans-ad-container" class="mt-4 w-full max-w-xs"></div>
+            <!-- Ad container for Ezmob ad - not strictly needed for interstitial but good for consistency -->
+            <div id="ezmob-ad-container" class="mt-4 w-full max-w-xs"></div>
         </div>
 
         <!-- Color Prediction Game Screen -->
@@ -869,7 +869,7 @@
         const betRedBtn = document.getElementById('bet-red-btn');
 
         // Ezmob Ad Container (still useful for general ad integration, even if interstitial doesn't use it directly)
-        const diclotransAdContainer = document.getElementById('diclotrans-ad-container'); // Updated ID
+        const ezmobAdContainer = document.getElementById('ezmob-ad-container'); // Updated ID
 
         let timeUpdateInterval; // Interval ID for time update
 
@@ -1399,27 +1399,52 @@
                 return;
             }
             
-            // Remove any existing Diclotrans script to prevent multiple loads
-            const existingDiclotransScript = document.getElementById('diclotrans-ad-script');
-            if (existingDiclotransScript) {
-                existingDiclotransScript.remove();
+            // Remove any existing script to prevent multiple loads
+            const existingEzmobScript = document.getElementById('ezmob-intstl-script');
+            if (existingEzmobScript) {
+                existingEzmobScript.remove();
             }
 
             window.showMessage("विज्ञापन लोड हो रहा है... कृपया प्रतीक्षा करें।");
 
-            // Create a temporary script element to load the Diclotrans ad
-            const diclotransScript = document.createElement('script');
-            diclotransScript.id = 'diclotrans-ad-script'; // Add an ID for easy removal
-            diclotransScript.type = 'text/javascript';
-            diclotransScript.src = 'https://cdn.diclotrans.com/sdk/v1/52677/a6722a970b18a5d69f7903086553d149ccce44a4/lib.js';
-            
-            // Append the script to the body to execute it
-            document.body.appendChild(diclotransScript);
-
-            // Hide the message box after a short delay to allow ad to render
-            setTimeout(() => {
-                messageBox.classList.remove('active');
-            }, 1000); // 1 second delay
+            // Create a temporary script element to load the Ezmob interstitial ad
+            const ezmobScript = document.createElement('script');
+            ezmobScript.id = 'ezmob-intstl-script'; // Add an ID for easy removal
+            ezmobScript.innerHTML = `
+                (function(i,n,t,s,t,l){
+                    i.intstl = i.intstl || function() {
+                        (i.intstl.q=(i.intstl.q||[])).push(arguments)
+                    };
+                    var s=n.getElementsByTagName('head')[0];
+                    var q=n.createElement('script'); q.async=1;
+                    q.src='https://static.ezmob.com/intstl/intstl.js';
+                    s.appendChild(q);
+                    q.onload = function() { // Ensure the script is loaded before calling init/show
+                        i.intstl('init', {
+                            host: 'xml.qualiclicks.com',
+                            feed: 840860, // Updated feed ID
+                            auth : '6M7v', // Updated auth key
+                            logo: 'https://adk.ezmob.com/images/icoLogo.png',
+                            color1: '#3c8dbc', color2: '#307196',
+                            textColor: 'white', background: '#f7f7f6',
+                            engagementPeriod: 10,
+                            interval: 20,
+                            defer: 10
+                        });
+                        i.intstl('show');
+                        console.log("Ezmob interstitial ad script loaded and attempting to show ad.");
+                        // Hide the message box after a short delay to allow ad to render
+                        setTimeout(() => {
+                            messageBox.classList.remove('active');
+                        }, 1000); // 1 second delay
+                    };
+                    q.onerror = function() {
+                        console.error("Failed to load Ezmob interstitial ad script.");
+                        window.showMessage("विज्ञापन लोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।");
+                    };
+                })(window, document);
+            `;
+            document.body.appendChild(ezmobScript);
 
             // After a delay (simulating ad view completion), award coins
             setTimeout(async () => {
