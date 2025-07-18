@@ -616,7 +616,7 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">सिक्के कमाएँ</h2>
             <p class="text-lg text-gray-700 mb-4">विज्ञापन देखकर सिक्के कमाएँ!</p>
             <button id="show-ad-btn" class="button-primary">विज्ञापन देखें</button>
-            <!-- Ad container for Ezmob ad -->
+            <!-- Ad container for Ezmob ad - not strictly needed for interstitial but good for consistency -->
             <div id="ezmob-ad-container" class="mt-4 w-full max-w-xs"></div>
         </div>
 
@@ -778,7 +778,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
-        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Removed Analytics import
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Removed Analytics initialization
 
         // Firebase configuration
         const firebaseConfig = {
@@ -867,7 +867,7 @@
         const betGreenBtn = document.getElementById('bet-green-btn');
         const betRedBtn = document.getElementById('bet-red-btn');
 
-        // Ezmob Ad Container
+        // Ezmob Ad Container (still useful for general ad integration, even if interstitial doesn't use it directly)
         const ezmobAdContainer = document.getElementById('ezmob-ad-container');
 
         let timeUpdateInterval; // Interval ID for time update
@@ -967,7 +967,8 @@
         }
 
         // Function to display a custom message box
-        function showMessage(message, callback = null) {
+        // Made showMessage global for accessibility from dynamically loaded scripts
+        window.showMessage = function(message, callback = null) {
             messageText.textContent = message;
             messageBox.classList.add('active');
             messageBoxOkBtn.onclick = () => {
@@ -983,7 +984,7 @@
                 // Check if firebaseConfig is properly set up
                 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
                     console.error("Firebase कॉन्फ़िगरेशन अधूरा है। कृपया सुनिश्चित करें कि apiKey और projectId प्रदान किए गए हैं।");
-                    showMessage("Firebase कॉन्फ़िगरेशन उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।");
+                    window.showMessage("Firebase कॉन्फ़िगरेशन उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।");
                     hideLoadingScreen(); // Hide loading screen on error
                     return;
                 }
@@ -1024,12 +1025,12 @@
                             // Ensure an anonymous session is established for Firestore rules to work.
                             try {
                                 await signInAnonymously(auth);
-                                console.log("New anonymous session established after logout/initial load.");
+                                console.log("Initial anonymous sign-in attempt.");
                                 // onAuthStateChanged will fire again with the new anonymous user.
                                 // So we don't need to call showScreen(mainScreen) here directly.
                             } catch (anonError) {
                                 console.error("Error signing in anonymously:", anonError);
-                                showMessage(`प्रमाणीकरण में त्रुटि: ${anonError.message}`);
+                                window.showMessage(`प्रमाणीकरण में त्रुटि: ${anonError.message}`);
                                 showScreen(mainScreen); // Fallback to main screen even if anonymous sign-in fails
                             }
                         } else {
@@ -1053,10 +1054,10 @@
                     } catch (authError) {
                         if (authError.code === 'auth/admin-restricted-operation') {
                             console.error("Firebase authentication error: Anonymous authentication is not enabled in your Firebase project. Please enable it under Firebase Console -> Authentication -> Sign-in method.");
-                            showMessage("Firebase प्रमाणीकरण त्रुटि: आपके Firebase प्रोजेक्ट में गुमनाम प्रमाणीकरण सक्षम नहीं है। कृपया इसे Firebase कंसोल में प्रमाणीकरण -> साइन-in विधि के तहत सक्षम करें।");
+                            window.showMessage("Firebase प्रमाणीकरण त्रुटि: आपके Firebase प्रोजेक्ट में गुमनाम प्रमाणीकरण सक्षम नहीं है। कृपया इसे Firebase कंसोल में प्रमाणीकरण -> साइन-in विधि के तहत सक्षम करें।");
                         } else {
                             console.error("Firebase authentication failed:", authError);
-                            showMessage(`Firebase प्रमाणीकरण में त्रुटि: ${authError.message}`);
+                            window.showMessage(`Firebase प्रमाणीकरण में त्रुटि: ${authError.message}`);
                         }
                         hideLoadingScreen(); // Hide loading screen on authentication error
                     }
@@ -1064,7 +1065,7 @@
 
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                showMessage(`Firebase आरंभ करने में त्रुटि: ${error.message}`);
+                window.showMessage(`Firebase आरंभ करने में त्रुटि: ${error.message}`);
                 hideLoadingScreen(); // Hide loading screen on initialization error
             }
         }
@@ -1091,16 +1092,16 @@
                     // If user data does not exist (e.g., an invalid stored ID), show main screen
                     localStorage.removeItem('adbossAppUserId'); // Remove invalid ID
                     console.warn("loadUserData: User document not found for ID:", appUserIdToLoad, "Removing from localStorage.");
-                    showMessage("आपकी संग्रहीत उपयोगकर्ता ID नहीं मिली। कृपया एक नया खाता बनाएँ या फिर से लॉग इन करें।", () => {
+                    window.showMessage("आपकी संग्रहीत उपयोगकर्ता ID नहीं मिली। कृपया एक नया खाता बनाएँ या फिर से लॉग इन करें।", () => {
                         showScreen(mainScreen);
                     });
                 }
             } catch (error) {
                 console.error("Error loading user data:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("उपयोगकर्ता डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("उपयोगकर्ता डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`उपयोगकर्ता डेटा लोड करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`उपयोगकर्ता डेटा लोड करने में त्रुटि: ${error.message}`);
                 }
             }
         }
@@ -1114,13 +1115,13 @@
         async function createNewUser() {
             const name = newUserNameInput.value.trim();
             if (!name) {
-                showMessage("कृपया अपना पूरा नाम दर्ज करें");
+                window.showMessage("कृपया अपना पूरा नाम दर्ज करें");
                 return;
             }
 
             // Ensure Firebase is ready and firebaseAuthUid is available
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
 
@@ -1145,16 +1146,16 @@
                 currentUserCoins = 0; // Update current coins to 0
                 userCreatedAt = new Date(); // Set creation date
                 
-                showMessage("खाता सफलतापूर्वक बन गया!", () => {
+                window.showMessage("खाता सफलतापूर्वक बन गया!", () => {
                     showHomePage(name, newUserId, 0);
                 });
                 newUserNameInput.value = ''; // Clear input
             } catch (error) {
                 console.error("Error creating user:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("खाता बनाने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("खाता बनाने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`खाता बनाने में त्रुटि: ${error.message}`);
+                    window.showMessage(`खाता बनाने में त्रुटि: ${error.message}`);
                 }
             }
         }
@@ -1163,13 +1164,13 @@
         async function loginExistingUser() {
             const userId = existingUserIdInput.value.trim();
             if (!userId) {
-                showMessage("कृपया अपनी User ID दर्ज करें");
+                window.showMessage("कृपया अपनी User ID दर्ज करें");
                 return;
             }
 
             // Ensure Firebase is ready and firebaseAuthUid is available
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
 
@@ -1177,7 +1178,7 @@
                 const userDoc = await getDoc(doc(db, "users", userId));
                 
                 if (!userDoc.exists()) {
-                    showMessage("यह User ID मौजूद नहीं है");
+                    window.showMessage("यह User ID मौजूद नहीं है");
                     existingUserIdInput.value = ''; // Clear input
                     return;
                 }
@@ -1196,9 +1197,9 @@
             } catch (error) {
                 console.error("Login error:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("लॉगिन में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("लॉगिन में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`लॉगिन में त्रुटि: ${error.message}`);
+                    window.showMessage(`लॉगिन में त्रुटि: ${error.message}`);
                 }
                 existingUserIdInput.value = ''; // Clear input on error
             }
@@ -1234,11 +1235,11 @@
         // Function to show detailed account age
         function showDetailedAccountAge() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) { // Ensure applicationUserId is available
-                showMessage("खाता आयु देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("खाता आयु देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
             if (userCreatedAt) {
@@ -1253,9 +1254,9 @@
                 const remainingMinutes = minutes % 60;
 
                 let ageMessage = `आपका खाता ${days} दिन, ${remainingHours} घंटे, और ${remainingMinutes} मिनट पुराना है।`;
-                showMessage(ageMessage);
+                window.showMessage(ageMessage);
             } else {
-                showMessage("आपके खाते की निर्माण तिथि उपलब्ध नहीं है।");
+                window.showMessage("आपके खाते की निर्माण तिथि उपलब्ध नहीं है।");
             }
         }
 
@@ -1279,7 +1280,7 @@
         // Function to copy user ID to clipboard
         function copyUserId() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             const userIdText = displayUserId.textContent;
@@ -1295,10 +1296,10 @@
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    showMessage("उपयोगकर्ता ID कॉपी हो गई!");
+                    window.showMessage("उपयोगकर्ता ID कॉपी हो गई!");
                 } catch (err) {
                     console.error('क्लिपबोर्ड पर कॉपी करने में विफल:', err);
-                    showMessage("ID कॉपी करने में विफल। कृपया मैन्युअल रूपally कॉपी करें।");
+                    window.showMessage("ID कॉपी करने में विफल। कृपया मैन्युअल रूपally कॉपी करें।");
                 }
                 document.body.removeChild(textArea);
             }
@@ -1307,7 +1308,7 @@
         // Handler for withdrawal button
         function handleWithdrawal() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             // Show withdrawal scheme screen
@@ -1317,11 +1318,11 @@
         // Function to select withdrawal scheme
         window.selectWithdrawalScheme = async function(coins, rupees) {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) {
-                showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
 
@@ -1331,7 +1332,7 @@
                 upiAmountDisplay.textContent = `आप ₹${rupees} प्राप्त करेंगे।`;
                 showScreen(upiInputScreen);
             } else {
-                showMessage(`आपके पास पर्याप्त सिक्के नहीं हैं। आपको ₹${rupees} प्राप्त करने के लिए ${coins} सिक्के चाहिए, लेकिन आपके पास केवल ${currentUserCoins} सिक्के हैं।`);
+                window.showMessage(`आपके पास पर्याप्त सिक्के नहीं हैं। आपको ₹${rupees} प्राप्त करने के लिए ${coins} सिक्के चाहिए, लेकिन आपके पास केवल ${currentUserCoins} सिक्के हैं।`);
             }
         }
 
@@ -1339,12 +1340,12 @@
         async function submitUpiId() {
             const upiId = upiIdInput.value.trim();
             if (!upiId) {
-                showMessage("कृपया अपनी UPI ID दर्ज करें।");
+                window.showMessage("कृपया अपनी UPI ID दर्ज करें।");
                 return;
             }
 
             if (!db || !applicationUserId) {
-                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
+                window.showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
                 return;
             }
 
@@ -1374,7 +1375,7 @@
 
                 upiIdInput.value = ''; // Clear UPI input
 
-                showMessage("आपका पैसा 24 घंटे में आ जाएगा!", () => {
+                window.showMessage("आपका पैसा 24 घंटे में आ जाएगा!", () => {
                     // Go to home screen after message box closes
                     setTimeout(() => {
                         showHomePage(currentUserName, applicationUserId, currentUserCoins);
@@ -1383,9 +1384,9 @@
             } catch (error) {
                 console.error("निकासी संसाधित करने में त्रुटि:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("निकासी संसाधित करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("निकासी संसाधित करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
                 }
             }
         }
@@ -1393,54 +1394,53 @@
         // विज्ञापन देखें बटन के लिए हैंडलर
         async function handleShowAd() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             
-            // Load and show Ezmob ad
+            // Load and show Ezmob interstitial ad
             // Remove any existing script to prevent multiple loads
-            const existingEzmobScript = document.getElementById('ezmob-script');
+            const existingEzmobScript = document.getElementById('ezmob-intstl-script');
             if (existingEzmobScript) {
                 existingEzmobScript.remove();
             }
 
-            showMessage("विज्ञापन लोड हो रहा है... कृपया प्रतीक्षा करें।");
+            window.showMessage("विज्ञापन लोड हो रहा है... कृपया प्रतीक्षा करें।");
 
-            // Create a temporary script element to load the Ezmob ad
+            // Create a temporary script element to load the Ezmob interstitial ad
             const ezmobScript = document.createElement('script');
-            ezmobScript.id = 'ezmob-script'; // Add an ID for easy removal
+            ezmobScript.id = 'ezmob-intstl-script'; // Add an ID for easy removal
             ezmobScript.innerHTML = `
-                (function(i,n,p,a,g,e){
-                    i.inpagepush = i.inpagepush || function() {
-                        (i.inpagepush.q=(i.inpagepush.q||[])).push(arguments)
+                (function(i,n,t,s,t,l){
+                    i.intstl = i.intstl || function() {
+                        (i.intstl.q=(i.intstl.q||[])).push(arguments)
                     };
                     var s=n.getElementsByTagName('head')[0];
                     var q=n.createElement('script'); q.async=1;
-                    q.src='//static.ezmob.com/inpage/inpage.js';
+                    q.src='https://static.ezmob.com/intstl/intstl.js';
                     s.appendChild(q);
                     q.onload = function() { // Ensure the script is loaded before calling init/show
-                        i.inpagepush('init', {
+                        i.intstl('init', {
                             host: 'xml.qualiclicks.com',
-                            feed: 840837,
-                            auth : 'Zqis',
-                            subid: 'site1',
-                            refresh: 90,
-                            position: 'bottom',
-                            position_mobile: 'bottom',
-                            slots: 1,
-                            query : '',
-                            nodesrc : true
+                            feed: 840837, // Assuming this is your feed ID, please confirm from Ezmob
+                            auth : 'Zqis', // Assuming this is your auth key, please confirm from Ezmob
+                            logo: 'https://adk.ezmob.com/images/icoLogo.png',
+                            color1: '#3c8dbc', color2: '#307196',
+                            textColor: 'white', background: '#f7f7f6',
+                            engagementPeriod: 10,
+                            interval: 25,
+                            defer: 10
                         });
-                        i.inpagepush('show');
-                        console.log("Ezmob ad script loaded and attempting to show ad.");
+                        i.intstl('show');
+                        console.log("Ezmob interstitial ad script loaded and attempting to show ad.");
                         // Hide the message box after a short delay to allow ad to render
                         setTimeout(() => {
                             messageBox.classList.remove('active');
                         }, 1000); // 1 second delay
                     };
                     q.onerror = function() {
-                        console.error("Failed to load Ezmob ad script.");
-                        showMessage("विज्ञापन लोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।");
+                        console.error("Failed to load Ezmob interstitial ad script.");
+                        window.showMessage("विज्ञापन लोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।");
                     };
                 })(window, document);
             `;
@@ -1453,23 +1453,23 @@
                     console.log("handleShowAd: Attempting to update coins for userId:", applicationUserId, "with firebaseAuthUid:", firebaseAuthUid);
                     try {
                         // उपयोगकर्ता के सिक्के बढ़ाएँ
-                        currentUserCoins += 10; // उदाहरण के लिए 10 सिक्के जोड़ें
+                        currentUserCoins += 1; // 1 सिक्के जोड़ें
                         await updateDoc(userRef, {
                             coins: currentUserCoins
                         });
                         userCoinsSpan.textContent = currentUserCoins; // UI अपडेट करें
                         gameUserCoins.textContent = currentUserCoins; // Game UI भी अपडेट करें
-                        showMessage(`आपको 10 सिक्के मिले! आपके पास अब ${currentUserCoins} सिक्के हैं।`);
+                        window.showMessage(`आपको 1 सिक्का मिला! आपके पास अब ${currentUserCoins} सिक्के हैं।`);
                     } catch (error) {
                         console.error("सिक्के अपडेट करने में त्रुटि:", error);
                         if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                            showMessage("सिक्के अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                            window.showMessage("सिक्के अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                         } else {
-                            showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+                            window.showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
                         }
                     }
                 } else {
-                    showMessage("Firebase तैयार नहीं है या उपयोगकर्ता प्रमाणित नहीं है।");
+                    window.showMessage("Firebase तैयार नहीं है या उपयोगकर्ता प्रमाणित नहीं है।");
                 }
             }, 5000); // 5 सेकंड के बाद सिक्के बढ़ाएं (विज्ञापन देखने का अनुकरण)
         }
@@ -1477,11 +1477,11 @@
         // प्रोफाइल स्क्रीन के लिए फंक्शन
         function showProfileScreen() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) {
-                showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
             profileNameInput.value = currentUserName; // इनपुट फील्ड में वर्तमान नाम सेट करें
@@ -1505,9 +1505,9 @@
             }).catch(error => {
                 console.error("प्रोफ़ाइल डेटा लोड करने में त्रुटि:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("प्रोफ़ाइल डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("प्रोफ़ाइल डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`प्रोफ़ाइल डेटा लोड करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`प्रोफ़ाइल डेटा लोड करने में त्रुटि: ${error.message}`);
                 }
             });
             
@@ -1522,21 +1522,21 @@
         // नाम अपडेट करने के लिए फंक्शन
         async function updateUserName() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             const newName = profileNameInput.value.trim();
             if (!newName) {
-                showMessage(" कृपया एक वैध नाम दर्ज करें।");
+                window.showMessage(" कृपया एक वैध नाम दर्ज करें।");
                 return;
             }
             if (newName === currentUserName) {
-                showMessage("नाम पहले से ही अपडेटेड है।");
+                window.showMessage("नाम पहले से ही अपडेटेड है।");
                 return;
             }
 
             if (!db || !applicationUserId) {
-                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें.");
+                window.showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें.");
                 return;
             }
 
@@ -1548,13 +1548,13 @@
                 });
                 currentUserName = newName;
                 welcomeMessage.textContent = `नमस्ते, ${currentUserName}!`; // होम स्क्रीन पर नाम अपडेट करें
-                showMessage("आपका नाम सफलतापूर्वक अपडेट हो गया है!");
+                window.showMessage("आपका नाम सफलतापूर्वक अपडेट हो गया है!");
             } catch (error) {
                 console.error("नाम अपडेट करने में त्रुटि:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("नाम अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("नाम अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`नाम अपडेट करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`नाम अपडेट करने में त्रुटि: ${error.message}`);
                 }
             }
         }
@@ -1562,17 +1562,17 @@
         // रेफरल कोड लागू करने के लिए फंक्शन
         async function applyReferralCode() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             const enteredCode = enterReferralCodeInput.value.trim();
             if (!enteredCode) {
-                showMessage(" कृपया एक रेफरल कोड दर्ज करें।");
+                window.showMessage(" कृपया एक रेफरल कोड दर्ज करें।");
                 return;
             }
 
             if (!db || !applicationUserId) {
-                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
+                window.showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
                 return;
             }
 
@@ -1583,7 +1583,7 @@
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
                     if (userData.referralApplied) {
-                        showMessage("आपने पहले ही एक रेफरल कोड का उपयोग कर लिया है।");
+                        window.showMessage("आपने पहले ही एक रेफरल कोड का उपयोग कर लिया है।");
                         return;
                     }
 
@@ -1595,21 +1595,21 @@
                         });
                         userCoinsSpan.textContent = currentUserCoins; // Update UI
                         gameUserCoins.textContent = currentUserCoins; // Game UI भी अपडेट करें
-                        showMessage("रेफरल कोड सफलतापूर्वक लागू हुआ! आपको 20 सिक्के मिले!");
+                        window.showMessage("रेफरल कोड सफलतापूर्वक लागू हुआ! आपको 20 सिक्के मिले!");
                         enterReferralCodeInput.disabled = true;
                         applyReferralBtn.disabled = true;
                         enterReferralCodeInput.value = ""; // Clear input
                         enterReferralCodeInput.placeholder = "रेफरल पहले ही उपयोग किया जा चुका है";
                     } else {
-                        showMessage("अमान्य रेफरल कोड।");
+                        window.showMessage("अमान्य रेफरल कोड।");
                     }
                 }
             } catch (error) {
                 console.error("रेफरल कोड लागू करने में त्रुटि:", error);
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("रेफरल कोड लागू करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                    window.showMessage("रेफरल कोड लागू करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
                 } else {
-                    showMessage(`रेफरal कोड लागू करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`रेफरal कोड लागू करने में त्रुटि: ${error.message}`);
                 }
             }
         }
@@ -1617,16 +1617,16 @@
         // अपना रेफरल कोड प्रदर्शित करने के लिए फंक्शन
         function displayOwnReferralCode() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) {
-                showMessage("आपका रेफरल कोड प्राप्त करने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("आपका रेफरल कोड प्राप्त करने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
             myReferralCodeDisplay.textContent = applicationUserId;
             myReferralCodeDisplay.classList.remove('hidden');
-            showMessage("यह आपका रेफरल कोड है। इसे दोस्तों के साथ साझा करें!");
+            window.showMessage("यह आपका रेफरल कोड है। इसे दोस्तों के साथ साझा करें!");
         }
 
         // लॉगआउट फंक्शन
@@ -1658,7 +1658,7 @@
 
             } catch (error) {
                 console.error("Error logging out:", error);
-                showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
+                window.showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
                 hideLoadingScreen(); // Ensure loading screen is hidden if an error occurs
                 // If an error occurs, bring back the UI (if it was hidden)
                 if (containerElement) containerElement.style.display = 'flex';
@@ -1668,11 +1668,11 @@
         // स्कोरबोर्ड स्क्रीन दिखाने के लिए फ़ंक्शन
         async function showScoreboardScreen() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) {
-                showMessage("स्कोरबोर्ड देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("स्कोरबोर्ड देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
 
@@ -1737,9 +1737,9 @@
                 console.error("स्कोरबोर्ड लोड करने में त्रुटि:", error);
                 // यदि 'permission-denied' या इंडेक्स गायब होने की त्रुटि है
                 if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
-                    showMessage("स्कोरबोर्ड लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं या 'coins' फ़ील्ड पर एक इंडेक्स गायब है। कृपया Firebase कंसोल में Firestore सुरक्षा नियम और इंडेक्स सेटिंग्स की जाँच करें।");
+                    window.showMessage("स्कोरबोर्ड लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं या 'coins' फ़ील्ड पर एक इंडेक्स गायब है। कृपया Firebase कंसोल में Firestore सुरक्षा नियम और इंडेक्स सेटिंग्स की जाँच करें।");
                 } else {
-                    showMessage(`स्कोरबोर्ड लोड करने में त्रुटि: ${error.message}`);
+                    window.showMessage(`स्कोरबोर्ड लोड करने में त्रुटि: ${error.message}`);
                 }
                 scoreboardListContainer.innerHTML = '<p class="text-red-500">स्कोरबोर्ड लोड करने में त्रुटि।</p>';
                 myRankDisplay.textContent = 'आपकी रैंक: त्रुटि';
@@ -1749,11 +1749,11 @@
         // कलर प्रेडिक्शन गेम दिखाने के लिए फ़ंक्शन
         function showColorPredictionGameScreen() {
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
                 return;
             }
             if (!applicationUserId) {
-                showMessage("गेम खेलने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage("गेम खेलने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
                 return;
             }
             showScreen(colorPredictionGameScreen);
@@ -1840,12 +1840,12 @@
                 // यह मामला आदर्श रूप से इनपुट/बटन को अक्षम करके रोका जाना चाहिए
                 // शर्त लगाने से पहले यदि betAmount अमान्य है।
                 // अभी के लिए, संदेश रखें, लेकिन यह दुर्लभ होना चाहिए।
-                // showMessage("कृपया एक वैध शर्त राशि दर्ज करें।"); // पॉपअप हटा दिया गया
+                // window.showMessage("कृपया एक वैध शर्त राशि दर्ज करें।"); // पॉपअप हटा दिया गया
                 return;
             }
 
             if (currentUserCoins < betAmount) {
-                // showMessage("आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।"); // पॉपअप हटा दिया गया
+                // window.showMessage("आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।"); // पॉपअप हटा दिया गया
                 gameStatusMessage.textContent = "आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।";
                 return;
             }
@@ -1870,7 +1870,7 @@
                 userCoinsSpan.textContent = currentUserCoins; // होम UI अपडेट करें
             } catch (error) {
                 console.error("सिक्के अपडेट करने में त्रुटि:", error);
-                showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+                window.showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
             }
         }
 
@@ -1931,7 +1931,7 @@
             if (isBettingOpen) {
                 const betAmount = parseInt(betAmountInput.value);
                 if (isNaN(betAmount) || betAmount <= 0) {
-                    gameStatusMessage.textContent = "कृपया शर्त लगाने के लिए एक वैध राशि दर्ज करें।";
+                    gameStatusMessage.textContent = " कृपया शर्त लगाने के लिए एक वैध राशि दर्ज करें।";
                     return;
                 }
                 if (currentUserCoins < betAmount) {
@@ -1961,7 +1961,7 @@
                 navGame.classList.remove('active');
                 navProfile.classList.remove('active');
             } else {
-                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
             }
         });
 
@@ -1973,7 +1973,7 @@
                 navGame.classList.remove('active');
                 navProfile.classList.remove('active');
             } else {
-                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
             }
         });
 
@@ -1981,7 +1981,7 @@
             if (applicationUserId) {
                 showColorPredictionGameScreen();
             } else {
-                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                window.showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
             }
         });
 
