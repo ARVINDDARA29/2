@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADBOSS 2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Google AdSense Script - Removed as requested -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* हल्का ग्रे बैकग्राउंड */
+            display: flex;
+            flex-direction: column; /* कॉलम लेआउट ताकि नेविगेशन बार नीचे रहे */
+            justify-content: flex-start; /* सामग्री को ऊपर से शुरू करें */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-y: auto; /* स्क्रॉल करने योग्य बनाएं */
+            padding-bottom: 6rem; /* नेविगेशन बार के लिए जगह */
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* अधिक गोल कोने */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* गहरी छाया */
+            padding: 2.5rem; /* अधिक पैडिंग */
+            width: 100%;
+            max-width: 28rem; /* अधिकतम चौड़ाई बढ़ाई गई */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1; /* कंटेनर को उपलब्ध स्थान भरने दें */
+            justify-content: center; /* सामग्री को केंद्र में रखें */
+            transition: all 0.5s ease-in-out; /* कंटेनर के लिए स्मूथ ट्रांज़िशन */
+            margin-top: 2rem; /* ऊपर से थोड़ा मार्gin */
+            margin-bottom: 2rem; /* नीचे से थोड़ा मार्जिन */
+        }
+        /* होम स्क्रीन के लिए विशेष बैकग्राउंड */
+        #home-screen.screen.active,
+        #profile-screen.screen.active,
+        #withdrawal-scheme-screen.screen.active,
+        #upi-input-screen.screen.active,
+        #scoreboard-screen.screen.active, /* स्कोरबोर्ड स्क्रीन के लिए */
+        #color-prediction-game-screen.screen.active { /* कलर प्रेडिक्शन गेम स्क्रीन के लिए */
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe); /* हल्का नीला-बैंगनी ग्रेडिएंट */
+            border-radius: 1.5rem; /* कंटेनर के समान गोल कोने */
+            padding: 2.5rem; /* कंटेनर के समान पैडिंग */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        /* अन्य स्क्रीन के लिए कंटेनर का बैकग्राउंड */
+        #intro-screen.screen.active,
+        #main-screen.screen.active,
+        #new-user-screen.screen.active,
+        #have-account-screen.screen.active,
+        #earn-screen.screen.active {
+            background-color: #ffffff;
+        }
+
+        .screen {
+            display: none; /* डिफ़ॉल्ट रूप से छिपा हुआ */
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1; /* स्क्रीन को उपलब्ध स्थान भरने दें */
+            animation: fadeIn 0.5s ease-in-out; /* स्क्रीन के लिए फेड-इन एनिमेशन */
+            position: relative; /* बैक बटन के लिए सापेक्ष स्थिति */
+        }
+        .screen.active {
+            display: flex; /* सक्रिय स्क्रीन दिखाई देती है */
+        }
+        .button-primary {
+            background-color: #4f46e5; /* इंडिगो 600 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem; /* बटन के लिए गोल कोने */
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%; /* पूरी चौड़ाई वाले बटन */
+            max-width: 20rem; /* बटन के लिए अधिकतम चौड़ाई */
+        }
+        .button-primary:hover {
+            background-color: #4338ca; /* इंडिगो 700 */
+            transform: translateY(-3px) scale(1.02); /* थोड़ा ऊपर और बड़ा करें */
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* गहरी छाया */
+        }
+        .button-secondary {
+            background-color: #e0e7ff; /* इंडिगो 100 */
+            color: #4f46e5; /* इंडिगो 600 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 20rem;
+        }
+        .button-secondary:hover {
+            background-color: #c7d2fe; /* इंडिगो 200 */
+            transform: translateY(-3px) scale(1.02); /* थोड़ा ऊपर और बड़ा करें */
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1); /* गहरी छाया */
+        }
+        input[type="text"], input[type="number"] {
+            border: 1px solid #d1d5db; /* ग्रे 300 */
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            max-width: 20rem;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #6366f1; /* इंडिगो 500 */
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); /* फोकस रिंग */
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9); /* शुरुआत में थोड़ा छोटा */
+            background-color: #333;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 90%;
+            opacity: 0; /* शुरुआत में अदृश्य */
+            transition: all 0.3s ease-out; /* ट्रांज़िशन प्रभाव */
+        }
+        .message-box.active {
+            display: flex;
+            opacity: 1; /* दिखाई दे */
+            transform: translate(-50%, -50%) scale(1); /* सामान्य आकार पर स्केल करें */
+        }
+        .message-box button {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .message-box button:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        /* बॉटम नेविगेशन बार स्टाइल */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 32rem; /* कंटेनर के समान अधिकतम चौड़ाई */
+            background-color: #ffffff;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem 0;
+            z-index: 999;
+            animation: slideUp 0.5s ease-out forwards; /* नेविगेशन बार के लिए स्लाइड-अप एनिमेशन */
+        }
+        .bottom-nav.hidden {
+            display: none;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6b7280; /* ग्रे */
+            font-size: 0.875rem; /* छोटा फ़ॉन्ट */
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+            padding: 0.5rem; /* क्लिक करने योग्य क्षेत्र बढ़ाएं */
+            border-radius: 0.5rem;
+        }
+        .nav-item.active, .nav-item:hover {
+            color: #4f46e5; /* इंडिगो */
+            transform: translateY(-2px); /* थोड़ा ऊपर उठाएं */
+        }
+        .nav-item svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* एनिमेशन */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* इंट्रो स्क्रीन के लिए विशेष एनिमेशन */
+        #intro-screen h1 {
+            animation: fadeInScale 1.5s ease-out forwards;
+        }
+        #intro-screen p {
+            animation: fadeIn 2s ease-out forwards;
+            animation-delay: 0.5s;
+            opacity: 0; /* शुरुआत में छिपा हुआ */
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* सिक्का डिस्प्ले के लिए एनिमेशन */
+        .coin-display {
+            animation: popIn 0.5s ease-out forwards;
+            animation-delay: 0.2s; /* थोड़ा विलंब */
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* टेक्स्ट के लिए ग्रेडिएंट */
+        .gradient-text {
+            background: linear-gradient(45deg, #6366f1, #a855f7); /* इंडिगो से वॉयलेट */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* बैक बटन स्टाइल */
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 10;
+            display: none; /* डिफ़ॉल्ट रूप से छिपा हुआ */
+        }
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: scale(1.05);
+        }
+        .back-button svg {
+            width: 1.5rem;
+            height: 1.5rem;
+            color: #4f46e5;
+        }
+
+        /* लोडिंग स्क्रीन स्टाइल */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9); /* हल्का पारदर्शी सफेद */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* अन्य सभी तत्वों के ऊपर */
+            transition: opacity 0.5s ease-out;
+            opacity: 1;
+        }
+        #loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none; /* छिपा होने पर क्लिक करने योग्य न हो */
+        }
+        .spinner {
+            border: 4px solid #f3f3f3; /* हल्का ग्रे */
+            border-top: 4px solid #4f46e5; /* इंडिगो */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* निकासी योजना कार्ड स्टाइल */
+        .withdrawal-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .withdrawal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .withdrawal-card .coins {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4f46e5; /* इंडिगो */
+            margin-bottom: 0.5rem;
+        }
+        .withdrawal-card .rupees {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #10b981; /* हरा */
+            margin-bottom: 1rem;
+        }
+        .withdrawal-card button {
+            background-color: #10b981; /* हरा */
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            width: 80%;
+        }
+        .withdrawal-card button:hover {
+            background-color: #059669; /* गहरा हरा */
+        }
+
+        /* मेरी निकासी सूची स्टाइल */
+        .withdrawal-list {
+            width: 100%;
+            max-width: 25rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .withdrawal-list-item {
+            background-color: #e0e7ff; /* हल्का इंडिगो */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .withdrawal-list-item p {
+            font-size: 0.9rem;
+            color: #374151; /* गहरा ग्रे */
+        }
+        .withdrawal-list-item .status {
+            font-weight: 600;
+            color: #4f46e5; /* इंडिगो */
+        }
+        .withdrawal-list-item .status.pending {
+            color: #f59e0b; /* नारंगी */
+        }
+        .withdrawal-list-item .status.completed {
+            color: #10b981; /* हरा */
+        }
+        .withdrawal-list-item .status.failed {
+            color: #ef4444; /* लाल */
+        }
+
+        /* स्कोरबोर्ड स्टाइल */
+        .scoreboard-list {
+            width: 100%;
+            max-width: 25rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .scoreboard-item {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1rem;
+            color: #374151;
+        }
+        .scoreboard-item.current-user {
+            background-color: #d1e7dd; /* हल्का हरा */
+            border: 2px solid #10b981; /* गहरा हरा बॉर्डर */
+            font-weight: bold;
+        }
+        .scoreboard-item .rank {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-right: 1rem;
+        }
+        .scoreboard-item .name {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .scoreboard-item .coins {
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        /* कलर प्रेडिक्शन गेम स्टाइल */
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+        .game-header .user-info {
+            text-align: left;
+        }
+        .game-header .user-info p {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #374151;
+        }
+        .game-header .user-info .coins {
+            font-size: 1.8rem;
+            color: #4f46e5;
+        }
+        .color-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #ccc; /* डिफ़ॉल्ट ग्रे */
+            margin-bottom: 2rem;
+            border: 5px solid #4f46e5;
+            transition: background-color 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .color-circle.green {
+            background-color: #10b981; /* हरा */
+        }
+        .color-circle.red {
+            background-color: #ef4444; /* लाल */
+        }
+        .game-controls {
+            width: 100%;
+            max-width: 20rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .bet-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        .bet-buttons button {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .bet-buttons .bet-green {
+            background-color: #10b981;
+            color: white;
+        }
+        .bet-buttons .bet-green:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+        .bet-buttons .bet-red {
+            background-color: #ef4444;
+            color: white;
+        }
+        .bet-buttons .bet-red:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        .game-status-message {
+            margin-top: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .timer-display {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="screen active">
+            <h1 class="text-6xl font-bold text-indigo-600 mb-4 gradient-text">ADBOSS 2.0</h1>
+            <p class="text-xl text-gray-700">आपका डिजिटल साथी</p>
+        </div>
+
+        <!-- Main Options Screen -->
+        <div id="main-screen" class="screen">
+            <h2 class="text-3xl font-bold text-gray-800 mb-8">स्वागत है!</h2>
+            <button id="have-account-btn" class="button-primary mb-4">मौजूदा खाता</button>
+            <button id="new-user-btn" class="button-secondary">नया उपयोगकर्ता</button>
+        </div>
+
+        <!-- New User Screen -->
+        <div id="new-user-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">आपका पूरा नाम क्या है?</h2>
+            <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="mb-4">
+            <button id="create-user-btn" class="button-primary">खाता बनाएँ</button>
+        </div>
+
+        <!-- Have Account Screen -->
+        <div id="have-account-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">अपनी ID दर्ज करें</h2>
+            <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता ID दर्ज करें" class="mb-4">
+            <button id="login-btn" class="button-primary">लॉग इन करें</button>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen">
+            <!-- होम स्क्रीन पर बैक बटन की आवश्यकता नहीं है क्योंकि यह मुख्य स्क्रीन है -->
+            <div class="w-full flex justify-between items-center text-gray-600 text-sm mb-4 px-4">
+                <span id="current-time" class="font-semibold"></span>
+                <!-- "You Old" बटन यहां जोड़ा गया है -->
+                <button id="account-age-btn" class="font-semibold text-indigo-600 hover:underline cursor-pointer">आप पुराने हैं</button>
+            </div>
+            <p class="text-xs text-gray-500 text-right w-full pr-4">आपकी उपयोगकर्ता ID: <span id="display-user-id" class="font-mono text-gray-600 break-all"></span> <button id="copy-id-btn" class="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-md hover:bg-gray-300 transition">कॉपी करें</button></p>
+            <h2 id="welcome-message" class="text-4xl font-bold text-indigo-600 mb-4 mt-4 gradient-text">नमस्ते!</h2>
+            <p class="text-lg text-gray-700 mb-4">आपका ADBOSS 2.0 में स्वागत है।</p>
+            
+            <div class="bg-indigo-50 p-4 rounded-xl shadow-md w-full max-w-xs mb-6 coin-display">
+                <p class="text-xl font-semibold text-indigo-700">आपके सिक्के:</p>
+                <p id="user-coins" class="text-5xl font-bold text-indigo-800 mt-2">0</p>
+            </div>
+
+            <button id="withdrawal-btn" class="button-primary">निकासी</button>
+            <button id="scoreboard-btn" class="button-secondary mt-4">स्कोरबोर्ड</button>
+
+            <!-- मेरी निकासी अनुभाग - अब यह UI पर प्रदर्शित नहीं होगा -->
+            <div class="withdrawal-list" style="display: none;"> 
+                <h3 class="text-xl font-bold text-gray-800 mb-4">मेरी निकासी</h3>
+                <div id="my-withdrawals-container">
+                    <!-- निकासी अनुरोध यहां डायनेमिक रूप से लोड होंगे -->
+                    <p class="text-gray-500">कोई निकासी अनुरोध नहीं।</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scoreboard Screen -->
+        <div id="scoreboard-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">स्कोरबोर्ड</h2>
+            <p id="my-rank-display" class="text-lg text-gray-700 mb-4">आपकी रैंक: लोडिंग...</p>
+            
+            <div id="scoreboard-list-container" class="scoreboard-list">
+                <!-- स्कोरबोर्ड आइटम यहां डायनेमिक रूप से लोड होंगे -->
+                <p class="text-gray-500">लोड हो रहा है...</p>
+            </div>
+        </div>
+
+        <!-- Earn Screen -->
+        <div id="earn-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">सिक्के कमाएँ</h2>
+            <p class="text-lg text-gray-700 mb-4">विज्ञापन देखकर सिक्के कमाएँ!</p>
+            <button id="show-ad-btn" class="button-primary">विज्ञापन देखें</button>
+            <!-- Ad container for Ezmob ad -->
+            <div id="ezmob-ad-container" class="mt-4 w-full max-w-xs"></div>
+        </div>
+
+        <!-- Color Prediction Game Screen -->
+        <div id="color-prediction-game-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <div class="game-header">
+                <div class="user-info">
+                    <p>नाम: <span id="game-user-name" class="font-bold"></span></p>
+                    <p>सिक्के: <span id="game-user-coins" class="coins font-bold"></span></p>
+                </div>
+                <div class="timer-display" id="game-timer-display">15</div>
+            </div>
+
+            <div id="color-circle" class="color-circle"></div>
+            <p id="game-status-message" class="game-status-message mb-4">रंग का अनुमान लगाएँ!</p>
+
+            <div class="game-controls">
+                <input type="number" id="bet-amount-input" placeholder="शर्त राशि (सिक्के)" class="mb-2" min="1">
+                <div class="bet-buttons">
+                    <button id="bet-green-btn" class="bet-green">हरा (x3)</button>
+                    <button id="bet-red-btn" class="bet-red">लाल (x3)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Withdrawal Scheme Screen -->
+        <div id="withdrawal-scheme-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">ADBOSS निकासी योजना</h2>
+            <p class="text-lg text-gray-700 mb-6">अपने सिक्के भुनाएँ!</p>
+
+            <div class="withdrawal-card">
+                <p class="coins">100 सिक्के</p>
+                <p class="rupees">= ₹10</p>
+                <button onclick="window.selectWithdrawalScheme(100, 10)">निकासी करें</button>
+            </div>
+
+            <div class="withdrawal-card">
+                <p class="coins">200 सिक्के</p>
+                <p class="rupees">= ₹25</p>
+                <button onclick="window.selectWithdrawalScheme(200, 25)">निकासी करें</button>
+            </div>
+
+            <div class="withdrawal-card">
+                <p class="coins">300 सिक्के</p>
+                <p class="rupees">= ₹40</p>
+                <button onclick="window.selectWithdrawalScheme(300, 40)">निकासी करें</button>
+            </div>
+        </div>
+
+        <!-- UPI Input Screen -->
+        <div id="upi-input-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">अपनी UPI ID दर्ज करें</h2>
+            <p id="upi-amount-display" class="text-lg text-gray-700 mb-4"></p>
+            <input type="text" id="upi-id-input" placeholder="अपनी UPI ID दर्ज करें (उदाहरण: yourname@bank)" class="mb-4">
+            <button id="submit-upi-btn" class="button-primary">जमा करें</button>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">प्रोफ़ाइल</h2>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
+                <p class="text-lg font-semibold text-gray-700 mb-2">आपका नाम:</p>
+                <input type="text" id="profile-name-input" class="mb-2 w-full" placeholder="अपना नाम दर्ज करें">
+                <button id="save-name-btn" class="button-primary w-full max-w-none text-sm py-2">नाम सहेजें</button>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
+                <p class="text-lg font-semibold text-gray-700 mb-2">रेफरल कोड दर्ज करें:</p>
+                <input type="text" id="enter-referral-code-input" class="mb-2 w-full" placeholder="रेफरल कोड दर्ज करें">
+                <button id="apply-referral-btn" class="button-primary w-full max-w-none text-sm py-2 mb-2">रेफरल कोड लागू करें</button>
+                <p class="text-xs text-gray-500 mb-2 text-center">या</p>
+                <button id="get-referral-code-btn" class="button-secondary w-full max-w-none text-sm py-2">अपना रेफरल कोड प्राप्त करें</button>
+                <p id="my-referral-code-display" class="font-mono text-gray-600 break-all text-sm mt-2 hidden"></p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
+                <p class="text-lg font-semibold text-gray-700 mb-2">विशेष ऑफ़र:</p>
+                <ul class="list-disc list-inside text-gray-600 text-sm">
+                    <li>पहले रेफरल पर 50 सिक्के!</li>
+                    <li>दैनिक लॉगिन बोनस: 10 सिक्के</li>
+                    <li>विज्ञापन देखकर अधिक कमाएँ!</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
+                <p class="text-lg font-semibold text-gray-700 mb-2">हमारा चैनल:</p>
+                <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full max-w-none text-sm py-2 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-2">
+                        <path d="M19.5 2.25a1.5 1.5 0 011.5 1.5v16.5a1.5 1.5 0 01-1.5 1.5h-15a1.5 1.5 0 01-1.5-1.5V3.75a1.5 1.5 0 011.5-1.5h15zm-6 1.5H5.25v13.5h8.25V3.75zm.75 0v16.5h3.75a1.5 1.5 0 001.5-1.5V3.75a1.5 1.5 0 00-1.5-1.5h-3.75z" />
+                    </svg>
+                    चैनल चेक बायो
+                </a>
+            </div>
+
+            <button id="logout-btn" class="button-primary bg-red-500 hover:bg-red-600">लॉगआउट</button>
+        </div>
+    </div>
+
+    <div id="message-box" class="message-box">
+        <p id="message-text" class="text-lg mb-4"></p>
+        <button id="message-box-ok-btn">ठीक है</button>
+    </div>
+
+    <nav id="bottom-nav" class="bottom-nav hidden">
+        <div id="nav-home" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125h9.75a1.125 1.125 0 001.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+            <span>होम</span>
+        </div>
+        <div id="nav-earn" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H4.5M7.5 14.25v2.25m4.5-4.5v4.5m4.5-1.125v1.125m2.25-13.5V4.5m1.5-2.25V4.5m-1.5 0h-1.5M4.5 9.75v.75m.75-1.5h2.25m-.75 0l-2.25-2.25m-.75 0l2.25 2.25m4.5-1.5h-2.25m.75 0l2.25 2.25m-.75 0l-2.25-2.25M12 1.5v2.25m4.5 1.5V3.75m-1.5-2.25V3.75m-1.5 0h-1.5M19.5 9.75v.75m.75-1.5h2.25m-.75 0l-2.25-2.25m-.75 0l2.25 2.25m-4.5-1.5h-2.25m.75 0l2.25 2.25m-.75 0l-2.25-2.25M12 1.5v2.25m-4.5 1.5V3.75m-1.5-2.25V3.75m-1.5 0h-1.5" />
+            </svg>
+            <span>कमाएँ</span>
+        </div>
+        <div id="nav-game" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0h.008v.008H21V5.25zM3 5.25h-.008v.008H3V5.25zm2.25 0h.008v.008H5.25V5.25zm-.008 9.75H5.25V15h.008v-.008zm7.5-9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 12a.75.75 0 100-1.5.75.75 0 000 1.5zM12 15a.75.75 0 100-1.5.75.75 0 000 1.5z" />
+            </svg>
+            <span>गेम</span>
+        </div>
+        <div id="nav-profile" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <span>प्रोफ़ाइल</span>
+        </div>
+    </nav>
+
+    <div id="loading-screen" class="active">
+        <div class="spinner"></div>
+        <p class="text-lg text-gray-700">ADBOSS लोड हो रहा है...</p>
+    </div>
+    
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js"; // Removed Analytics import
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3faZ16ZTsIUBEfI9dl55RnDklVeWIHts",
+            authDomain: "arvind-dara.firebaseapp.com",
+            projectId: "arvind-dara", // Corrected projectId
+            storageBucket: "arvind-dara.firebasestorage.app",
+            messagingSenderId: "341922555843",
+            appId: "1:341922555843:web:cefd0e44e5d8afae4fbf76",
+            measurementId: "G-FDSW4BEXDF"
+        };
+
+        // Firebase instances
+        let app;
+        let db;
+        let auth;
+        // let analytics; // Removed analytics variable
+        let firebaseAuthUid = null; // Firebase Auth UID (can be anonymous and change on refresh)
+        let applicationUserId = null; // This is the ID we save in localStorage and use in Firestore
+        let currentUserName = "उपयोगकर्ता"; // To store the current user's name
+        let currentUserCoins = 0; // To store the current user's coins
+        let userCreatedAt = null; // To store the user account creation date
+        let firebaseReady = false; // Flag to indicate Firebase is ready
+
+        // Global variable to store screen history
+        let screenHistory = [];
+
+        // Variables to hold selected withdrawal details
+        let selectedCoinsToDeduct = 0;
+        let selectedRupeesToGet = 0;
+
+        // DOM Elements
+        const introScreen = document.getElementById('intro-screen');
+        const mainScreen = document.getElementById('main-screen');
+        const newUserNameInput = document.getElementById('new-user-name-input');
+        const existingUserIdInput = document.getElementById('existing-user-id-input');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const displayUserId = document.getElementById('display-user-id');
+        const copyIdBtn = document.getElementById('copy-id-btn');
+        const userCoinsSpan = document.getElementById('user-coins');
+        const withdrawalBtn = document.getElementById('withdrawal-btn');
+        const earnScreen = document.getElementById('earn-screen');
+        const showAdBtn = document.getElementById('show-ad-btn');
+        const bottomNav = document.getElementById('bottom-nav');
+        const navHome = document.getElementById('nav-home');
+        const navEarn = document.getElementById('nav-earn');
+        const navGame = document.getElementById('nav-game'); // New game nav item
+        const navProfile = document.getElementById('nav-profile');
+        const currentTimeSpan = document.getElementById('current-time');
+        const accountAgeBtn = document.getElementById('account-age-btn');
+        const containerElement = document.querySelector('.container'); // Get the main container
+
+        const profileScreen = document.getElementById('profile-screen');
+        const profileNameInput = document.getElementById('profile-name-input');
+        const saveNameBtn = document.getElementById('save-name-btn');
+        const enterReferralCodeInput = document.getElementById('enter-referral-code-input');
+        const applyReferralBtn = document.getElementById('apply-referral-btn');
+        const getReferralCodeBtn = document.getElementById('get-referral-code-btn');
+        const myReferralCodeDisplay = document.getElementById('my-referral-code-display');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const messageBoxOkBtn = document.getElementById('message-box-ok-btn');
+        const loadingScreen = document.getElementById('loading-screen'); // Loading screen DOM element
+
+        const withdrawalSchemeScreen = document.getElementById('withdrawal-scheme-screen'); // Withdrawal scheme screen
+        const upiInputScreen = document.getElementById('upi-input-screen'); // UPI Input screen
+        const upiAmountDisplay = document.getElementById('upi-amount-display'); // UPI Amount display
+        const upiIdInput = document.getElementById('upi-id-input'); // UPI ID input
+        const submitUpiBtn = document.getElementById('submit-upi-btn'); // UPI submit button
+
+        const scoreboardBtn = document.getElementById('scoreboard-btn'); // Scoreboard button
+        const scoreboardScreen = document.getElementById('scoreboard-screen'); // Scoreboard screen
+        const scoreboardListContainer = document.getElementById('scoreboard-list-container'); // Scoreboard list container
+        const myRankDisplay = document.getElementById('my-rank-display'); // My rank display
+
+        // Color Prediction Game DOM Elements
+        const colorPredictionGameScreen = document.getElementById('color-prediction-game-screen');
+        const gameUserName = document.getElementById('game-user-name');
+        const gameUserCoins = document.getElementById('game-user-coins');
+        const colorCircle = document.getElementById('color-circle');
+        const gameTimerDisplay = document.getElementById('game-timer-display');
+        const gameStatusMessage = document.getElementById('game-status-message');
+        const betAmountInput = document.getElementById('bet-amount-input');
+        const betGreenBtn = document.getElementById('bet-green-btn');
+        const betRedBtn = document.getElementById('bet-red-btn');
+
+        // Ezmob Ad Container
+        const ezmobAdContainer = document.getElementById('ezmob-ad-container');
+
+        let timeUpdateInterval; // Interval ID for time update
+
+        // Game specific variables
+        let gameCountdown = 15;
+        let gameInterval;
+        let colorChangeTimeout;
+        let selectedBetColor = null;
+        let isBettingOpen = true; // Flag to control betting during countdown
+
+        // Function to show loading screen
+        function showLoadingScreen() {
+            loadingScreen.classList.remove('hidden');
+            loadingScreen.classList.add('active');
+        }
+
+        // Function to hide loading screen
+        function hideLoadingScreen() {
+            loadingScreen.classList.add('hidden');
+            loadingScreen.classList.remove('active');
+        }
+
+        // Function to show a specific screen and hide others
+        function showScreen(screenToShowElement) {
+            const currentActiveScreen = document.querySelector('.screen.active');
+
+            // Only push to history if we are moving from a non-intro/non-main screen to another screen
+            // and the target screen is not the one we are currently on.
+            // Also, if we are going to main-screen, clear history to prevent infinite loops.
+            if (currentActiveScreen && currentActiveScreen.id !== screenToShowElement.id) {
+                if (currentActiveScreen.id !== 'intro-screen' && currentActiveScreen.id !== 'main-screen') {
+                    screenHistory.push(currentActiveScreen.id);
+                } else if (screenToShowElement.id === 'main-screen' || screenToShowElement.id === 'intro-screen') {
+                    screenHistory = []; // Clear history when going back to main or intro
+                }
+            }
+
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            screenToShowElement.classList.add('active');
+
+            // Show/hide bottom nav
+            if (['home-screen', 'earn-screen', 'profile-screen', 'scoreboard-screen', 'color-prediction-game-screen'].includes(screenToShowElement.id)) {
+                bottomNav.classList.remove('hidden');
+                if (screenToShowElement.id === 'home-screen') {
+                    startCurrentTimeUpdate();
+                } else {
+                    stopCurrentTimeUpdate();
+                }
+            } else {
+                bottomNav.classList.add('hidden');
+                stopCurrentTimeUpdate();
+            }
+
+            // Show/hide back button
+            const backButtons = document.querySelectorAll('.back-button');
+            backButtons.forEach(btn => {
+                if (screenToShowElement.id === 'main-screen' || screenToShowElement.id === 'intro-screen' || screenToShowElement.id === 'home-screen') {
+                    btn.style.display = 'none'; // Hide back button on main, intro, and home screens
+                } else {
+                    btn.style.display = 'flex'; // Show back button on other screens
+                }
+            });
+        }
+
+        // Function to go back to the previous screen
+        window.goBack = function() { // Made goBack global
+            if (screenHistory.length > 0) {
+                const previousScreenId = screenHistory.pop();
+                const previousScreenElement = document.getElementById(previousScreenId);
+                if (previousScreenElement) {
+                    // If going back from game screen, stop game loop
+                    if (document.querySelector('.screen.active').id === 'color-prediction-game-screen') {
+                        stopGameLoop();
+                    }
+                    showScreen(previousScreenElement);
+                } else {
+                    // Fallback if previous screen element not found (shouldn't happen with correct IDs)
+                    showScreen(mainScreen);
+                    screenHistory = []; // Clear history if fallback to main
+                }
+            } else {
+                // If history is empty, and we are not on main/intro, go to main.
+                const currentActiveScreen = document.querySelector('.screen.active');
+                if (currentActiveScreen.id !== 'main-screen' && currentActiveScreen.id !== 'intro-screen') {
+                    showScreen(mainScreen);
+                }
+            }
+        }
+
+        // Function to go directly to the home screen
+        window.goBackToHome = function() {
+            showHomePage(currentUserName, applicationUserId, currentUserCoins);
+            screenHistory = []; // Clear history when going to home
+        }
+
+        // Function to display a custom message box
+        function showMessage(message, callback = null) {
+            messageText.textContent = message;
+            messageBox.classList.add('active');
+            messageBoxOkBtn.onclick = () => {
+                messageBox.classList.remove('active');
+                if (callback) callback();
+            };
+        }
+
+        // Initialize and authenticate Firebase
+        async function initializeFirebase() {
+            showLoadingScreen(); // Show loading screen before Firebase initialization
+            try {
+                // Check if firebaseConfig is properly set up
+                if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+                    console.error("Firebase कॉन्फ़िगरेशन अधूरा है। कृपया सुनिश्चित करें कि apiKey और projectId प्रदान किए गए हैं।");
+                    showMessage("Firebase कॉन्फ़िगरेशन उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।");
+                    hideLoadingScreen(); // Hide loading screen on error
+                    return;
+                }
+
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                // analytics = getAnalytics(app); // Removed Analytics initialization
+
+                // Listen for authentication state changes to get the current Firebase Auth UID
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        firebaseAuthUid = user.uid;
+                        console.log("Firebase प्रमाणित। Firebase Auth UID:", firebaseAuthUid);
+                        const storedAppUserId = localStorage.getItem('adbossAppUserId');
+                        if (storedAppUserId) {
+                            applicationUserId = storedAppUserId;
+                            await loadUserData(applicationUserId); // Load data with stored ID
+                        } else {
+                            // If Firebase user exists but no appUserId in localStorage (e.g., first anonymous session)
+                            // We still want to show the main screen for login/signup
+                            console.log("onAuthStateChanged: Firebase user exists, but no appUserId in localStorage. Showing main screen.");
+                            showScreen(mainScreen);
+                        }
+                    } else {
+                        // User is null (signed out or no session)
+                        firebaseAuthUid = null;
+                        applicationUserId = null;
+                        currentUserName = "उपयोगकर्ता";
+                        currentUserCoins = 0;
+                        userCreatedAt = null;
+                        console.log("Firebase is not authenticated.");
+
+                        const storedAppUserId = localStorage.getItem('adbossAppUserId');
+                        if (!storedAppUserId) {
+                            // If no user in Firebase and no app ID in local storage,
+                            // it means a full reset or initial load.
+                            // Ensure an anonymous session is established for Firestore rules to work.
+                            try {
+                                await signInAnonymously(auth);
+                                console.log("New anonymous session established after logout/initial load.");
+                                // onAuthStateChanged will fire again with the new anonymous user.
+                                // So we don't need to call showScreen(mainScreen) here directly.
+                            } catch (anonError) {
+                                console.error("Error signing in anonymously:", anonError);
+                                showMessage(`प्रमाणीकरण में त्रुटि: ${anonError.message}`);
+                                showScreen(mainScreen); // Fallback to main screen even if anonymous sign-in fails
+                            }
+                        } else {
+                            // If user is null but appUserId is in localStorage,
+                            // it means the Firebase session expired but app still thinks it has a user.
+                            // This case should be handled by loadUserData which will clear localStorage if ID is invalid.
+                            // For now, just show main screen.
+                            showScreen(mainScreen);
+                        }
+                    }
+                    firebaseReady = true; // Firebase is ready after this state check
+                    hideLoadingScreen(); // Hide loading screen once state is processed
+                });
+
+                // Initial anonymous sign-in attempt (if not already authenticated)
+                // This is important for the first load of the app.
+                if (!auth.currentUser) {
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("Initial anonymous sign-in attempt.");
+                    } catch (authError) {
+                        if (authError.code === 'auth/admin-restricted-operation') {
+                            console.error("Firebase authentication error: Anonymous authentication is not enabled in your Firebase project. Please enable it under Firebase Console -> Authentication -> Sign-in method.");
+                            showMessage("Firebase प्रमाणीकरण त्रुटि: आपके Firebase प्रोजेक्ट में गुमनाम प्रमाणीकरण सक्षम नहीं है। कृपया इसे Firebase कंसोल में प्रमाणीकरण -> साइन-in विधि के तहत सक्षम करें।");
+                        } else {
+                            console.error("Firebase authentication failed:", authError);
+                            showMessage(`Firebase प्रमाणीकरण में त्रुटि: ${authError.message}`);
+                        }
+                        hideLoadingScreen(); // Hide loading screen on authentication error
+                    }
+                }
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                showMessage(`Firebase आरंभ करने में त्रुटि: ${error.message}`);
+                hideLoadingScreen(); // Hide loading screen on initialization error
+            }
+        }
+
+        // Function to load user data
+        async function loadUserData(appUserIdToLoad) {
+            if (!db || !firebaseAuthUid) { // Also check for firebaseAuthUid availability
+                console.error("Firestore database or Firebase Auth UID not available.");
+                return;
+            }
+            const userRef = doc(collection(db, `users`), appUserIdToLoad);
+            try {
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    
+                    currentUserName = userData.name || "उपयोगकर्ता";
+                    currentUserCoins = userData.coins || 0;
+                    userCreatedAt = userData.createdAt ? new Date(userData.createdAt) : null; // Load creation date
+                    applicationUserId = appUserIdToLoad; // Ensure current application ID is set
+                    console.log("loadUserData: User data loaded successfully for:", applicationUserId, "Name:", currentUserName, "Coins:", currentUserCoins);
+                    showHomePage(currentUserName, applicationUserId, currentUserCoins);
+                } else {
+                    // If user data does not exist (e.g., an invalid stored ID), show main screen
+                    localStorage.removeItem('adbossAppUserId'); // Remove invalid ID
+                    console.warn("loadUserData: User document not found for ID:", appUserIdToLoad, "Removing from localStorage.");
+                    showMessage("आपकी संग्रहीत उपयोगकर्ता ID नहीं मिली। कृपया एक नया खाता बनाएँ या फिर से लॉग इन करें।", () => {
+                        showScreen(mainScreen);
+                    });
+                }
+            } catch (error) {
+                console.error("Error loading user data:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("उपयोगकर्ता डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`उपयोगकर्ता डेटा लोड करने में त्रुटि: ${error.message}`);
+                }
+            }
+        }
+
+        // Function to generate a unique ID
+        function generateUniqueId() {
+            return crypto.randomUUID(); // Generates a UUID
+        }
+
+        // Function to create a new user
+        async function createNewUser() {
+            const name = newUserNameInput.value.trim();
+            if (!name) {
+                showMessage("कृपया अपना पूरा नाम दर्ज करें");
+                return;
+            }
+
+            // Ensure Firebase is ready and firebaseAuthUid is available
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+
+            try {
+                // Generate user ID
+                const newUserId = generateUniqueId();
+                
+                // Create user document
+                await setDoc(doc(db, "users", newUserId), {
+                    name: name,
+                    userId: newUserId,
+                    coins: 0, // Starting bonus set to 0 as requested
+                    createdAt: new Date().toISOString(),
+                    firebaseAuthUid: firebaseAuthUid, // Save current Firebase Auth UID
+                    referralApplied: false
+                });
+
+                // Store user ID locally
+                localStorage.setItem('adbossAppUserId', newUserId);
+                applicationUserId = newUserId;
+                currentUserName = name;
+                currentUserCoins = 0; // Update current coins to 0
+                userCreatedAt = new Date(); // Set creation date
+                
+                showMessage("खाता सफलतापूर्वक बन गया!", () => {
+                    showHomePage(name, newUserId, 0);
+                });
+                newUserNameInput.value = ''; // Clear input
+            } catch (error) {
+                console.error("Error creating user:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("खाता बनाने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`खाता बनाने में त्रुटि: ${error.message}`);
+                }
+            }
+        }
+
+        // Function to log in an existing user
+        async function loginExistingUser() {
+            const userId = existingUserIdInput.value.trim();
+            if (!userId) {
+                showMessage("कृपया अपनी User ID दर्ज करें");
+                return;
+            }
+
+            // Ensure Firebase is ready and firebaseAuthUid is available
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, "users", userId));
+                
+                if (!userDoc.exists()) {
+                    showMessage("यह User ID मौजूद नहीं है");
+                    existingUserIdInput.value = ''; // Clear input
+                    return;
+                }
+
+                const userData = userDoc.data();
+                
+                // Successful login
+                localStorage.setItem('adbossAppUserId', userId);
+                applicationUserId = userId;
+                currentUserName = userData.name;
+                currentUserCoins = userData.coins || 0;
+                userCreatedAt = userData.createdAt ? new Date(userData.createdAt) : null; // Load creation date
+                
+                showHomePage(currentUserName, userId, currentUserCoins);
+                existingUserIdInput.value = ''; // Clear input
+            } catch (error) {
+                console.error("Login error:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("लॉगिन में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`लॉगिन में त्रुटि: ${error.message}`);
+                }
+                existingUserIdInput.value = ''; // Clear input on error
+            }
+        }
+
+        // Function to display the home page
+        function showHomePage(userName, userId, coins) {
+            console.log("showHomePage called with:", { userName, userId, coins }); // Add logging
+            welcomeMessage.textContent = `नमस्ते, ${userName}!`;
+            displayUserId.textContent = userId;
+            userCoinsSpan.textContent = coins;
+            showScreen(document.getElementById('home-screen'));
+            // Activate Home on navigation bar
+            navHome.classList.add('active');
+            navEarn.classList.remove('active');
+            navGame.classList.remove('active'); // Deactivate game
+            navProfile.classList.remove('active'); // Deactivate Profile
+            // Update "You Old" button
+            if (userCreatedAt) {
+                accountAgeBtn.textContent = 'आप पुराने हैं';
+            } else {
+                accountAgeBtn.textContent = 'खाता: नया'; // If creation date not found
+            }
+        }
+
+        // Function to update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            currentTimeSpan.textContent = `समय: ${now.toLocaleTimeString('hi-IN', options)}`;
+        }
+
+        // Function to show detailed account age
+        function showDetailedAccountAge() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) { // Ensure applicationUserId is available
+                showMessage("खाता आयु देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+            if (userCreatedAt) {
+                const now = new Date();
+                const diffMs = Math.abs(now - userCreatedAt); // Difference in milliseconds
+
+                const minutes = Math.floor(diffMs / (1000 * 60));
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+
+                const remainingHours = hours % 24;
+                const remainingMinutes = minutes % 60;
+
+                let ageMessage = `आपका खाता ${days} दिन, ${remainingHours} घंटे, और ${remainingMinutes} मिनट पुराना है।`;
+                showMessage(ageMessage);
+            } else {
+                showMessage("आपके खाते की निर्माण तिथि उपलब्ध नहीं है।");
+            }
+        }
+
+        // Start time update
+        function startCurrentTimeUpdate() {
+            if (timeUpdateInterval) {
+                clearInterval(timeUpdateInterval); // Clear if already running
+            }
+            updateCurrentTime(); // Update immediately
+            timeUpdateInterval = setInterval(updateCurrentTime, 1000); // Update every second
+        }
+
+        // Stop time update
+        function stopCurrentTimeUpdate() {
+            if (timeUpdateInterval) {
+                clearInterval(timeUpdateInterval);
+                timeUpdateInterval = null;
+            }
+        }
+
+        // Function to copy user ID to clipboard
+        function copyUserId() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            const userIdText = displayUserId.textContent;
+            if (userIdText) {
+                // Always use document.execCommand('copy')
+                const textArea = document.createElement("textarea");
+                textArea.value = userIdText;
+                textArea.style.position = "fixed"; // Keep off-screen
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showMessage("उपयोगकर्ता ID कॉपी हो गई!");
+                } catch (err) {
+                    console.error('क्लिपबोर्ड पर कॉपी करने में विफल:', err);
+                    showMessage("ID कॉपी करने में विफल। कृपया मैन्युअल रूपally कॉपी करें।");
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // Handler for withdrawal button
+        function handleWithdrawal() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            // Show withdrawal scheme screen
+            showScreen(withdrawalSchemeScreen);
+        }
+
+        // Function to select withdrawal scheme
+        window.selectWithdrawalScheme = async function(coins, rupees) {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) {
+                showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+
+            if (currentUserCoins >= coins) {
+                selectedCoinsToDeduct = coins;
+                selectedRupeesToGet = rupees;
+                upiAmountDisplay.textContent = `आप ₹${rupees} प्राप्त करेंगे।`;
+                showScreen(upiInputScreen);
+            } else {
+                showMessage(`आपके पास पर्याप्त सिक्के नहीं हैं। आपको ₹${rupees} प्राप्त करने के लिए ${coins} सिक्के चाहिए, लेकिन आपके पास केवल ${currentUserCoins} सिक्के हैं।`);
+            }
+        }
+
+        // UPI ID जमा करने और निकासी अनुरोध बनाने के लिए फ़ंक्शन
+        async function submitUpiId() {
+            const upiId = upiIdInput.value.trim();
+            if (!upiId) {
+                showMessage("कृपया अपनी UPI ID दर्ज करें।");
+                return;
+            }
+
+            if (!db || !applicationUserId) {
+                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
+                return;
+            }
+
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            console.log("submitUpiId: Attempting to update coins for userId:", applicationUserId, "with firebaseAuthUid:", firebaseAuthUid);
+            try {
+                // Deduct coins
+                currentUserCoins -= selectedCoinsToDeduct;
+                await updateDoc(userRef, {
+                    coins: currentUserCoins
+                });
+                userCoinsSpan.textContent = currentUserCoins; // Update UI
+
+                // Save withdrawal request to Firestore
+                console.log("submitUpiId: Attempting to add withdrawal request with userId:", applicationUserId, "and firebaseAuthUid:", firebaseAuthUid);
+                await addDoc(collection(db, `withdrawalRequests`), {
+                    userId: applicationUserId,
+                    userName: currentUserName,
+                    upiId: upiId,
+                    coinsDeducted: selectedCoinsToDeduct,
+                    rupeesToPay: selectedRupeesToGet,
+                    requestTime: new Date().toISOString(),
+                    status: 'Pending',
+                    firebaseAuthUid: firebaseAuthUid
+                });
+                console.log("Withdrawal request added successfully.");
+
+                upiIdInput.value = ''; // Clear UPI input
+
+                showMessage("आपका पैसा 24 घंटे में आ जाएगा!", () => {
+                    // Go to home screen after message box closes
+                    setTimeout(() => {
+                        showHomePage(currentUserName, applicationUserId, currentUserCoins);
+                    }, 5000); // Go to home screen after 5 seconds
+                });
+            } catch (error) {
+                console.error("निकासी संसाधित करने में त्रुटि:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("निकासी संसाधित करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
+                }
+            }
+        }
+
+        // विज्ञापन देखें बटन के लिए हैंडलर
+        async function handleShowAd() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            
+            // Load and show Ezmob ad
+            // Remove any existing script to prevent multiple loads
+            const existingEzmobScript = document.getElementById('ezmob-script');
+            if (existingEzmobScript) {
+                existingEzmobScript.remove();
+            }
+
+            showMessage("विज्ञापन लोड हो रहा है... कृपया प्रतीक्षा करें।");
+
+            // Create a temporary script element to load the Ezmob ad
+            const ezmobScript = document.createElement('script');
+            ezmobScript.id = 'ezmob-script'; // Add an ID for easy removal
+            ezmobScript.innerHTML = `
+                (function(i,n,p,a,g,e){
+                    i.inpagepush = i.inpagepush || function() {
+                        (i.inpagepush.q=(i.inpagepush.q||[])).push(arguments)
+                    };
+                    var s=n.getElementsByTagName('head')[0];
+                    var q=n.createElement('script'); q.async=1;
+                    q.src='//static.ezmob.com/inpage/inpage.js';
+                    s.appendChild(q);
+                    q.onload = function() { // Ensure the script is loaded before calling init/show
+                        i.inpagepush('init', {
+                            host: 'xml.qualiclicks.com',
+                            feed: 840837,
+                            auth : 'Zqis',
+                            subid: 'site1',
+                            refresh: 90,
+                            position: 'bottom',
+                            position_mobile: 'bottom',
+                            slots: 1,
+                            query : '',
+                            nodesrc : true
+                        });
+                        i.inpagepush('show');
+                        console.log("Ezmob ad script loaded and attempting to show ad.");
+                        // Hide the message box after a short delay to allow ad to render
+                        setTimeout(() => {
+                            messageBox.classList.remove('active');
+                        }, 1000); // 1 second delay
+                    };
+                    q.onerror = function() {
+                        console.error("Failed to load Ezmob ad script.");
+                        showMessage("विज्ञापन लोड करने में त्रुटि हुई। कृपया बाद में पुनः प्रयास करें।");
+                    };
+                })(window, document);
+            `;
+            document.body.appendChild(ezmobScript);
+
+            // After a delay (simulating ad view completion), award coins
+            setTimeout(async () => {
+                if (db && applicationUserId) { // Use applicationUserId
+                    const userRef = doc(collection(db, `users`), applicationUserId);
+                    console.log("handleShowAd: Attempting to update coins for userId:", applicationUserId, "with firebaseAuthUid:", firebaseAuthUid);
+                    try {
+                        // उपयोगकर्ता के सिक्के बढ़ाएँ
+                        currentUserCoins += 10; // उदाहरण के लिए 10 सिक्के जोड़ें
+                        await updateDoc(userRef, {
+                            coins: currentUserCoins
+                        });
+                        userCoinsSpan.textContent = currentUserCoins; // UI अपडेट करें
+                        gameUserCoins.textContent = currentUserCoins; // Game UI भी अपडेट करें
+                        showMessage(`आपको 10 सिक्के मिले! आपके पास अब ${currentUserCoins} सिक्के हैं।`);
+                    } catch (error) {
+                        console.error("सिक्के अपडेट करने में त्रुटि:", error);
+                        if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                            showMessage("सिक्के अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                        } else {
+                            showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+                        }
+                    }
+                } else {
+                    showMessage("Firebase तैयार नहीं है या उपयोगकर्ता प्रमाणित नहीं है।");
+                }
+            }, 5000); // 5 सेकंड के बाद सिक्के बढ़ाएं (विज्ञापन देखने का अनुकरण)
+        }
+
+        // प्रोफाइल स्क्रीन के लिए फंक्शन
+        function showProfileScreen() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) {
+                showMessage("कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+            profileNameInput.value = currentUserName; // इनपुट फील्ड में वर्तमान नाम सेट करें
+            // रेफरल कोड इनपुट और बटन की स्थिति सेट करें
+            // Firestore से उपयोगकर्ता डेटा को फिर से लोड करें ताकि referralApplied स्थिति अपडेटेड रहे
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            getDoc(userRef).then(userSnap => {
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    if (userData.referralApplied) {
+                        enterReferralCodeInput.value = ""; // इनपुट खाली करें
+                        enterReferralCodeInput.placeholder = "रेफरल पहले ही उपयोग किया जा चुका है";
+                        enterReferralCodeInput.disabled = true;
+                        applyReferralBtn.disabled = true;
+                    } else {
+                        enterReferralCodeInput.disabled = false;
+                        applyReferralBtn.disabled = false;
+                        enterReferralCodeInput.placeholder = "रेferral कोड दर्ज करें";
+                    }
+                }
+            }).catch(error => {
+                console.error("प्रोफ़ाइल डेटा लोड करने में त्रुटि:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("प्रोफ़ाइल डेटा लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`प्रोफ़ाइल डेटा लोड करने में त्रुटि: ${error.message}`);
+                }
+            });
+            
+            myReferralCodeDisplay.classList.add('hidden'); // अपना रेफरल कोड शुरू में छिपाएं
+            showScreen(profileScreen);
+            navProfile.classList.add('active');
+            navHome.classList.remove('active');
+            navEarn.classList.remove('active');
+            navGame.classList.remove('active'); // Deactivate game
+        }
+
+        // नाम अपडेट करने के लिए फंक्शन
+        async function updateUserName() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            const newName = profileNameInput.value.trim();
+            if (!newName) {
+                showMessage(" कृपया एक वैध नाम दर्ज करें।");
+                return;
+            }
+            if (newName === currentUserName) {
+                showMessage("नाम पहले से ही अपडेटेड है।");
+                return;
+            }
+
+            if (!db || !applicationUserId) {
+                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें.");
+                return;
+            }
+
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            console.log("updateUserName: Attempting to update name for userId:", applicationUserId, "with firebaseAuthUid:", firebaseAuthUid);
+            try {
+                await updateDoc(userRef, {
+                    name: newName
+                });
+                currentUserName = newName;
+                welcomeMessage.textContent = `नमस्ते, ${currentUserName}!`; // होम स्क्रीन पर नाम अपडेट करें
+                showMessage("आपका नाम सफलतापूर्वक अपडेट हो गया है!");
+            } catch (error) {
+                console.error("नाम अपडेट करने में त्रुटि:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("नाम अपडेट करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`नाम अपडेट करने में त्रुटि: ${error.message}`);
+                }
+            }
+        }
+
+        // रेफरल कोड लागू करने के लिए फंक्शन
+        async function applyReferralCode() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            const enteredCode = enterReferralCodeInput.value.trim();
+            if (!enteredCode) {
+                showMessage(" कृपया एक रेफरल कोड दर्ज करें।");
+                return;
+            }
+
+            if (!db || !applicationUserId) {
+                showMessage("Firebase अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें।");
+                return;
+            }
+
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            console.log("applyReferralCode: Attempting to apply referral for userId:", applicationUserId, "with firebaseAuthUid:", firebaseAuthUid);
+            try {
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    if (userData.referralApplied) {
+                        showMessage("आपने पहले ही एक रेफरल कोड का उपयोग कर लिया है।");
+                        return;
+                    }
+
+                    if (enteredCode === "ADBOSSNEWUSER") {
+                        currentUserCoins += 20; // Add 20 coins
+                        await updateDoc(userRef, {
+                            coins: currentUserCoins,
+                            referralApplied: true // Mark referral as applied
+                        });
+                        userCoinsSpan.textContent = currentUserCoins; // Update UI
+                        gameUserCoins.textContent = currentUserCoins; // Game UI भी अपडेट करें
+                        showMessage("रेफरल कोड सफलतापूर्वक लागू हुआ! आपको 20 सिक्के मिले!");
+                        enterReferralCodeInput.disabled = true;
+                        applyReferralBtn.disabled = true;
+                        enterReferralCodeInput.value = ""; // Clear input
+                        enterReferralCodeInput.placeholder = "रेफरल पहले ही उपयोग किया जा चुका है";
+                    } else {
+                        showMessage("अमान्य रेफरल कोड।");
+                    }
+                }
+            } catch (error) {
+                console.error("रेफरल कोड लागू करने में त्रुटि:", error);
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("रेफरल कोड लागू करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं। कृपया सुनिश्चित करें कि आपके Firestore सुरक्षा नियम सही ढंग से सेट और प्रकाशित हैं।");
+                } else {
+                    showMessage(`रेफरal कोड लागू करने में त्रुटि: ${error.message}`);
+                }
+            }
+        }
+
+        // अपना रेफरल कोड प्रदर्शित करने के लिए फंक्शन
+        function displayOwnReferralCode() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) {
+                showMessage("आपका रेफरल कोड प्राप्त करने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+            myReferralCodeDisplay.textContent = applicationUserId;
+            myReferralCodeDisplay.classList.remove('hidden');
+            showMessage("यह आपका रेफरल कोड है। इसे दोस्तों के साथ साझा करें!");
+        }
+
+        // लॉगआउट फंक्शन
+        async function handleLogout() {
+            // Hide main container and bottom nav immediately
+            if (containerElement) containerElement.style.display = 'none';
+            if (bottomNav) bottomNav.classList.add('hidden');
+            
+            showLoadingScreen(); // Show loading screen immediately on logout
+            try {
+                await signOut(auth); // Sign out from Firebase Auth
+                localStorage.removeItem('adbossAppUserId'); // Clear local user ID
+                
+                // Reset in-memory user state
+                applicationUserId = null;
+                currentUserName = "उपयोगकर्ता";
+                currentUserCoins = 0;
+                userCreatedAt = null;
+                
+                // Clear screen history and stop time updates
+                screenHistory = [];
+                stopGameLoop(); // Stop game loop if active
+                stopCurrentTimeUpdate(); // Stop time update if active
+
+                // Force a full page reload to reset the app completely after a short delay
+                setTimeout(() => {
+                    location.reload(); 
+                }, 300); // 300ms delay to allow loading screen to render
+
+            } catch (error) {
+                console.error("Error logging out:", error);
+                showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
+                hideLoadingScreen(); // Ensure loading screen is hidden if an error occurs
+                // If an error occurs, bring back the UI (if it was hidden)
+                if (containerElement) containerElement.style.display = 'flex';
+            }
+        }
+
+        // स्कोरबोर्ड स्क्रीन दिखाने के लिए फ़ंक्शन
+        async function showScoreboardScreen() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) {
+                showMessage("स्कोरबोर्ड देखने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+
+            showScreen(scoreboardScreen);
+            navHome.classList.remove('active');
+            navEarn.classList.remove('active');
+            navGame.classList.remove('active');
+            navProfile.classList.remove('active');
+
+            scoreboardListContainer.innerHTML = '<p class="text-gray-500">लोड हो रहा है...</p>';
+            myRankDisplay.textContent = 'आपकी रैंक: लोडिंग...';
+
+            try {
+                const usersRef = collection(db, "users");
+                // orderBy("coins", "desc") के लिए Firestore कंसोल में एक इंडेक्स बनाना सुनिश्चित करें
+                const q = query(usersRef, orderBy("coins", "desc")); 
+
+                const querySnapshot = await getDocs(q);
+                const users = [];
+                querySnapshot.forEach((doc) => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort users by coins in descending order (already done by query, but good for safety)
+                users.sort((a, b) => b.coins - a.coins);
+
+                scoreboardListContainer.innerHTML = ''; // Clear existing content
+
+                if (users.length === 0) {
+                    scoreboardListContainer.innerHTML = '<p class="text-gray-500">कोई उपयोगकर्ता नहीं मिला।</p>';
+                    myRankDisplay.textContent = 'आपकी रैंक: N/A';
+                    return;
+                }
+
+                let myRank = -1;
+                users.forEach((user, index) => {
+                    if (user.userId === applicationUserId) {
+                        myRank = index + 1;
+                    }
+                    const scoreboardItem = document.createElement('div');
+                    scoreboardItem.classList.add('scoreboard-item');
+                    if (user.userId === applicationUserId) {
+                        scoreboardItem.classList.add('current-user');
+                    }
+                    scoreboardItem.innerHTML = `
+                        <span class="rank">${index + 1}.</span>
+                        <span class="name">${user.name}</span>
+                        <span class="coins">${user.coins} सिक्के</span>
+                    `;
+                    scoreboardListContainer.appendChild(scoreboardItem);
+                });
+
+                if (myRank !== -1) {
+                    myRankDisplay.textContent = `आपकी रैंक: ${myRank} / ${users.length}`;
+                } else {
+                    // This case should ideally not happen if the current user is in the database
+                    myRankDisplay.textContent = 'आपकी रैंक: सूची में नहीं (त्रुटि)';
+                    console.warn("Current user not found in scoreboard list, even though logged in.");
+                }
+
+            } catch (error) {
+                console.error("स्कोरबोर्ड लोड करने में त्रुटि:", error);
+                // यदि 'permission-denied' या इंडेक्स गायब होने की त्रुटि है
+                if (error.code === 'permission-denied' || (error.code === 'FirebaseError' && error.message.includes('Missing or insufficient permissions'))) {
+                    showMessage("स्कोरबोर्ड लोड करने में त्रुटि: Firebase अनुमतियाँ अपर्याप्त हैं या 'coins' फ़ील्ड पर एक इंडेक्स गायब है। कृपया Firebase कंसोल में Firestore सुरक्षा नियम और इंडेक्स सेटिंग्स की जाँच करें।");
+                } else {
+                    showMessage(`स्कोरबोर्ड लोड करने में त्रुटि: ${error.message}`);
+                }
+                scoreboardListContainer.innerHTML = '<p class="text-red-500">स्कोरबोर्ड लोड करने में त्रुटि।</p>';
+                myRankDisplay.textContent = 'आपकी रैंक: त्रुटि';
+            }
+        }
+
+        // कलर प्रेडिक्शन गेम दिखाने के लिए फ़ंक्शन
+        function showColorPredictionGameScreen() {
+            if (!firebaseReady || !firebaseAuthUid) {
+                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है। कृपया कुछ देर प्रतीक्षा करें और पुनः प्रयास करें। सुनिश्चित करें कि आपने Firebase कंसोल में 'Anonymous' साइन-in विधि को सक्षम किया है।");
+                return;
+            }
+            if (!applicationUserId) {
+                showMessage("गेम खेलने के लिए कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+                return;
+            }
+            showScreen(colorPredictionGameScreen);
+            navGame.classList.add('active');
+            navHome.classList.remove('active');
+            navEarn.classList.remove('active');
+            navProfile.classList.remove('active');
+            
+            gameUserName.textContent = currentUserName;
+            gameUserCoins.textContent = currentUserCoins;
+            resetGame(); // गेम को रीसेट और शुरू करें
+            startGameLoop(); // गेम लूप शुरू करें
+        }
+
+        // गेम लूप शुरू करने के लिए फ़ंक्शन
+        function startGameLoop() {
+            stopGameLoop(); // सुनिश्चित करें कि कोई पिछला लूप नहीं चल रहा है
+            gameCountdown = 15;
+            gameTimerDisplay.textContent = gameCountdown;
+            gameStatusMessage.textContent = "रंग का अनुमान लगाएँ!";
+            colorCircle.classList.remove('green', 'red');
+            colorCircle.textContent = ''; // रंग प्रकट होने से पहले टेक्स्ट साफ़ करें
+            betAmountInput.value = '1'; // डिफ़ॉल्ट शर्त 1 सिक्का
+            betAmountInput.disabled = false;
+            betGreenBtn.disabled = false;
+            betRedBtn.disabled = false;
+            isBettingOpen = true; // सट्टेबाजी खुली है
+            selectedBetColor = null; // प्रत्येक नए दौर में चयनित शर्त रीसेट करें
+
+            gameInterval = setInterval(() => {
+                gameCountdown--;
+                gameTimerDisplay.textContent = gameCountdown;
+                if (gameCountdown <= 0) {
+                    clearInterval(gameInterval);
+                    isBettingOpen = false; // सट्टेबाजी बंद करें
+                    revealColor(); // रंग प्रकट करें
+                }
+            }, 1000);
+        }
+
+        // गेम लूप को रोकने के लिए फ़ंक्शन
+        function stopGameLoop() {
+            clearInterval(gameInterval);
+            clearTimeout(colorChangeTimeout);
+            gameInterval = null;
+            colorChangeTimeout = null;
+            selectedBetColor = null; // चयनित शर्त रंग रीसेट करें
+        }
+
+        // रंग प्रकट करने और शर्त को संसाधित करने के लिए फ़ंक्शन
+        async function revealColor() {
+            const colors = ['green', 'red'];
+            const revealedColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            colorCircle.classList.add(revealedColor);
+            colorCircle.textContent = revealedColor === 'green' ? 'हरा' : 'लाल';
+
+            gameStatusMessage.textContent = `यह ${revealedColor === 'green' ? 'हरा' : 'लाल'} था!`;
+            betAmountInput.disabled = true;
+            betGreenBtn.disabled = true;
+            betRedBtn.disabled = true;
+
+            // केवल तभी शर्त को संसाधित करें जब कोई रंग चुना गया हो
+            if (selectedBetColor !== null) {
+                await processBet(revealedColor);
+            } else {
+                gameStatusMessage.textContent += " आपने कोई शर्त नहीं लगाई।"; // गेम स्टेटस में एक सूक्ष्म संदेश जोड़ें
+            }
+
+            // 5 सेकंड के बाद गेम रीसेट करें
+            colorChangeTimeout = setTimeout(() => {
+                startGameLoop();
+            }, 5000);
+        }
+
+        // शर्त को संसाधित करने के लिए फ़ंक्शन
+        async function processBet(revealedColor) {
+            const betAmount = parseInt(betAmountInput.value);
+
+            // यह फ़ंक्शन अब मानता है कि selectedBetColor null नहीं है
+            // क्योंकि इसे केवल revealColor में ही बुलाया जाता है यदि selectedBetColor null नहीं है।
+
+            if (isNaN(betAmount) || betAmount <= 0) {
+                // यह मामला आदर्श रूप से इनपुट/बटन को अक्षम करके रोका जाना चाहिए
+                // शर्त लगाने से पहले यदि betAmount अमान्य है।
+                // अभी के लिए, संदेश रखें, लेकिन यह दुर्लभ होना चाहिए।
+                // showMessage("कृपया एक वैध शर्त राशि दर्ज करें।"); // पॉपअप हटा दिया गया
+                return;
+            }
+
+            if (currentUserCoins < betAmount) {
+                // showMessage("आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।"); // पॉपअप हटा दिया गया
+                gameStatusMessage.textContent = "आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।";
+                return;
+            }
+
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            let newCoins = currentUserCoins;
+
+            if (selectedBetColor === revealedColor) {
+                newCoins += betAmount * 3; // 1 सिक्के पर 3 सिक्के
+                gameStatusMessage.textContent = `आप जीते! आपको ${betAmount * 3} सिक्के मिले!`;
+            } else {
+                newCoins -= betAmount; // शर्त हार गए
+                gameStatusMessage.textContent = `आप हार गए। आपने ${betAmount} सिक्के खो दिए।`;
+            }
+
+            try {
+                await updateDoc(userRef, {
+                    coins: newCoins
+                });
+                currentUserCoins = newCoins;
+                gameUserCoins.textContent = currentUserCoins; // गेम UI अपडेट करें
+                userCoinsSpan.textContent = currentUserCoins; // होम UI अपडेट करें
+            } catch (error) {
+                console.error("सिक्के अपडेट करने में त्रुटि:", error);
+                showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+            }
+        }
+
+        // गेम को रीसेट करने के लिए फ़ंक्शन
+        function resetGame() {
+            stopGameLoop();
+            gameCountdown = 15;
+            gameTimerDisplay.textContent = gameCountdown;
+            colorCircle.classList.remove('green', 'red');
+            colorCircle.textContent = '';
+            gameStatusMessage.textContent = "रंग का अनुमान लगाएँ!";
+            betAmountInput.value = '1'; // डिफ़ॉल्ट शर्त 1 सिक्का
+            betAmountInput.disabled = false;
+            betGreenBtn.disabled = false;
+            betRedBtn.disabled = false;
+            isBettingOpen = true;
+            selectedBetColor = null;
+        }
+
+
+        // इवेंट लिसनर्स
+        document.getElementById('have-account-btn').addEventListener('click', () => {
+            showScreen(document.getElementById('have-account-screen'));
+        });
+
+        document.getElementById('new-user-btn').addEventListener('click', () => {
+            showScreen(document.getElementById('new-user-screen'));
+        });
+
+        document.getElementById('create-user-btn').addEventListener('click', createNewUser);
+        document.getElementById('login-btn').addEventListener('click', loginExistingUser);
+        document.getElementById('copy-id-btn').addEventListener('click', copyUserId);
+        document.getElementById('withdrawal-btn').addEventListener('click', handleWithdrawal); // निकासी बटन अब नई स्क्रीन दिखाएगा
+        submitUpiBtn.addEventListener('click', submitUpiId); // UPI सबमिट बटन के लिए नया इवेंट लिसनर
+        document.getElementById('show-ad-btn').addEventListener('click', handleShowAd);
+        accountAgeBtn.addEventListener('click', showDetailedAccountAge);
+        scoreboardBtn.addEventListener('click', showScoreboardScreen); // स्कोरबोर्ड बटन
+
+        // कलर प्रेडिक्शन गेम इवेंट लिसनर्स
+        betGreenBtn.addEventListener('click', () => {
+            if (isBettingOpen) {
+                const betAmount = parseInt(betAmountInput.value);
+                if (isNaN(betAmount) || betAmount <= 0) {
+                    gameStatusMessage.textContent = "कृपया शर्त लगाने के लिए एक वैध राशि दर्ज करें।";
+                    return;
+                }
+                if (currentUserCoins < betAmount) {
+                    gameStatusMessage.textContent = "आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।";
+                    return;
+                }
+                selectedBetColor = 'green';
+                gameStatusMessage.textContent = `आपने हरा चुना है (${betAmount} सिक्के)।`;
+            } else {
+                gameStatusMessage.textContent = "शर्त लगाने का समय समाप्त हो गया है।";
+            }
+        });
+        betRedBtn.addEventListener('click', () => {
+            if (isBettingOpen) {
+                const betAmount = parseInt(betAmountInput.value);
+                if (isNaN(betAmount) || betAmount <= 0) {
+                    gameStatusMessage.textContent = "कृपया शर्त लगाने के लिए एक वैध राशि दर्ज करें।";
+                    return;
+                }
+                if (currentUserCoins < betAmount) {
+                    gameStatusMessage.textContent = "आपके पास इस शर्त के लिए पर्याप्त सिक्के नहीं हैं।";
+                    return;
+                }
+                selectedBetColor = 'red';
+                gameStatusMessage.textContent = `आपने लाल चुना है (${betAmount} सिक्के)।`;
+            } else {
+                gameStatusMessage.textContent = "शर्त लगाने का समय समाप्त हो गया है।";
+            }
+        });
+
+
+        // प्रोफ़ाइल स्क्रीन के लिए इवेंट लिसनर्स
+        saveNameBtn.addEventListener('click', updateUserName);
+        applyReferralBtn.addEventListener('click', applyReferralCode);
+        getReferralCodeBtn.addEventListener('click', displayOwnReferralCode);
+        logoutBtn.addEventListener('click', handleLogout);
+
+        // नेविगेशन बार इवेंट लिसनर्स
+        navHome.addEventListener('click', () => {
+            if (applicationUserId) {
+                showHomePage(currentUserName, applicationUserId, currentUserCoins);
+                navHome.classList.add('active');
+                navEarn.classList.remove('active');
+                navGame.classList.remove('active');
+                navProfile.classList.remove('active');
+            } else {
+                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+            }
+        });
+
+        navEarn.addEventListener('click', () => {
+            if (applicationUserId) {
+                showScreen(earnScreen);
+                navEarn.classList.add('active');
+                navHome.classList.remove('active');
+                navGame.classList.remove('active');
+                navProfile.classList.remove('active');
+            } else {
+                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+            }
+        });
+
+        navGame.addEventListener('click', () => { // New game nav item click
+            if (applicationUserId) {
+                showColorPredictionGameScreen();
+            } else {
+                showMessage(" कृपया लॉग इन करें या एक नया खाता बनाएँ।");
+            }
+        });
+
+        navProfile.addEventListener('click', showProfileScreen);
+
+        // प्रारंभिक ऐप प्रवाह
+        window.onload = () => {
+            showLoadingScreen(); // Show loading screen
+            initializeFirebase(); // Initialize Firebase on window load
+        };
+    </script>
+</body>
+</html>
