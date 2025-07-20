@@ -44,8 +44,8 @@
         #upi-input-screen.screen.active,
         #scoreboard-screen.screen.active, /* स्कोरबोर्ड स्क्रीन के लिए */
         #chat-screen.screen.active, /* चैट स्क्रीन के लिए */
-        #color-prediction-game-screen.screen.active, /* कलर प्रेडिक्शन गेम स्क्रीन के लिए */
-        #earn-screen.screen.active { /* अर्न स्क्रीन के लिए */
+        #earn-screen.screen.active, /* अर्न स्क्रीन के लिए */
+        #earn-2x-ads-screen.screen.active { /* Earn 2X Ads Screen के लिए */
             background: linear-gradient(135deg, #e0e7ff, #c7d2fe); /* हल्का नीला-बैंगनी ग्रेडिएंट */
             border-radius: 1.5rem; /* कंटेनर के समान गोल कोने */
             padding: 2.5rem; /* कंटेनर के समान पैडिंग */
@@ -340,6 +340,7 @@
             padding: 0.75rem 1rem;
             border-radius: 1rem;
             word-wrap: break-word;
+            position: relative; /* For views count positioning */
         }
         .message-sender {
             font-size: 0.75rem;
@@ -402,6 +403,7 @@
             cursor: pointer;
             z-index: 10;
         }
+        /* Removed .message-views styles as views are no longer displayed */
 
         /* अन्य स्टाइल... (पहले के सभी स्टाइल यहाँ रहेंगे) */
         .withdrawal-card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); width: 100%; max-width: 25rem; display: flex; flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
@@ -438,8 +440,24 @@
             border: 1px solid #e5e7eb; /* Subtle border to make it look like a clickable area */
             border-radius: 0.75rem;
             overflow: hidden; /* Ensure ad content stays within bounds */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .ad-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
 
+        /* New styles for earning games - Removed as per request */
+        /* .game-card { ... } */
+
+        /* Spin Wheel Specific Styles - Removed as per request */
+        /* #wheel-canvas { ... } */
+
+        /* Scratch Card Specific Styles - Removed as per request */
+        /* #scratch-canvas-container { ... } */
+
+        /* Quiz Game Specific Styles - Removed as per request */
+        /* .quiz-question { ... } */
     </style>
 </head>
 <body>
@@ -448,7 +466,6 @@
         <div id="intro-screen" class="screen active">
             <h1 class="text-6xl font-bold text-indigo-600 mb-4 gradient-text">ADBOSS 2.0</h1>
             <p class="text-xl text-gray-700">आपका डिजिटल साथी</p>
-            <!-- Ad Integration - Removed from intro screen, moved to earn screen -->
         </div>
 
         <!-- Main Options Screen -->
@@ -456,7 +473,11 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-8">स्वागत है!</h2>
             <button id="have-account-btn" class="button-primary mb-4">मौजूदा खाता</button>
             <button id="new-user-btn" class="button-secondary">नया उपयोगकर्ता</button>
-            <!-- Ad Integration - Removed from main screen, moved to earn screen -->
+            <!-- Ad on Main Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-main-screen-ad"></div>
+            </div>
         </div>
 
         <!-- New User Screen -->
@@ -469,7 +490,19 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6">आपका पूरा नाम क्या है?</h2>
             <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="mb-4">
             <button id="create-user-btn" class="button-primary">खाता बनाएँ</button>
-            <!-- Ad Integration - Removed from new user screen, moved to earn screen -->
+            <!-- Ad on New User Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '83bf329d89f64adb373217c75241cebf',
+                        'format' : 'iframe',
+                        'height' : 600,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
         </div>
 
         <!-- Have Account Screen -->
@@ -482,7 +515,11 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6">अपनी ID दर्ज करें</h2>
             <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता ID दर्ज करें" class="mb-4">
             <button id="login-btn" class="button-primary">लॉग इन करें</button>
-            <!-- Ad Integration - Removed from have account screen, moved to earn screen -->
+            <!-- Ad on Have Account Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-have-account-screen-ad"></div>
+            </div>
         </div>
 
         <!-- Home Screen -->
@@ -502,7 +539,19 @@
 
             <button id="withdrawal-btn" class="button-primary">निकासी</button>
             <button id="scoreboard-btn" class="button-secondary mt-4">स्कोरबोर्ड</button>
-            <!-- Ad Integration - Removed from home screen, moved to earn screen -->
+            <!-- Ad on Home Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '83bf329d89f64adb373217c75241cebf',
+                        'format' : 'iframe',
+                        'height' : 600,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
         </div>
 
         <!-- Scoreboard Screen -->
@@ -518,14 +567,17 @@
             <div id="scoreboard-list-container" class="scoreboard-list">
                 <p class="text-gray-500">लोड हो रहा है...</p>
             </div>
-            <!-- Ad Integration - Removed from scoreboard screen, moved to earn screen -->
+             <!-- Ad on Scoreboard Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-scoreboard-screen-ad"></div>
+            </div>
         </div>
         
         <!-- Chat Intro Screen -->
         <div id="chat-intro-screen" class="screen">
             <h1 class="text-4xl font-bold text-indigo-600 mb-4 gradient-text">खिलाड़ियों के साथ चैट</h1>
             <p class="text-xl text-gray-700">by arvind</p>
-            <!-- Ad Integration - Removed from chat intro screen, moved to earn screen -->
         </div>
 
         <!-- Chat Screen -->
@@ -539,6 +591,19 @@
             <div id="chat-messages">
                 <!-- Messages will be loaded here -->
             </div>
+            <!-- Ad on Chat Screen -->
+            <div class="ad-container w-full max-w-xs mt-6 mb-4">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '83bf329d89f64adb373217c75241cebf',
+                        'format' : 'iframe',
+                        'height' : 600,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
             <form id="chat-form">
                 <input type="text" id="chat-input" placeholder="संदेश लिखें..." autocomplete="off">
                 <button type="submit" id="send-chat-btn">
@@ -547,35 +612,6 @@
                     </svg>
                 </button>
             </form>
-            <!-- Ad Integration - Removed from chat screen, moved to earn screen -->
-        </div>
-
-        <!-- Color Prediction Game Screen -->
-        <div id="color-prediction-game-screen" class="screen">
-            <button class="back-button" onclick="window.goBack()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                </svg>
-            </button>
-            <div class="game-header">
-                <div class="user-info">
-                    <p>नाम: <span id="game-user-name" class="font-bold"></span></p>
-                    <p>सिक्के: <span id="game-user-coins" class="coins font-bold"></span></p>
-                </div>
-                <div class="timer-display" id="game-timer-display">15</div>
-            </div>
-
-            <div id="color-circle" class="color-circle"></div>
-            <p id="game-status-message" class="game-status-message mb-4">रंग का अनुमान लगाएँ!</p>
-
-            <div class="game-controls">
-                <input type="number" id="bet-amount-input" placeholder="शर्त राशि (सिक्के)" class="mb-2" min="1">
-                <div class="bet-buttons">
-                    <button id="bet-green-btn" class="bet-green">हरा (x2)</button>
-                    <button id="bet-red-btn" class="bet-red">लाल (x2)</button>
-                </div>
-            </div>
-            <!-- Ad Integration - Removed from game screen, moved to earn screen -->
         </div>
 
         <!-- Withdrawal Scheme Screen -->
@@ -605,7 +641,11 @@
                 <p class="rupees">= ₹40</p>
                 <button onclick="window.selectWithdrawalScheme(300, 40)">निकासी करें</button>
             </div>
-            <!-- Ad Integration - Removed from withdrawal screen, moved to earn screen -->
+             <!-- Ad on Withdrawal Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-withdrawal-screen-ad"></div>
+            </div>
         </div>
 
         <!-- UPI Input Screen -->
@@ -619,7 +659,19 @@
             <p id="upi-amount-display" class="text-lg text-gray-700 mb-4"></p>
             <input type="text" id="upi-id-input" placeholder=" अपनी UPI ID दर्ज करें (उदाहरण: yourname@bank)" class="mb-4">
             <button id="submit-upi-btn" class="button-primary">जमा करें</button>
-            <!-- Ad Integration - Removed from UPI input screen, moved to earn screen -->
+             <!-- Ad on UPI Input Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '83bf329d89f64adb373217c75241cebf',
+                        'format' : 'iframe',
+                        'height' : 600,
+                        'width' : 160,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
         </div>
 
         <!-- Profile Screen -->
@@ -664,9 +716,13 @@
                     चैनल चेक बायो
                 </a>
             </div>
+            <!-- Ad on Profile Screen -->
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-profile-screen-ad"></div>
+            </div>
 
             <button id="logout-btn" class="button-primary bg-red-500 hover:bg-red-600">लॉगआउट</button>
-            <!-- Ad Integration - Removed from profile screen, moved to earn screen -->
         </div>
 
         <!-- Earn Screen -->
@@ -677,8 +733,8 @@
                 </svg>
             </button>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">सिक्के कमाएँ!</h2>
-            <p id="earn-instruction-text" class="text-lg text-gray-700 mb-4">विज्ञापन बैनर पर क्लिक करके 0.5 सिक्के कमाएँ!</p>
-            <p id="ad-click-status" class="text-sm text-gray-600 mb-4"></p> <!-- New status message for ad clicks -->
+            <p id="earn-instruction-text" class="text-lg text-gray-700 mb-4">विज्ञापन देखकर सिक्के कमाएँ!</p>
+            <p id="ad-click-status" class="text-sm text-gray-600 mb-4"></p>
 
             <div class="mt-8 w-full flex flex-col items-center space-y-4">
                 <!-- Ad Integration 1 -->
@@ -699,6 +755,106 @@
                     </script>
                     <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
                 </div>
+                <!-- Additional Ad 1 -->
+                <div class="ad-container w-full">
+                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_2"></div>
+                </div>
+                <!-- Additional Ad 2 -->
+                <div class="ad-container w-full">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '83bf329d89f64adb373217c75241cebf',
+                            'format' : 'iframe',
+                            'height' : 600,
+                            'width' : 160,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+                </div>
+                <!-- Additional Ad 3 -->
+                <div class="ad-container w-full">
+                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_3"></div>
+                </div>
+                <!-- Additional Ad 4 -->
+                <div class="ad-container w-full">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '83bf329d89f64adb373217c75241cebf',
+                            'format' : 'iframe',
+                            'height' : 600,
+                            'width' : 160,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+                </div>
+                <!-- Additional Ad 5 -->
+                <div class="ad-container w-full">
+                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_4"></div>
+                </div>
+                <!-- Additional Ad 6 -->
+                <div class="ad-container w-full">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '83bf329d89f64adb373217c75241cebf',
+                            'format' : 'iframe',
+                            'height' : 600,
+                            'width' : 160,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+                </div>
+                <!-- Additional Ad 7 -->
+                <div class="ad-container w-full">
+                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_5"></div>
+                </div>
+                <!-- Additional Ad 8 -->
+                <div class="ad-container w-full">
+                    <script type="text/javascript">
+                        atOptions = {
+                            'key' : '83bf329d89f64adb373217c75241cebf',
+                            'format' : 'iframe',
+                            'height' : 600,
+                            'width' : 160,
+                            'params' : {}
+                        };
+                    </script>
+                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+                </div>
+
+
+                <button id="earn-2x-button" class="button-primary mt-6">2X सिक्के कमाएँ!</button>
+            </div>
+        </div>
+
+        <!-- Earn 2X Ads Screen -->
+        <div id="earn-2x-ads-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">2X सिक्के कमाएँ!</h2>
+            <p class="text-lg text-gray-700 mb-4">इन विज्ञापनों पर क्लिक करके अधिक सिक्के कमाएँ!</p>
+            <p id="ad-2x-click-status" class="text-sm text-gray-600 mb-4"></p>
+
+            <div class="ad-container w-full max-w-xs" id="ad-2x-container">
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '0d15173de61272c3e2bb15f8677bb5c5',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/0d15173de61272c3e2bb15f8677bb5c5/invoke.js"></script>
             </div>
         </div>
     </div>
@@ -725,10 +881,11 @@
             </svg>
             <span>चैट</span>
         </div>
-        <div id="nav-game" class="nav-item">
+        <!-- Removed Game Nav Item -->
+        <!-- <div id="nav-game" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0h.008v.008H21V5.25zM3 5.25h-.008v.008H3V5.25zm2.25 0h.008v.008H5.25V5.25zm-.008 9.75H5.25V15h.008v-.008zm7.5-9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 12a.75.75 0 100-1.5.75.75 0 000 1.5zM12 15a.75.75 0 100-1.5.75.75 0 000 1.5z" /></svg>
             <span>गेम</span>
-        </div>
+        </div> -->
         <div id="nav-profile" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
             <span>प्रोफ़ाइल</span>
@@ -786,7 +943,8 @@
         const navHome = document.getElementById('nav-home');
         const navEarn = document.getElementById('nav-earn'); 
         const navChat = document.getElementById('nav-chat'); 
-        const navGame = document.getElementById('nav-game'); 
+        // Removed navGame DOM element as games are removed
+        // const navGame = document.getElementById('nav-game'); 
         const navProfile = document.getElementById('nav-profile');
         const currentTimeSpan = document.getElementById('current-time');
         const accountAgeBtn = document.getElementById('account-age-btn');
@@ -825,32 +983,32 @@
         const chatInput = document.getElementById('chat-input');
         const tellQuestionBtn = document.getElementById('tell-question-btn');
 
-        // Color Prediction Game DOM Elements
-        const colorPredictionGameScreen = document.getElementById('color-prediction-game-screen');
-        const gameUserName = document.getElementById('game-user-name');
-        const gameUserCoins = document.getElementById('game-user-coins');
-        const colorCircle = document.getElementById('color-circle');
-        const gameTimerDisplay = document.getElementById('game-timer-display');
-        const gameStatusMessage = document.getElementById('game-status-message');
-        const betAmountInput = document.getElementById('bet-amount-input');
-        const betGreenBtn = document.getElementById('bet-green-btn');
-        const betRedBtn = document.getElementById('bet-red-btn');
-
         // Earn Screen DOM Elements
         const earnScreen = document.getElementById('earn-screen');
         const earnInstructionText = document.getElementById('earn-instruction-text'); 
         const adClickStatus = document.getElementById('ad-click-status'); 
+        const earn2xButton = document.getElementById('earn-2x-button');
+
+        // Earn 2X Ads DOM Elements
+        const earn2xAdsScreen = document.getElementById('earn-2x-ads-screen');
+        const ad2xContainer = document.getElementById('ad-2x-container');
+        const ad2xClickStatus = document.getElementById('ad-2x-click-status');
+
+        // New ad containers for various screens
+        const mainScreenAdContainer = document.getElementById('container-main-screen-ad');
+        const newUserScreenAdContainer = document.querySelector('#new-user-screen .ad-container'); // Select by class within screen
+        const haveAccountScreenAdContainer = document.querySelector('#have-account-screen .ad-container'); // Select by class within screen
+        const homeScreenAdContainer = document.querySelector('#home-screen .ad-container'); // Select by class within screen
+        const scoreboardScreenAdContainer = document.querySelector('#scoreboard-screen .ad-container');
+        const chatScreenAdContainer = document.querySelector('#chat-screen .ad-container');
+        const withdrawalScreenAdContainer = document.querySelector('#withdrawal-scheme-screen .ad-container');
+        const upiInputScreenAdContainer = document.querySelector('#upi-input-screen .ad-container');
+        const profileScreenAdContainer = document.querySelector('#profile-screen .ad-container');
+
 
         let timeUpdateInterval; 
         let canClickAd = true; // Cooldown for ad clicks
         const adClickCooldownTime = 5000; // 5 seconds
-
-        // Game specific variables
-        let gameCountdown = 15;
-        let gameInterval;
-        let colorChangeTimeout;
-        let selectedBetColor = null;
-        let isBettingOpen = true; 
 
         // Function to show loading screen
         function showLoadingScreen() {
@@ -872,7 +1030,7 @@
                 unsubscribeChat(); // Detach chat listener when leaving chat screen
                 console.log("Chat listener detached.");
             }
-
+            
             if (currentActiveScreen && currentActiveScreen.id !== screenToShowElement.id) {
                 if (currentActiveScreen.id !== 'intro-screen' && currentActiveScreen.id !== 'main-screen') {
                     screenHistory.push(currentActiveScreen.id);
@@ -887,7 +1045,7 @@
             screenToShowElement.classList.add('active');
 
             // Show/hide bottom nav
-            const screensWithNav = ['home-screen', 'profile-screen', 'scoreboard-screen', 'color-prediction-game-screen', 'chat-screen', 'earn-screen']; 
+            const screensWithNav = ['home-screen', 'profile-screen', 'scoreboard-screen', 'chat-screen', 'earn-screen', 'earn-2x-ads-screen']; 
             if (screensWithNav.includes(screenToShowElement.id)) {
                 bottomNav.classList.remove('hidden');
                 if (screenToShowElement.id === 'home-screen') {
@@ -910,6 +1068,18 @@
                     btn.style.display = 'flex'; 
                 }
             });
+
+            // Attach ad click listeners for the current screen
+            attachAdListenersToScreen(screenToShowElement);
+        }
+
+        // Function to attach ad listeners to all ad containers on a given screen
+        function attachAdListenersToScreen(screenElement) {
+            const adContainers = screenElement.querySelectorAll('.ad-container');
+            adContainers.forEach(container => {
+                container.removeEventListener('click', handleAdClick); // Remove existing to prevent duplicates
+                container.addEventListener('click', handleAdClick);
+            });
         }
 
         // Function to go back to the previous screen
@@ -918,9 +1088,6 @@
                 const previousScreenId = screenHistory.pop();
                 const previousScreenElement = document.getElementById(previousScreenId);
                 if (previousScreenElement) {
-                    if (document.querySelector('.screen.active').id === 'color-prediction-game-screen') {
-                        stopGameLoop();
-                    }
                     showScreen(previousScreenElement);
                 } else {
                     showScreen(mainScreen);
@@ -935,7 +1102,7 @@
         }
         
         // Function to display a custom message box
-        function showMessage(message, callback = null) {
+        window.showMessage = function(message, callback = null) { // Made global
             messageText.textContent = message;
             messageBox.classList.add('active');
             messageBoxOkBtn.onclick = () => {
@@ -950,7 +1117,7 @@
             try {
                 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
                     console.error("Firebase कॉन्फ़िगरेशन अधूरा है।");
-                    showMessage("Firebase कॉन्फ़िगरेशन उपलब्ध नहीं है।");
+                    window.showMessage("Firebase कॉन्फ़िगरेशन उपलब्ध नहीं है।");
                     hideLoadingScreen();
                     return;
                 }
@@ -979,7 +1146,7 @@
                             console.log("New anonymous session established.");
                         } catch (anonError) {
                             console.error("Error signing in anonymously:", anonError);
-                            showMessage(`प्रमाणीकरण में त्रुटि: ${anonError.message}`);
+                            window.showMessage(`प्रमाणीकरण में त्रुटि: ${anonError.message}`);
                             showScreen(mainScreen);
                         }
                     }
@@ -993,7 +1160,7 @@
 
             } catch (error) {
                 console.error("Firebase initialization failed:", error);
-                showMessage(`Firebase आरंभ करने में त्रुटि: ${error.message}`);
+                window.showMessage(`Firebase आरंभ करने में त्रुटि: ${error.message}`);
                 hideLoadingScreen();
             }
         }
@@ -1015,18 +1182,17 @@
                     userCreatedAt = userData.createdAt ? new Date(userData.createdAt) : null;
                     applicationUserId = appUserIdToLoad;
 
-                    // Removed automatic 0.5 coin bonus on app open/login
                     showHomePage(currentUserName, applicationUserId, currentUserCoins);
                     
                 } else {
                     localStorage.removeItem('adbossAppUserId');
-                    showMessage("आपकी संग्रहीत उपयोगकर्ता ID नहीं मिली।", () => {
+                    window.showMessage("आपकी संग्रहीत उपयोगकर्ता ID नहीं मिली।", () => {
                         showScreen(mainScreen);
                     });
                 }
             } catch (error) {
                 console.error("Error loading user data:", error);
-                showMessage(`उपयोगकर्ता डेटा लोड करने में त्रुटि: ${error.message}`);
+                window.showMessage(`उपयोगकर्ता डेटा लोड करने में त्रुटि: ${error.message}`);
             }
         }
 
@@ -1039,11 +1205,11 @@
         async function createNewUser() {
             const name = newUserNameInput.value.trim();
             if (!name) {
-                showMessage("कृपया अपना पूरा नाम दर्ज करें");
+                window.showMessage("कृपया अपना पूरा नाम दर्ज करें");
                 return;
             }
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है।");
                 return;
             }
 
@@ -1062,13 +1228,13 @@
                 currentUserName = name;
                 currentUserCoins = 0; // Update local coins to 0
                 userCreatedAt = new Date();
-                showMessage("खाता सफलतापूर्वक बन गया!", () => {
+                window.showMessage("खाता सफलतापूर्वक बन गया!", () => {
                     showHomePage(name, newUserId, currentUserCoins);
                 });
                 newUserNameInput.value = '';
             } catch (error) {
                 console.error("Error creating user:", error);
-                showMessage(`खाता बनाने में त्रुटि: ${error.message}`);
+                window.showMessage(`खाता बनाने में त्रुटि: ${error.message}`);
             }
         }
 
@@ -1076,17 +1242,17 @@
         async function loginExistingUser() {
             const userId = existingUserIdInput.value.trim();
             if (!userId) {
-                showMessage("कृपया अपनी User ID दर्ज करें");
+                window.showMessage("कृपया अपनी User ID दर्ज करें");
                 return;
             }
             if (!firebaseReady || !firebaseAuthUid) {
-                showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है।");
+                window.showMessage("Firebase प्रमाणीकरण अभी तैयार नहीं है।");
                 return;
             }
             try {
                 const userDoc = await getDoc(doc(db, "users", userId));
                 if (!userDoc.exists()) {
-                    showMessage("यह User ID मौजूद नहीं है");
+                    window.showMessage("यह User ID मौजूद नहीं है");
                     return;
                 }
                 const userData = userDoc.data();
@@ -1097,14 +1263,13 @@
                 currentUserCoins = userData.coins || 0;
                 userCreatedAt = userData.createdAt ? new Date(userData.createdAt) : null;
 
-                // Removed automatic 0.5 coin bonus on login
-                showMessage("लॉगिन सफल!", () => {
+                window.showMessage("लॉगिन सफल!", () => {
                     showHomePage(currentUserName, userId, currentUserCoins);
                 });
                 existingUserIdInput.value = '';
             } catch (error) {
                 console.error("Login error:", error);
-                showMessage(`लॉगिन में त्रुटि: ${error.message}`);
+                window.showMessage(`Lलॉगिन में त्रुटि: ${error.message}`);
             }
         }
 
@@ -1135,7 +1300,7 @@
 
         function showDetailedAccountAge() {
             if (!applicationUserId) {
-                showMessage("खाता आयु देखने के लिए कृपया लॉग इन करें।");
+                window.showMessage("खाता आयु देखने के लिए कृपया लॉग इन करें।");
                 return;
             }
             if (userCreatedAt) {
@@ -1147,9 +1312,9 @@
                 const remainingHours = hours % 24;
                 const remainingMinutes = minutes % 60;
                 let ageMessage = `आपका खाता ${days} दिन, ${remainingHours} घंटे, और ${remainingMinutes} मिनट पुराना है।`;
-                showMessage(ageMessage);
+                window.showMessage(ageMessage);
             } else {
-                showMessage("आपके खाते की निर्माण तिथि उपलब्ध नहीं है।");
+                window.showMessage("आपके खाते की निर्माण तिथि उपलब्ध नहीं है।");
             }
         }
 
@@ -1174,9 +1339,9 @@
                 textArea.select();
                 try {
                     document.execCommand('copy');
-                    showMessage("उपयोगकर्ता ID कॉपी हो गई!");
+                    window.showMessage("उपयोगकर्ता ID कॉपी हो गई!");
                 } catch (err) {
-                    showMessage("ID कॉपी करने में विफल।");
+                    window.showMessage("ID कॉपी करने में विफल।");
                 }
                 document.body.removeChild(textArea);
             }
@@ -1194,14 +1359,14 @@
                 upiAmountDisplay.textContent = `आप ₹${rupees} प्राप्त करेंगे।`;
                 showScreen(upiInputScreen);
             } else {
-                showMessage(`आपके पास पर्याप्त सिक्के नहीं हैं।`);
+                window.showMessage(`आपके पास पर्याप्त सिक्के नहीं हैं।`);
             }
         }
 
         async function submitUpiId() {
             const upiId = upiIdInput.value.trim();
             if (!upiId) {
-                showMessage("कृपया अपनी UPI ID दर्ज करें।");
+                window.showMessage("कृपया अपनी UPI ID दर्ज करें।");
                 return;
             }
             const userRef = doc(collection(db, `users`), applicationUserId);
@@ -1220,18 +1385,18 @@
                     firebaseAuthUid: firebaseAuthUid
                 });
                 upiIdInput.value = '';
-                showMessage("आपका पैसा जल्द ही आपके खाते में आ जाएगा!", () => { 
+                window.showMessage("आपका पैसा जल्द ही आपके खाते में आ जाएगा!", () => { 
                     showHomePage(currentUserName, applicationUserId, currentUserCoins);
                 });
             } catch (error) {
                 console.error("निकासी संसाधित करने में त्रुटि:", error);
-                showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
+                window.showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
             }
         }
 
         function showProfileScreen() {
             if (!applicationUserId) {
-                showMessage("कृपया लॉग इन करें।");
+                window.showMessage("कृपया लॉग इन करें।");
                 return;
             }
             profileNameInput.value = currentUserName;
@@ -1251,7 +1416,7 @@
                 }
             }).catch(error => {
                 console.error("प्रोफ़ाइल डेटा लोड करने में त्रुटि:", error);
-                showMessage(`प्रोफ़ाइल डेटा लोड करने में त्रुटि: ${error.message}`);
+                window.showMessage(`प्रोफ़ाइल डेटा लोड करने में त्रुटि: ${error.message}`);
             });
             myReferralCodeDisplay.classList.add('hidden');
             showScreen(profileScreen);
@@ -1262,7 +1427,7 @@
         async function updateUserName() {
             const newName = profileNameInput.value.trim();
             if (!newName) {
-                showMessage(" कृपया एक वैध नाम दर्ज करें।");
+                window.showMessage(" कृपया एक वैध नाम दर्ज करें।");
                 return;
             }
             const userRef = doc(collection(db, `users`), applicationUserId);
@@ -1270,17 +1435,17 @@
                 await updateDoc(userRef, { name: newName });
                 currentUserName = newName;
                 welcomeMessage.textContent = `नमस्ते, ${currentUserName}!`;
-                showMessage("आपका नाम सफलतापूर्वक अपडेट हो गया है!");
+                window.showMessage("आपका नाम सफलतापूर्वक अपडेट हो गया है!");
             } catch (error) {
                 console.error("नाम अपडेट करने में त्रुटि:", error);
-                showMessage(`नाम अपडेट करने में त्रुटि: ${error.message}`);
+                window.showMessage(`नाम अपडेट करने में त्रुटि: ${error.message}`);
             }
         }
 
         // Chat Functions
         function showChatIntro() {
             if (!applicationUserId) {
-                showMessage("चैट करने के लिए कृपया लॉग इन करें।");
+                window.showMessage("चैट करने के लिए कृपया लॉग इन करें।");
                 return;
             }
             showScreen(chatIntroScreen);
@@ -1307,12 +1472,12 @@
                     text: messageText,
                     senderId: applicationUserId,
                     senderName: currentUserName,
-                    timestamp: serverTimestamp()
+                    timestamp: serverTimestamp(),
                 });
                 chatInput.value = "";
             } catch (error) {
                 console.error("Error sending message: ", error);
-                showMessage("संदेश भेजने में त्रुटि हुई।");
+                window.showMessage("संदेश भेजने में त्रुटि हुई।");
             }
         }
 
@@ -1321,10 +1486,10 @@
                 unsubscribeChat(); // Detach any existing listener
             }
             const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
-            unsubscribeChat = onSnapshot(q, (querySnapshot) => {
+            unsubscribeChat = onSnapshot(q, async (querySnapshot) => { 
                 chatMessages.innerHTML = ""; // Clear previous messages
-                querySnapshot.forEach((doc) => {
-                    const message = doc.data();
+                for (const docSnapshot of querySnapshot.docs) { 
+                    const message = docSnapshot.data();
                     const messageContainer = document.createElement('div');
                     const messageBubble = document.createElement('div');
                     const senderName = document.createElement('div');
@@ -1335,22 +1500,23 @@
                     
                     senderName.textContent = message.senderName;
                     messageBubble.textContent = message.text;
-
+                    
                     if (message.senderId === applicationUserId) {
                         messageContainer.classList.add('sent');
                         messageBubble.classList.add('sent');
+                        messageContainer.appendChild(messageBubble);
                     } else {
                         messageContainer.classList.add('received');
                         messageBubble.classList.add('received');
                         messageContainer.appendChild(senderName);
+                        messageContainer.appendChild(messageBubble);
                     }
                     
-                    messageContainer.appendChild(messageBubble);
                     chatMessages.appendChild(messageContainer);
-                });
+                }
             }, (error) => {
                 console.error("Error loading messages:", error);
-                showMessage("संदेश लोड करने में त्रुटि हुई।");
+                window.showMessage("संदेश लोड करने में त्रुटि हुई।");
             });
         }
 
@@ -1364,15 +1530,15 @@
                         userName: currentUserName,
                         timestamp: serverTimestamp()
                     });
-                    showMessage("आपका प्रश्न सफलतापूर्वक भेज दिया गया है!");
+                    window.showMessage("आपका प्रश्न सफलतापूर्वक भेज दिया गया है!");
                 } catch (error) {
                     console.error("Error sending question: ", error);
-                    showMessage("प्रश्न भेजने में त्रुटि हुई।");
+                    window.showMessage("प्रश्न भेजने में त्रुटि हुई।");
                 }
             }
         }
 
-        // Other functions (logout, scoreboard, game, etc.) remain the same
+        // Other functions (logout, scoreboard, etc.) remain the same
         async function applyReferralCode() { /* ... */ }
         function displayOwnReferralCode() { /* ... */ }
         async function handleLogout() {
@@ -1384,13 +1550,13 @@
                 setTimeout(() => { location.reload(); }, 300);
             } catch (error) {
                 console.error("Error logging out:", error);
-                showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
+                window.showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
                 hideLoadingScreen();
             }
         }
         async function showScoreboardScreen() {
              if (!applicationUserId) {
-                showMessage("स्कोरबोर्ड देखने के लिए कृपया लॉग इन करें।");
+                window.showMessage("स्कोरबोर्ड देखने के लिए कृपया लॉग इन करें।");
                 return;
             }
             showScreen(scoreboardScreen);
@@ -1417,154 +1583,160 @@
                 myRankDisplay.textContent = myRank !== -1 ? `आपकी रैंक: ${myRank} / ${users.length}` : 'आपकी रैंक: N/A';
             } catch (error) {
                 console.error("स्कोरबोर्ड लोड करने में त्रुटि:", error);
-                showMessage(`स्कोरबोर्ड लोड करने में त्रुटि: ${error.message}`);
+                window.showMessage(`स्कोरबोर्ड लोड करने में त्रुटि: ${error.message}`);
             }
         }
-        function showColorPredictionGameScreen() {
-             if (!applicationUserId) {
-                showMessage("गेम खेलने के लिए कृपया लॉग इन करें।");
-                return;
-            }
-            showScreen(colorPredictionGameScreen);
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            navGame.classList.add('active');
-            gameUserName.textContent = currentUserName;
-            gameUserCoins.textContent = currentUserCoins;
-            resetGame();
-            startGameLoop();
-        }
-        function startGameLoop() {
-            stopGameLoop();
-            gameCountdown = 15;
-            gameTimerDisplay.textContent = gameCountdown;
-            gameStatusMessage.textContent = "रंग का अनुमान लगाएँ!";
-            colorCircle.className = 'color-circle';
-            colorCircle.textContent = '';
-            betAmountInput.disabled = false;
-            betGreenBtn.disabled = false;
-            betRedBtn.disabled = false;
-            isBettingOpen = true;
-            selectedBetColor = null;
-
-            gameInterval = setInterval(() => {
-                gameCountdown--;
-                gameTimerDisplay.textContent = gameCountdown;
-                if (gameCountdown <= 0) {
-                    clearInterval(gameInterval);
-                    isBettingOpen = false;
-                    revealColor();
-                }
-            }, 1000);
-        }
-        function stopGameLoop() {
-            clearInterval(gameInterval);
-            clearTimeout(colorChangeTimeout);
-        }
-        async function revealColor() {
-            const revealedColor = Math.random() < 0.5 ? 'green' : 'red';
-            colorCircle.classList.add(revealedColor);
-            colorCircle.textContent = revealedColor === 'green' ? 'हरा' : 'लाल';
-            betAmountInput.disabled = true;
-            betGreenBtn.disabled = true;
-            betRedBtn.disabled = true;
-
-            if (selectedBetColor !== null) {
-                await processBet(revealedColor);
-            } else {
-                gameStatusMessage.textContent = `यह ${revealedColor === 'green' ? 'हरा' : 'लाल'} था! आपने कोई शर्त नहीं लगाई।`;
-            }
-            colorChangeTimeout = setTimeout(startGameLoop, 5000);
-        }
-        async function processBet(revealedColor) {
-            const betAmount = parseInt(betAmountInput.value);
-            if (isNaN(betAmount) || betAmount <= 0 || currentUserCoins < betAmount) {
-                gameStatusMessage.textContent = "अमान्य शर्त राशि या अपर्याप्त सिक्के।";
-                return;
-            }
-            const userRef = doc(collection(db, `users`), applicationUserId);
-            let newCoins = currentUserCoins;
-            if (selectedBetColor === revealedColor) {
-                newCoins += betAmount * 2; // Changed multiplier to 2x
-                gameStatusMessage.textContent = `आप जीते! आपको ${betAmount * 2} सिक्के मिले!`;
-            } else {
-                newCoins -= betAmount;
-                gameStatusMessage.textContent = `आप हार गए। आपने ${betAmount} सिक्के खो दिए।`;
-            }
-            try {
-                await updateDoc(userRef, { coins: newCoins });
-                currentUserCoins = newCoins;
-                gameUserCoins.textContent = currentUserCoins;
-                userCoinsSpan.textContent = currentUserCoins;
-            } catch (error) {
-                console.error("सिक्के अपडेट करने में त्रुटि:", error);
-                showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
-            }
-        }
-        function resetGame() {
-            stopGameLoop();
-            // ... reset game UI elements
-        }
-
-        // Handle ad click to earn coins
+        
+        // Handle ad click to earn coins (for normal ads)
         async function handleAdClick(event) {
             // Prevent the click from propagating to child elements if they also have listeners
             event.stopPropagation(); 
 
             if (!applicationUserId) {
-                showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
+                window.showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
                 return;
             }
             if (!canClickAd) {
-                showMessage("कृपया दोबारा क्लिक करने से पहले थोड़ा इंतज़ार करें।");
+                window.showMessage("कृपया दोबारा क्लिक करने से पहले थोड़ा इंतज़ार करें।");
                 return;
             }
 
             canClickAd = false; // Disable clicks
-            adClickStatus.textContent = "विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...";
+            // Determine which status message to update based on the screen
+            const currentScreenId = document.querySelector('.screen.active').id;
+            let statusMessageElement = null;
+            if (currentScreenId === 'earn-screen') {
+                statusMessageElement = adClickStatus;
+            } else if (currentScreenId === 'earn-2x-ads-screen') {
+                statusMessageElement = ad2xClickStatus;
+            } else {
+                // For other screens, display a general message
+                window.showMessage("विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...");
+            }
+
+            if (statusMessageElement) {
+                statusMessageElement.textContent = "विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...";
+            }
 
             const userRef = doc(collection(db, `users`), applicationUserId);
             try {
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     let userData = userSnap.data();
-                    let newCoins = (userData.coins || 0) + 0.5;
+                    let newCoins = (userData.coins || 0) + 0.5; // 0.5 coins for normal ads
                     await updateDoc(userRef, { coins: newCoins });
                     currentUserCoins = newCoins;
                     userCoinsSpan.textContent = currentUserCoins; // Update coins on home screen
-                    gameUserCoins.textContent = currentUserCoins; // Update coins on game screen
-                    adClickStatus.textContent = "आपको 0.5 सिक्के मिले!";
-                    showMessage("आपको 0.5 सिक्के मिले!");
+                    if (statusMessageElement) {
+                        statusMessageElement.textContent = "आपको 0.5 सिक्के मिले!";
+                    }
+                    window.showMessage("आपको 0.5 सिक्के मिले!");
                 }
             } catch (error) {
                 console.error("विज्ञापन से सिक्के कमाने में त्रुटि:", error);
-                adClickStatus.textContent = `त्रुटि: ${error.message}`;
-                showMessage(`विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
+                if (statusMessageElement) {
+                    statusMessageElement.textContent = `त्रुटि: ${error.message}`;
+                }
+                window.showMessage(`विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
             } finally {
                 setTimeout(() => {
                     canClickAd = true; // Re-enable click after cooldown
-                    adClickStatus.textContent = "";
+                    if (statusMessageElement) {
+                        statusMessageElement.textContent = "";
+                    }
                 }, adClickCooldownTime);
             }
         }
 
+        // Handle ad click to earn 2X coins (for specific 2x ad)
+        async function handle2xAdClick(event) {
+            event.stopPropagation();
+
+            if (!applicationUserId) {
+                window.showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
+                return;
+            }
+            if (!canClickAd) {
+                window.showMessage("कृपया दोबारा क्लिक करने से पहले थोड़ा इंतज़ार करें।");
+                return;
+            }
+
+            canClickAd = false; // Disable clicks
+            ad2xClickStatus.textContent = "विज्ञापन पर क्लिक का पता चला। 2X सिक्के जोड़ रहा हूँ...";
+
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            try {
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    let userData = userSnap.data();
+                    let newCoins = (userData.coins || 0) + 1; // 1 coin for 2x ads
+                    await updateDoc(userRef, { coins: newCoins });
+                    currentUserCoins = newCoins;
+                    userCoinsSpan.textContent = currentUserCoins;
+                    ad2xClickStatus.textContent = "आपको 1 सिक्का मिला!";
+                    window.showMessage("आपको 1 सिक्का मिला!");
+                }
+            } catch (error) {
+                console.error("2X विज्ञापन से सिक्के कमाने में त्रुटि:", error);
+                ad2xClickStatus.textContent = `त्रुटि: ${error.message}`;
+                window.showMessage(`2X विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
+            } finally {
+                setTimeout(() => {
+                    canClickAd = true;
+                    ad2xClickStatus.textContent = "";
+                }, adClickCooldownTime);
+            }
+        }
+
+
         function showEarnScreen() {
             if (!applicationUserId) {
-                showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
+                window.showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
                 return;
             }
             showScreen(earnScreen);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             navEarn.classList.add('active');
+            earnInstructionText.textContent = "विज्ञापन देखकर सिक्के कमाएँ!"; // Updated instruction
             adClickStatus.textContent = ""; // Clear status message on screen entry
             canClickAd = true; // Reset cooldown when entering screen
 
             // Attach event listeners to all ad containers when the earn screen is shown
-            const adContainers = document.querySelectorAll('.ad-container');
+            const adContainers = earnScreen.querySelectorAll('.ad-container');
             adContainers.forEach(container => {
-                // Remove existing listener to prevent duplicates if screen is re-entered
                 container.removeEventListener('click', handleAdClick);
                 container.addEventListener('click', handleAdClick);
             });
+        }
+
+        // Helper function to update coins in Firebase and UI
+        async function updateCoins(amount) {
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            try {
+                let newCoins = currentUserCoins + amount;
+                if (newCoins < 0) newCoins = 0; // Ensure coins don't go negative
+                await updateDoc(userRef, { coins: newCoins });
+                currentUserCoins = newCoins;
+                userCoinsSpan.textContent = currentUserCoins;
+            } catch (error) {
+                console.error("सिक्के अपडेट करने में त्रुटि:", error);
+                window.showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+            }
+        }
+
+        // Function to show the Earn 2X Ads screen
+        window.showEarn2xAdsScreen = function() {
+            if (!applicationUserId) {
+                window.showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
+                return;
+            }
+            showScreen(earn2xAdsScreen);
+            ad2xClickStatus.textContent = ""; // Clear status message on screen entry
+            canClickAd = true; // Reset cooldown when entering screen
+
+            // Attach event listener to the 2x ad container
+            ad2xContainer.removeEventListener('click', handle2xAdClick); // Prevent duplicates
+            ad2xContainer.addEventListener('click', handle2xAdClick);
         }
 
 
@@ -1579,10 +1751,6 @@
         scoreboardBtn.addEventListener('click', showScoreboardScreen);
         chatForm.addEventListener('submit', sendMessage);
         tellQuestionBtn.addEventListener('click', handleTellQuestion);
-
-        // Game Event Listeners
-        betGreenBtn.addEventListener('click', () => { if (isBettingOpen) { selectedBetColor = 'green'; gameStatusMessage.textContent = `आपने हरा चुना है।`; } });
-        betRedBtn.addEventListener('click', () => { if (isBettingOpen) { selectedBetColor = 'red'; gameStatusMessage.textContent = `आपने लाल चुना है।`; } });
         
         // Profile Event Listeners
         saveNameBtn.addEventListener('click', updateUserName);
@@ -1594,8 +1762,11 @@
         navHome.addEventListener('click', () => { if (applicationUserId) showHomePage(currentUserName, applicationUserId, currentUserCoins); });
         navEarn.addEventListener('click', () => { if (applicationUserId) showEarnScreen(); }); 
         navChat.addEventListener('click', () => { if (applicationUserId) showChatScreen(); });
-        navGame.addEventListener('click', () => { if (applicationUserId) showColorPredictionGameScreen(); });
+        // Removed navGame click listener as games are removed
         navProfile.addEventListener('click', showProfileScreen);
+
+        // Earn 2X Button Listener
+        earn2xButton.addEventListener('click', window.showEarn2xAdsScreen);
 
 
         // Initial App Flow
