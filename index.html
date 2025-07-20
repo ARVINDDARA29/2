@@ -432,6 +432,13 @@
         .bet-buttons .bet-red:hover { background-color: #dc2626; transform: translateY(-2px); }
         .game-status-message { margin-top: 1rem; font-size: 1.1rem; font-weight: 600; color: #4f46e5; }
         .timer-display { font-size: 1.8rem; font-weight: bold; color: #4f46e5; margin-bottom: 1rem; }
+        /* Ad container specific styles for clickability */
+        .ad-container {
+            cursor: pointer; /* Indicate that the ad is clickable */
+            border: 1px solid #e5e7eb; /* Subtle border to make it look like a clickable area */
+            border-radius: 0.75rem;
+            overflow: hidden; /* Ensure ad content stays within bounds */
+        }
 
     </style>
 </head>
@@ -670,9 +677,8 @@
                 </svg>
             </button>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">सिक्के कमाएँ!</h2>
-            <p class="text-lg text-gray-700 mb-4">जितने बैनर पर क्लिक करोगे 0.5 सिक्के मिलेंगे!</p>
-            <button id="view-ad-banner-btn" class="button-primary mb-4">विज्ञापन देखकर सिक्के कमाएँ</button>
-            <p id="ad-view-status" class="text-sm text-gray-600 mb-4"></p>
+            <p id="earn-instruction-text" class="text-lg text-gray-700 mb-4">विज्ञापन बैनर पर क्लिक करके 0.5 सिक्के कमाएँ!</p>
+            <p id="ad-click-status" class="text-sm text-gray-600 mb-4"></p> <!-- New status message for ad clicks -->
 
             <div class="mt-8 w-full flex flex-col items-center space-y-4">
                 <!-- Ad Integration 1 -->
@@ -778,7 +784,7 @@
         const withdrawalBtn = document.getElementById('withdrawal-btn');
         const bottomNav = document.getElementById('bottom-nav');
         const navHome = document.getElementById('nav-home');
-        const navEarn = document.getElementById('nav-earn'); // Re-added Earn Nav Item
+        const navEarn = document.getElementById('nav-earn'); 
         const navChat = document.getElementById('nav-chat'); 
         const navGame = document.getElementById('nav-game'); 
         const navProfile = document.getElementById('nav-profile');
@@ -832,8 +838,8 @@
 
         // Earn Screen DOM Elements
         const earnScreen = document.getElementById('earn-screen');
-        const viewAdBannerBtn = document.getElementById('view-ad-banner-btn');
-        const adViewStatus = document.getElementById('ad-view-status');
+        const earnInstructionText = document.getElementById('earn-instruction-text'); 
+        const adClickStatus = document.getElementById('ad-click-status'); 
 
         let timeUpdateInterval; 
         let canClickAd = true; // Cooldown for ad clicks
@@ -864,7 +870,6 @@
 
             if (currentActiveScreen && currentActiveScreen.id === 'chat-screen' && unsubscribeChat) {
                 unsubscribeChat(); // Detach chat listener when leaving chat screen
-                unsubscribeChat = null;
                 console.log("Chat listener detached.");
             }
 
@@ -1215,7 +1220,7 @@
                     firebaseAuthUid: firebaseAuthUid
                 });
                 upiIdInput.value = '';
-                showMessage("आपका पैसा जल्द ही आपके खाते में आ जाएगा!", () => { // Updated message
+                showMessage("आपका पैसा जल्द ही आपके खाते में आ जाएगा!", () => { 
                     showHomePage(currentUserName, applicationUserId, currentUserCoins);
                 });
             } catch (error) {
@@ -1500,8 +1505,11 @@
             // ... reset game UI elements
         }
 
-        // Earn Coins from Ad Click
-        async function earnCoinsFromAdClick() {
+        // Handle ad click to earn coins
+        async function handleAdClick(event) {
+            // Prevent the click from propagating to child elements if they also have listeners
+            event.stopPropagation(); 
+
             if (!applicationUserId) {
                 showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
                 return;
@@ -1512,33 +1520,31 @@
             }
 
             canClickAd = false; // Disable clicks
-            adViewStatus.textContent = "विज्ञापन लोड हो रहा है...";
+            adClickStatus.textContent = "विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...";
 
-            // Simulate ad loading/viewing time
-            setTimeout(async () => {
-                const userRef = doc(collection(db, `users`), applicationUserId);
-                try {
-                    const userSnap = await getDoc(userRef);
-                    if (userSnap.exists()) {
-                        let userData = userSnap.data();
-                        let newCoins = (userData.coins || 0) + 0.5;
-                        await updateDoc(userRef, { coins: newCoins });
-                        currentUserCoins = newCoins;
-                        userCoinsSpan.textContent = currentUserCoins;
-                        adViewStatus.textContent = "आपको 0.5 सिक्के मिले!";
-                        showMessage("आपको 0.5 सिक्के मिले!");
-                    }
-                } catch (error) {
-                    console.error("विज्ञापन से सिक्के कमाने में त्रुटि:", error);
-                    adViewStatus.textContent = `त्रुटि: ${error.message}`;
-                    showMessage(`विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
-                } finally {
-                    setTimeout(() => {
-                        canClickAd = true; // Re-enable click after cooldown
-                        adViewStatus.textContent = "";
-                    }, adClickCooldownTime);
+            const userRef = doc(collection(db, `users`), applicationUserId);
+            try {
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    let userData = userSnap.data();
+                    let newCoins = (userData.coins || 0) + 0.5;
+                    await updateDoc(userRef, { coins: newCoins });
+                    currentUserCoins = newCoins;
+                    userCoinsSpan.textContent = currentUserCoins; // Update coins on home screen
+                    gameUserCoins.textContent = currentUserCoins; // Update coins on game screen
+                    adClickStatus.textContent = "आपको 0.5 सिक्के मिले!";
+                    showMessage("आपको 0.5 सिक्के मिले!");
                 }
-            }, 1000); // Simulate 1 second ad view
+            } catch (error) {
+                console.error("विज्ञापन से सिक्के कमाने में त्रुटि:", error);
+                adClickStatus.textContent = `त्रुटि: ${error.message}`;
+                showMessage(`विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
+            } finally {
+                setTimeout(() => {
+                    canClickAd = true; // Re-enable click after cooldown
+                    adClickStatus.textContent = "";
+                }, adClickCooldownTime);
+            }
         }
 
         function showEarnScreen() {
@@ -1549,8 +1555,16 @@
             showScreen(earnScreen);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             navEarn.classList.add('active');
-            adViewStatus.textContent = ""; // Clear status message on screen entry
+            adClickStatus.textContent = ""; // Clear status message on screen entry
             canClickAd = true; // Reset cooldown when entering screen
+
+            // Attach event listeners to all ad containers when the earn screen is shown
+            const adContainers = document.querySelectorAll('.ad-container');
+            adContainers.forEach(container => {
+                // Remove existing listener to prevent duplicates if screen is re-entered
+                container.removeEventListener('click', handleAdClick);
+                container.addEventListener('click', handleAdClick);
+            });
         }
 
 
@@ -1578,13 +1592,10 @@
 
         // Navigation Bar Event Listeners
         navHome.addEventListener('click', () => { if (applicationUserId) showHomePage(currentUserName, applicationUserId, currentUserCoins); });
-        navEarn.addEventListener('click', () => { if (applicationUserId) showEarnScreen(); }); // Re-added Earn Event Listener
+        navEarn.addEventListener('click', () => { if (applicationUserId) showEarnScreen(); }); 
         navChat.addEventListener('click', () => { if (applicationUserId) showChatScreen(); });
         navGame.addEventListener('click', () => { if (applicationUserId) showColorPredictionGameScreen(); });
         navProfile.addEventListener('click', showProfileScreen);
-
-        // Earn Screen Button Listener
-        viewAdBannerBtn.addEventListener('click', earnCoinsFromAdClick);
 
 
         // Initial App Flow
