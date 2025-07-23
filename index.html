@@ -6,7 +6,6 @@
     <title>ADBOSS 2.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Google AdSense Script - Removed as requested -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -45,7 +44,11 @@
         #scoreboard-screen.screen.active, /* स्कोरबोर्ड स्क्रीन के लिए */
         #chat-screen.screen.active, /* चैट स्क्रीन के लिए */
         #earn-screen.screen.active, /* अर्न स्क्रीन के लिए */
-        #earn-2x-ads-screen.screen.active { /* Earn 2X Ads Screen के लिए */
+        #earn-2x-ads-screen.screen.active, /* Earn 2X Ads Screen के लिए */
+        #game-selection-screen.screen.active, /* Game Selection Screen */
+        #color-prediction-game-screen.screen.active, /* Color Prediction Game Screen */
+        #withdrawal-success-screen.screen.active, /* Withdrawal Success Screen */
+        #announcement-detail-screen.screen.active { /* Announcement Detail Screen */
             background: linear-gradient(135deg, #e0e7ff, #c7d2fe); /* हल्का नीला-बैंगनी ग्रेडिएंट */
             border-radius: 1.5rem; /* कंटेनर के समान गोल कोने */
             padding: 2.5rem; /* कंटेनर के समान पैडिंग */
@@ -120,7 +123,7 @@
             border-color: #6366f1; /* इंडिगो 500 */
             box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.3); /* फोकस रिंग */
         }
-        .message-box {
+        .message-box, .input-modal {
             position: fixed;
             top: 50%;
             left: 50%;
@@ -140,12 +143,12 @@
             opacity: 0; /* शुरुआत में अदृश्य */
             transition: all 0.3s ease-out; /* ट्रांज़िशन प्रभाव */
         }
-        .message-box.active {
+        .message-box.active, .input-modal.active {
             display: flex;
             opacity: 1; /* दिखाई दे */
             transform: translate(-50%, -50%) scale(1); /* सामान्य आकार पर स्केल करें */
         }
-        .message-box button {
+        .message-box button, .input-modal button {
             background-color: #4f46e5;
             color: white;
             padding: 0.5rem 1rem;
@@ -154,10 +157,30 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .message-box button:hover {
+        .message-box button:hover, .input-modal button:hover {
             background-color: #4338ca;
             transform: translateY(-1px);
         }
+        .input-modal input {
+            background-color: #f0f2f5;
+            color: #1f2937;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+        .input-modal .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .input-modal .button-group button {
+            flex: 1;
+            margin-top: 0;
+        }
+
 
         /* बॉटम नेविगेशन बार स्टाइल */
         .bottom-nav {
@@ -201,7 +224,6 @@
             height: 1.5rem;
             margin-bottom: 0.25rem;
         }
-
         /* एनिमेशन */
         @keyframes pulse {
             0%, 100% { opacity: 1; }
@@ -340,7 +362,7 @@
             padding: 0.75rem 1rem;
             border-radius: 1rem;
             word-wrap: break-word;
-            position: relative; /* For views count positioning */
+            position: relative;
         }
         .message-sender {
             font-size: 0.75rem;
@@ -390,22 +412,7 @@
         #send-chat-btn:hover {
             background-color: #4338ca;
         }
-        #tell-question-btn {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #4f46e5;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            z-index: 10;
-        }
-        /* Removed .message-views styles as views are no longer displayed */
 
-        /* अन्य स्टाइल... (पहले के सभी स्टाइल यहाँ रहेंगे) */
         .withdrawal-card { background-color: #ffffff; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); width: 100%; max-width: 25rem; display: flex; flex-direction: column; align-items: center; text-align: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .withdrawal-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
         .withdrawal-card .coins { font-size: 2.5rem; font-weight: bold; color: #4f46e5; margin-bottom: 0.5rem; }
@@ -434,12 +441,11 @@
         .bet-buttons .bet-red:hover { background-color: #dc2626; transform: translateY(-2px); }
         .game-status-message { margin-top: 1rem; font-size: 1.1rem; font-weight: 600; color: #4f46e5; }
         .timer-display { font-size: 1.8rem; font-weight: bold; color: #4f46e5; margin-bottom: 1rem; }
-        /* Ad container specific styles for clickability */
         .ad-container {
-            cursor: pointer; /* Indicate that the ad is clickable */
-            border: 1px solid #e5e7eb; /* Subtle border to make it look like a clickable area */
+            cursor: pointer; 
+            border: 1px solid #e5e7eb; 
             border-radius: 0.75rem;
-            overflow: hidden; /* Ensure ad content stays within bounds */
+            overflow: hidden; 
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .ad-container:hover {
@@ -447,17 +453,106 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
 
-        /* New styles for earning games - Removed as per request */
-        /* .game-card { ... } */
+        .game-card {
+            background-color: #ffffff;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .game-card .game-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: #4f46e5;
+        }
+        .game-card .game-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .game-card .game-description {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
 
-        /* Spin Wheel Specific Styles - Removed as per request */
-        /* #wheel-canvas { ... } */
-
-        /* Scratch Card Specific Styles - Removed as per request */
-        /* #scratch-canvas-container { ... } */
-
-        /* Quiz Game Specific Styles - Removed as per request */
-        /* .quiz-question { ... } */
+        #announcement-section {
+            background: linear-gradient(45deg, #ef4444, #f97316); 
+            color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 25rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            animation: announcementPulse 2s infinite ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            overflow: hidden; 
+            position: relative;
+        }
+        #announcement-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+        @keyframes announcementPulse {
+            0% { transform: scale(1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); } 
+            50% { transform: scale(1.02); box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5); } 
+            100% { transform: scale(1); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); } 
+        }
+        #announcement-section .announcement-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        #announcement-section .announcement-message-preview {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 90%;
+            display: block;
+        }
+        #announcement-detail-screen {
+            padding: 2rem;
+            text-align: left;
+        }
+        #announcement-detail-screen h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+        #announcement-detail-screen p {
+            font-size: 1.1rem;
+            color: #4b5563;
+            line-height: 1.6;
+        }
+        .announcement-icon {
+            /* बदला हुआ आकार */
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.5rem;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -473,7 +568,6 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-8">स्वागत है!</h2>
             <button id="have-account-btn" class="button-primary mb-4">मौजूदा खाता</button>
             <button id="new-user-btn" class="button-secondary">नया उपयोगकर्ता</button>
-            <!-- Ad on Main Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                 <div id="container-main-screen-ad"></div>
@@ -490,16 +584,9 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6">आपका पूरा नाम क्या है?</h2>
             <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="mb-4">
             <button id="create-user-btn" class="button-primary">खाता बनाएँ</button>
-            <!-- Ad on New User Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '83bf329d89f64adb373217c75241cebf',
-                        'format' : 'iframe',
-                        'height' : 600,
-                        'width' : 160,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
             </div>
@@ -515,7 +602,6 @@
             <h2 class="text-3xl font-bold text-gray-800 mb-6">अपनी ID दर्ज करें</h2>
             <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता ID दर्ज करें" class="mb-4">
             <button id="login-btn" class="button-primary">लॉग इन करें</button>
-            <!-- Ad on Have Account Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                 <div id="container-have-account-screen-ad"></div>
@@ -528,6 +614,17 @@
                 <span id="current-time" class="font-semibold"></span>
                 <button id="account-age-btn" class="font-semibold text-indigo-600 hover:underline cursor-pointer">आप पुराने हैं</button>
             </div>
+            
+            <div id="announcement-section" class="mb-6 hidden">
+                <div class="flex items-center justify-center mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="announcement-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.04 5.455 1.31m5.714 0a24.249 24.249 0 00-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                    </svg>
+                    <div id="announcement-title" class="announcement-title">महत्वपूर्ण घोषणा!</div>
+                </div>
+                <div id="announcement-message-preview" class="announcement-message-preview"></div>
+            </div>
+
             <p class="text-xs text-gray-500 text-right w-full pr-4">आपकी उपयोगकर्ता ID: <span id="display-user-id" class="font-mono text-gray-600 break-all"></span> <button id="copy-id-btn" class="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-md hover:bg-gray-300 transition">कॉपी करें</button></p>
             <h2 id="welcome-message" class="text-4xl font-bold text-indigo-600 mb-4 mt-4 gradient-text">नमस्ते!</h2>
             <p class="text-lg text-gray-700 mb-4">आपका ADBOSS 2.0 में स्वागत है।</p>
@@ -539,16 +636,9 @@
 
             <button id="withdrawal-btn" class="button-primary">निकासी</button>
             <button id="scoreboard-btn" class="button-secondary mt-4">स्कोरबोर्ड</button>
-            <!-- Ad on Home Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '83bf329d89f64adb373217c75241cebf',
-                        'format' : 'iframe',
-                        'height' : 600,
-                        'width' : 160,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
             </div>
@@ -567,7 +657,6 @@
             <div id="scoreboard-list-container" class="scoreboard-list">
                 <p class="text-gray-500">लोड हो रहा है...</p>
             </div>
-             <!-- Ad on Scoreboard Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                 <div id="container-scoreboard-screen-ad"></div>
@@ -587,20 +676,10 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
             </button>
-            <button id="tell-question-btn">प्रश्न पूछें</button>
-            <div id="chat-messages">
-                <!-- Messages will be loaded here -->
-            </div>
-            <!-- Ad on Chat Screen -->
+            <div id="chat-messages"></div>
             <div class="ad-container w-full max-w-xs mt-6 mb-4">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '83bf329d89f64adb373217c75241cebf',
-                        'format' : 'iframe',
-                        'height' : 600,
-                        'width' : 160,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
             </div>
@@ -612,6 +691,77 @@
                     </svg>
                 </button>
             </form>
+        </div>
+
+        <!-- Announcement Detail Screen -->
+        <div id="announcement-detail-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 id="announcement-detail-title" class="gradient-text">घोषणा</h2>
+            <p id="announcement-detail-message"></p>
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-announcement-detail-screen-ad"></div>
+            </div>
+        </div>
+
+        <!-- Game Selection Screen -->
+        <div id="game-selection-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">गेम चुनें</h2>
+            <p class="text-lg text-gray-700 mb-4">अपनी किस्मत आजमाएँ और सिक्के कमाएँ!</p>
+            
+            <div class="mt-8 w-full flex flex-col items-center space-y-4">
+                <div class="game-card" onclick="window.showColorPredictionGameScreen()">
+                    <span class="game-icon">🌈</span>
+                    <p class="game-title">रंग भविष्यवाणी</p>
+                    <p class="game-description">अगले रंग का अनुमान लगाएँ और जीतें!</p>
+                </div>
+            </div>
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-game-selection-screen-ad"></div>
+            </div>
+        </div>
+
+        <!-- Color Prediction Game Screen -->
+        <div id="color-prediction-game-screen" class="screen">
+            <button class="back-button" onclick="window.goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+            </button>
+            <div class="game-header">
+                <div class="user-info">
+                    <p>नाम: <span id="game-user-name" class="font-bold"></span></p>
+                    <p>सिक्के: <span id="game-user-coins" class="coins font-bold"></span></p>
+                </div>
+                <div class="timer-display" id="game-timer-display">15</div>
+            </div>
+
+            <div id="color-circle" class="color-circle"></div>
+            <p id="game-status-message" class="game-status-message mb-4">रंग का अनुमान लगाएँ!</p>
+
+            <div class="game-controls">
+                <input type="number" id="bet-amount-input" placeholder="शर्त राशि (सिक्के)" class="mb-2" min="1">
+                <div class="bet-buttons">
+                    <button id="bet-green-btn" class="bet-green">हरा (x2)</button>
+                    <button id="bet-red-btn" class="bet-red">लाल (x2)</button>
+                </div>
+            </div>
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
         </div>
 
         <!-- Withdrawal Scheme Screen -->
@@ -641,7 +791,6 @@
                 <p class="rupees">= ₹40</p>
                 <button onclick="window.selectWithdrawalScheme(300, 40)">निकासी करें</button>
             </div>
-             <!-- Ad on Withdrawal Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                 <div id="container-withdrawal-screen-ad"></div>
@@ -659,18 +808,22 @@
             <p id="upi-amount-display" class="text-lg text-gray-700 mb-4"></p>
             <input type="text" id="upi-id-input" placeholder=" अपनी UPI ID दर्ज करें (उदाहरण: yourname@bank)" class="mb-4">
             <button id="submit-upi-btn" class="button-primary">जमा करें</button>
-             <!-- Ad on UPI Input Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '83bf329d89f64adb373217c75241cebf',
-                        'format' : 'iframe',
-                        'height' : 600,
-                        'width' : 160,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
+            </div>
+        </div>
+
+        <!-- Withdrawal Success Screen -->
+        <div id="withdrawal-success-screen" class="screen">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">आपको बधाई!</h2>
+            <p id="withdrawal-success-message" class="text-lg text-gray-700 mb-4">आपका पैसा 24 घंटे में आपके खाते में आ जाएगा।</p>
+            <p class="text-sm text-gray-500">आपको होम स्क्रीन पर रीडायरेक्ट किया जा रहा है...</p>
+            <div class="ad-container w-full max-w-xs mt-6">
+                <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
+                <div id="container-withdrawal-success-screen-ad"></div>
             </div>
         </div>
 
@@ -711,12 +864,11 @@
                 <p class="text-lg font-semibold text-gray-700 mb-2">हमारा चैनल:</p>
                 <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full max-w-none text-sm py-2 flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-2">
-                        <path d="M19.5 2.25a1.5 1.5 0 011.5 1.5v16.5a1.5 1.5 0 01-1.5 1.5h-15a1.5 1.5 0 01-1.5-1.5V3.75a1.5 1.5 0 011.5-1.5h15zm-6 1.5H5.25v13.5h8.25V3.75zm.75 0v16.5h3.75a1.5 1.5 0 001.5-1.5V3.75a1.5 1.5 0 00-1.5-1.5h-3.75z" />
+                        <path d="M19.5 2.25a1.5 1.5 0 011.5 1.5v16.5a1.5 1.5 0 01-1.5-1.5h-15a1.5 1.5 0 01-1.5-1.5V3.75a1.5 1.5 0 011.5-1.5h15zm-6 1.5H5.25v13.5h8.25V3.75zm.75 0v16.5h3.75a1.5 1.5 0 001.5-1.5V3.75a1.5 1.5 0 00-1.5-1.5h-3.75z" />
                     </svg>
                     चैनल चेक बायो
                 </a>
             </div>
-            <!-- Ad on Profile Screen -->
             <div class="ad-container w-full max-w-xs mt-6">
                 <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                 <div id="container-profile-screen-ad"></div>
@@ -737,98 +889,16 @@
             <p id="ad-click-status" class="text-sm text-gray-600 mb-4"></p>
 
             <div class="mt-8 w-full flex flex-col items-center space-y-4">
-                <!-- Ad Integration 1 -->
                 <div class="ad-container w-full">
                     <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
                     <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9"></div>
                 </div>
-                <!-- Ad Integration 2 -->
                 <div class="ad-container w-full">
                     <script type="text/javascript">
-                        atOptions = {
-                            'key' : '83bf329d89f64adb373217c75241cebf',
-                            'format' : 'iframe',
-                            'height' : 600,
-                            'width' : 160,
-                            'params' : {}
-                        };
+                        atOptions = { 'key' : '83bf329d89f64adb373217c75241cebf', 'format' : 'iframe', 'height' : 600, 'width' : 160, 'params' : {} };
                     </script>
                     <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
                 </div>
-                <!-- Additional Ad 1 -->
-                <div class="ad-container w-full">
-                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
-                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_2"></div>
-                </div>
-                <!-- Additional Ad 2 -->
-                <div class="ad-container w-full">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '83bf329d89f64adb373217c75241cebf',
-                            'format' : 'iframe',
-                            'height' : 600,
-                            'width' : 160,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
-                </div>
-                <!-- Additional Ad 3 -->
-                <div class="ad-container w-full">
-                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
-                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_3"></div>
-                </div>
-                <!-- Additional Ad 4 -->
-                <div class="ad-container w-full">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '83bf329d89f64adb373217c75241cebf',
-                            'format' : 'iframe',
-                            'height' : 600,
-                            'width' : 160,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
-                </div>
-                <!-- Additional Ad 5 -->
-                <div class="ad-container w-full">
-                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
-                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_4"></div>
-                </div>
-                <!-- Additional Ad 6 -->
-                <div class="ad-container w-full">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '83bf329d89f64adb373217c75241cebf',
-                            'format' : 'iframe',
-                            'height' : 600,
-                            'width' : 160,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
-                </div>
-                <!-- Additional Ad 7 -->
-                <div class="ad-container w-full">
-                    <script async="async" data-cfasync="false" src="//pl27209153.profitableratecpm.com/4e2d6d16c1332f7c73b28bca760b3ec9/invoke.js"></script>
-                    <div id="container-4e2d6d16c1332f7c73b28bca760b3ec9_5"></div>
-                </div>
-                <!-- Additional Ad 8 -->
-                <div class="ad-container w-full">
-                    <script type="text/javascript">
-                        atOptions = {
-                            'key' : '83bf329d89f64adb373217c75241cebf',
-                            'format' : 'iframe',
-                            'height' : 600,
-                            'width' : 160,
-                            'params' : {}
-                        };
-                    </script>
-                    <script type="text/javascript" src="//www.highperformanceformat.com/83bf329d89f64adb373217c75241cebf/invoke.js"></script>
-                </div>
-
-
                 <button id="earn-2x-button" class="button-primary mt-6">2X सिक्के कमाएँ!</button>
             </div>
         </div>
@@ -846,13 +916,7 @@
 
             <div class="ad-container w-full max-w-xs" id="ad-2x-container">
                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '0d15173de61272c3e2bb15f8677bb5c5',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
+                    atOptions = { 'key' : '0d15173de61272c3e2bb15f8677bb5c5', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
                 </script>
                 <script type="text/javascript" src="//www.highperformanceformat.com/0d15173de61272c3e2bb15f8677bb5c5/invoke.js"></script>
             </div>
@@ -862,6 +926,15 @@
     <div id="message-box" class="message-box">
         <p id="message-text" class="text-lg mb-4"></p>
         <button id="message-box-ok-btn">ठीक है</button>
+    </div>
+
+    <div id="input-modal" class="input-modal">
+        <p id="input-modal-title" class="text-lg mb-4"></p>
+        <input type="text" id="input-modal-field" class="w-full max-w-xs" placeholder="">
+        <div class="button-group w-full max-w-xs">
+            <button id="input-modal-submit-btn" class="button-primary">भेजें</button>
+            <button id="input-modal-cancel-btn" class="button-secondary">रद्द करें</button>
+        </div>
     </div>
 
     <nav id="bottom-nav" class="bottom-nav hidden">
@@ -881,11 +954,10 @@
             </svg>
             <span>चैट</span>
         </div>
-        <!-- Removed Game Nav Item -->
-        <!-- <div id="nav-game" class="nav-item">
+        <div id="nav-game" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0h.008v.008H21V5.25zM3 5.25h-.008v.008H3V5.25zm2.25 0h.008v.008H5.25V5.25zm-.008 9.75H5.25V15h.008v-.008zm7.5-9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5zM12 12a.75.75 0 100-1.5.75.75 0 000 1.5zM12 15a.75.75 0 100-1.5.75.75 0 000 1.5z" /></svg>
             <span>गेम</span>
-        </div> -->
+        </div>
         <div id="nav-profile" class="nav-item">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
             <span>प्रोफ़ाइल</span>
@@ -907,8 +979,8 @@
         const firebaseConfig = {
             apiKey: "AIzaSyC3faZ16ZTsIUBEfI9dl55RnDklVeWIHts",
             authDomain: "arvind-dara.firebaseapp.com",
-            projectId: "arvind-dara", // Corrected projectId
-            storageBucket: "arvind-dara.firebasestorage.app",
+            projectId: "arvind-dara",
+            storageBucket: "arvind-dara.appspot.com",
             messagingSenderId: "341922555843",
             appId: "1:341922555843:web:cefd0e44e5d8afae4fbf76",
             measurementId: "G-FDSW4BEXDF"
@@ -927,7 +999,8 @@
         let screenHistory = [];
         let selectedCoinsToDeduct = 0;
         let selectedRupeesToGet = 0;
-        let unsubscribeChat = null; // To store the chat listener unsubscribe function
+        let unsubscribeChat = null;
+        let unsubscribeAnnouncements = null;
 
         // DOM Elements
         const introScreen = document.getElementById('intro-screen');
@@ -943,8 +1016,7 @@
         const navHome = document.getElementById('nav-home');
         const navEarn = document.getElementById('nav-earn'); 
         const navChat = document.getElementById('nav-chat'); 
-        // Removed navGame DOM element as games are removed
-        // const navGame = document.getElementById('nav-game'); 
+        const navGame = document.getElementById('nav-game'); 
         const navProfile = document.getElementById('nav-profile');
         const currentTimeSpan = document.getElementById('current-time');
         const accountAgeBtn = document.getElementById('account-age-btn');
@@ -969,68 +1041,84 @@
         const upiAmountDisplay = document.getElementById('upi-amount-display');
         const upiIdInput = document.getElementById('upi-id-input');
         const submitUpiBtn = document.getElementById('submit-upi-btn');
+        const withdrawalSuccessScreen = document.getElementById('withdrawal-success-screen');
 
         const scoreboardBtn = document.getElementById('scoreboard-btn');
         const scoreboardScreen = document.getElementById('scoreboard-screen');
         const scoreboardListContainer = document.getElementById('scoreboard-list-container');
         const myRankDisplay = document.getElementById('my-rank-display');
 
-        // Chat DOM Elements
         const chatIntroScreen = document.getElementById('chat-intro-screen');
         const chatScreen = document.getElementById('chat-screen');
         const chatMessages = document.getElementById('chat-messages');
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
-        const tellQuestionBtn = document.getElementById('tell-question-btn');
 
-        // Earn Screen DOM Elements
+        const gameSelectionScreen = document.getElementById('game-selection-screen');
+
+        const colorPredictionGameScreen = document.getElementById('color-prediction-game-screen');
+        const gameUserName = document.getElementById('game-user-name');
+        const gameUserCoins = document.getElementById('game-user-coins');
+        const colorCircle = document.getElementById('color-circle');
+        const gameTimerDisplay = document.getElementById('game-timer-display');
+        const gameStatusMessage = document.getElementById('game-status-message');
+        const betAmountInput = document.getElementById('bet-amount-input');
+        const betGreenBtn = document.getElementById('bet-green-btn');
+        const betRedBtn = document.getElementById('bet-red-btn');
+        let gameCountdown = 15;
+        let gameInterval;
+        let colorChangeTimeout;
+        let selectedBetColor = null;
+        let isBettingOpen = true; 
+
         const earnScreen = document.getElementById('earn-screen');
         const earnInstructionText = document.getElementById('earn-instruction-text'); 
         const adClickStatus = document.getElementById('ad-click-status'); 
         const earn2xButton = document.getElementById('earn-2x-button');
 
-        // Earn 2X Ads DOM Elements
         const earn2xAdsScreen = document.getElementById('earn-2x-ads-screen');
         const ad2xContainer = document.getElementById('ad-2x-container');
         const ad2xClickStatus = document.getElementById('ad-2x-click-status');
 
-        // New ad containers for various screens
-        const mainScreenAdContainer = document.getElementById('container-main-screen-ad');
-        const newUserScreenAdContainer = document.querySelector('#new-user-screen .ad-container'); // Select by class within screen
-        const haveAccountScreenAdContainer = document.querySelector('#have-account-screen .ad-container'); // Select by class within screen
-        const homeScreenAdContainer = document.querySelector('#home-screen .ad-container'); // Select by class within screen
-        const scoreboardScreenAdContainer = document.querySelector('#scoreboard-screen .ad-container');
-        const chatScreenAdContainer = document.querySelector('#chat-screen .ad-container');
-        const withdrawalScreenAdContainer = document.querySelector('#withdrawal-scheme-screen .ad-container');
-        const upiInputScreenAdContainer = document.querySelector('#upi-input-screen .ad-container');
-        const profileScreenAdContainer = document.querySelector('#profile-screen .ad-container');
+        const announcementSection = document.getElementById('announcement-section');
+        const announcementTitle = document.getElementById('announcement-title');
+        const announcementMessagePreview = document.getElementById('announcement-message-preview');
+        const announcementDetailScreen = document.getElementById('announcement-detail-screen');
+        const announcementDetailTitle = document.getElementById('announcement-detail-title');
+        const announcementDetailMessage = document.getElementById('announcement-detail-message');
+
+        const inputModal = document.getElementById('input-modal');
+        const inputModalTitle = document.getElementById('input-modal-title');
+        const inputModalField = document.getElementById('input-modal-field');
+        const inputModalSubmitBtn = document.getElementById('input-modal-submit-btn');
+        const inputModalCancelBtn = document.getElementById('input-modal-cancel-btn');
 
 
         let timeUpdateInterval; 
-        let canClickAd = true; // Cooldown for ad clicks
-        const adClickCooldownTime = 5000; // 5 seconds
+        let canClickAd = true;
+        const adClickCooldownTime = 5000;
 
-        // Function to show loading screen
         function showLoadingScreen() {
             loadingScreen.classList.remove('hidden');
             loadingScreen.classList.add('active');
         }
 
-        // Function to hide loading screen
         function hideLoadingScreen() {
             loadingScreen.classList.add('hidden');
             loadingScreen.classList.remove('active');
         }
 
-        // Function to show a specific screen and hide others
         function showScreen(screenToShowElement) {
             const currentActiveScreen = document.querySelector('.screen.active');
 
             if (currentActiveScreen && currentActiveScreen.id === 'chat-screen' && unsubscribeChat) {
-                unsubscribeChat(); // Detach chat listener when leaving chat screen
+                unsubscribeChat();
                 console.log("Chat listener detached.");
             }
-            
+            if (currentActiveScreen && currentActiveScreen.id === 'color-prediction-game-screen') {
+                stopColorPredictionGameLoop();
+            }
+
             if (currentActiveScreen && currentActiveScreen.id !== screenToShowElement.id) {
                 if (currentActiveScreen.id !== 'intro-screen' && currentActiveScreen.id !== 'main-screen') {
                     screenHistory.push(currentActiveScreen.id);
@@ -1044,45 +1132,47 @@
             });
             screenToShowElement.classList.add('active');
 
-            // Show/hide bottom nav
-            const screensWithNav = ['home-screen', 'profile-screen', 'scoreboard-screen', 'chat-screen', 'earn-screen', 'earn-2x-ads-screen']; 
+            const screensWithNav = ['home-screen', 'profile-screen', 'scoreboard-screen', 'chat-screen', 'earn-screen', 'earn-2x-ads-screen', 'game-selection-screen', 'color-prediction-game-screen']; 
             if (screensWithNav.includes(screenToShowElement.id)) {
                 bottomNav.classList.remove('hidden');
                 if (screenToShowElement.id === 'home-screen') {
                     startCurrentTimeUpdate();
+                    loadAnnouncements();
                 } else {
                     stopCurrentTimeUpdate();
+                    if (unsubscribeAnnouncements) {
+                        unsubscribeAnnouncements();
+                        unsubscribeAnnouncements = null;
+                        console.log("Announcements listener detached.");
+                    }
                 }
             } else {
                 bottomNav.classList.add('hidden');
                 stopCurrentTimeUpdate();
+                 if (unsubscribeAnnouncements) {
+                    unsubscribeAnnouncements();
+                    unsubscribeAnnouncements = null;
+                    console.log("Announcements listener detached.");
+                }
             }
 
-            // Show/hide back button
             const backButtons = document.querySelectorAll('.back-button');
-            const noBackScreens = ['main-screen', 'intro-screen', 'home-screen', 'chat-intro-screen'];
+            const noBackScreens = ['main-screen', 'intro-screen', 'home-screen', 'chat-intro-screen', 'withdrawal-success-screen'];
             backButtons.forEach(btn => {
-                if (noBackScreens.includes(screenToShowElement.id)) {
-                    btn.style.display = 'none';
-                } else {
-                    btn.style.display = 'flex'; 
-                }
+                btn.style.display = noBackScreens.includes(screenToShowElement.id) ? 'none' : 'flex';
             });
 
-            // Attach ad click listeners for the current screen
             attachAdListenersToScreen(screenToShowElement);
         }
 
-        // Function to attach ad listeners to all ad containers on a given screen
         function attachAdListenersToScreen(screenElement) {
             const adContainers = screenElement.querySelectorAll('.ad-container');
             adContainers.forEach(container => {
-                container.removeEventListener('click', handleAdClick); // Remove existing to prevent duplicates
+                container.removeEventListener('click', handleAdClick);
                 container.addEventListener('click', handleAdClick);
             });
         }
 
-        // Function to go back to the previous screen
         window.goBack = function() { 
             if (screenHistory.length > 0) {
                 const previousScreenId = screenHistory.pop();
@@ -1101,8 +1191,7 @@
             }
         }
         
-        // Function to display a custom message box
-        window.showMessage = function(message, callback = null) { // Made global
+        window.showMessage = function(message, callback = null) {
             messageText.textContent = message;
             messageBox.classList.add('active');
             messageBoxOkBtn.onclick = () => {
@@ -1111,7 +1200,6 @@
             };
         }
 
-        // Initialize and authenticate Firebase
         async function initializeFirebase() {
             showLoadingScreen();
             try {
@@ -1165,7 +1253,6 @@
             }
         }
 
-        // Function to load user data
         async function loadUserData(appUserIdToLoad) {
             if (!db || !firebaseAuthUid) {
                 console.error("Firestore database or Firebase Auth UID not available.");
@@ -1196,12 +1283,10 @@
             }
         }
 
-        // Function to generate a unique ID
         function generateUniqueId() {
             return crypto.randomUUID();
         }
 
-        // Function to create a new user
         async function createNewUser() {
             const name = newUserNameInput.value.trim();
             if (!name) {
@@ -1218,7 +1303,7 @@
                 await setDoc(doc(db, "users", newUserId), {
                     name: name,
                     userId: newUserId,
-                    coins: 0, // Give 0 coins on new signup as requested
+                    coins: 0,
                     createdAt: new Date().toISOString(),
                     firebaseAuthUid: firebaseAuthUid,
                     referralApplied: false,
@@ -1226,7 +1311,7 @@
                 localStorage.setItem('adbossAppUserId', newUserId);
                 applicationUserId = newUserId;
                 currentUserName = name;
-                currentUserCoins = 0; // Update local coins to 0
+                currentUserCoins = 0;
                 userCreatedAt = new Date();
                 window.showMessage("खाता सफलतापूर्वक बन गया!", () => {
                     showHomePage(name, newUserId, currentUserCoins);
@@ -1238,7 +1323,6 @@
             }
         }
 
-        // Function to log in an existing user
         async function loginExistingUser() {
             const userId = existingUserIdInput.value.trim();
             if (!userId) {
@@ -1250,12 +1334,18 @@
                 return;
             }
             try {
-                const userDoc = await getDoc(doc(db, "users", userId));
+                const userDocRef = doc(collection(db, `users`), userId);
+                const userDoc = await getDoc(userDocRef);
                 if (!userDoc.exists()) {
                     window.showMessage("यह User ID मौजूद नहीं है");
                     return;
                 }
                 const userData = userDoc.data();
+
+                if (userData.firebaseAuthUid !== firebaseAuthUid) {
+                    await updateDoc(userDocRef, { firebaseAuthUid: firebaseAuthUid });
+                    console.log("Updated firebaseAuthUid for user:", userId);
+                }
 
                 localStorage.setItem('adbossAppUserId', userId);
                 applicationUserId = userId;
@@ -1269,18 +1359,16 @@
                 existingUserIdInput.value = '';
             } catch (error) {
                 console.error("Login error:", error);
-                window.showMessage(`Lलॉगिन में त्रुटि: ${error.message}`);
+                window.showMessage(`Login में त्रुटि: ${error.message}`);
             }
         }
 
-        // Function to display the home page
         function showHomePage(userName, userId, coins) {
             welcomeMessage.textContent = `नमस्ते, ${userName}!`;
             displayUserId.textContent = userId;
             userCoinsSpan.textContent = coins;
             showScreen(document.getElementById('home-screen'));
             
-            // Activate Home on navigation bar
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             navHome.classList.add('active');
             
@@ -1291,7 +1379,6 @@
             }
         }
         
-        // Function to update current time
         function updateCurrentTime() {
             const now = new Date();
             const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
@@ -1329,7 +1416,6 @@
             timeUpdateInterval = null;
         }
 
-        // Function to copy user ID to clipboard
         function copyUserId() {
             const userIdText = displayUserId.textContent;
             if (userIdText) {
@@ -1347,12 +1433,15 @@
             }
         }
 
-        // Handler for withdrawal button
         function handleWithdrawal() {
             showScreen(withdrawalSchemeScreen);
         }
 
         window.selectWithdrawalScheme = async function(coins, rupees) {
+            if (!applicationUserId) {
+                window.showMessage("निकासी करने के लिए कृपया लॉग इन करें।");
+                return;
+            }
             if (currentUserCoins >= coins) {
                 selectedCoinsToDeduct = coins;
                 selectedRupeesToGet = rupees;
@@ -1372,8 +1461,10 @@
             const userRef = doc(collection(db, `users`), applicationUserId);
             try {
                 currentUserCoins -= selectedCoinsToDeduct;
-                await updateDoc(userRef, { coins: currentUserCoins });
                 userCoinsSpan.textContent = currentUserCoins;
+
+                await updateDoc(userRef, { coins: currentUserCoins });
+                
                 await addDoc(collection(db, `withdrawalRequests`), {
                     userId: applicationUserId,
                     userName: currentUserName,
@@ -1385,14 +1476,20 @@
                     firebaseAuthUid: firebaseAuthUid
                 });
                 upiIdInput.value = '';
-                window.showMessage("आपका पैसा जल्द ही आपके खाते में आ जाएगा!", () => { 
-                    showHomePage(currentUserName, applicationUserId, currentUserCoins);
-                });
+                window.showWithdrawalSuccessScreen();
             } catch (error) {
                 console.error("निकासी संसाधित करने में त्रुटि:", error);
                 window.showMessage(`निकासी संसाधित करने में त्रुटि: ${error.message}`);
             }
         }
+
+        window.showWithdrawalSuccessScreen = function() {
+            showScreen(withdrawalSuccessScreen);
+            setTimeout(() => {
+                showHomePage(currentUserName, applicationUserId, currentUserCoins);
+            }, 5000);
+        }
+
 
         function showProfileScreen() {
             if (!applicationUserId) {
@@ -1442,7 +1539,6 @@
             }
         }
 
-        // Chat Functions
         function showChatIntro() {
             if (!applicationUserId) {
                 window.showMessage("चैट करने के लिए कृपया लॉग इन करें।");
@@ -1451,7 +1547,7 @@
             showScreen(chatIntroScreen);
             setTimeout(() => {
                 showChatScreen();
-            }, 2000); // 2 सेकंड के बाद चैट स्क्रीन दिखाएं
+            }, 2000);
         }
 
         function showChatScreen() {
@@ -1476,18 +1572,22 @@
                 });
                 chatInput.value = "";
             } catch (error) {
-                console.error("Error sending message: ", error);
+                console.error("संदेश भेजने में त्रुटि: ", error);
                 window.showMessage("संदेश भेजने में त्रुटि हुई।");
             }
         }
 
         function loadMessages() {
             if (unsubscribeChat) {
-                unsubscribeChat(); // Detach any existing listener
+                unsubscribeChat();
+                console.log("पिछला चैट श्रोता अलग किया गया।");
             }
             const q = query(collection(db, "chats"), orderBy("timestamp", "desc"));
-            unsubscribeChat = onSnapshot(q, async (querySnapshot) => { 
-                chatMessages.innerHTML = ""; // Clear previous messages
+            unsubscribeChat = onSnapshot(q, (querySnapshot) => { 
+                chatMessages.innerHTML = "";
+                if (querySnapshot.docs.length === 0) {
+                    chatMessages.innerHTML = '<p class="text-gray-500 text-center">अभी कोई संदेश नहीं है।</p>';
+                }
                 for (const docSnapshot of querySnapshot.docs) { 
                     const message = docSnapshot.data();
                     const messageContainer = document.createElement('div');
@@ -1515,41 +1615,21 @@
                     chatMessages.appendChild(messageContainer);
                 }
             }, (error) => {
-                console.error("Error loading messages:", error);
+                console.error("संदेश लोड करने में त्रुटि:", error);
                 window.showMessage("संदेश लोड करने में त्रुटि हुई।");
             });
         }
 
-        async function handleTellQuestion() {
-            const question = prompt("आपका क्या प्रश्न है?");
-            if (question && question.trim() !== "") {
-                try {
-                    await addDoc(collection(db, "questions"), {
-                        question: question.trim(),
-                        userId: applicationUserId,
-                        userName: currentUserName,
-                        timestamp: serverTimestamp()
-                    });
-                    window.showMessage("आपका प्रश्न सफलतापूर्वक भेज दिया गया है!");
-                } catch (error) {
-                    console.error("Error sending question: ", error);
-                    window.showMessage("प्रश्न भेजने में त्रुटि हुई।");
-                }
-            }
-        }
-
-        // Other functions (logout, scoreboard, etc.) remain the same
-        async function applyReferralCode() { /* ... */ }
-        function displayOwnReferralCode() { /* ... */ }
         async function handleLogout() {
             showLoadingScreen();
             try {
                 if (unsubscribeChat) unsubscribeChat();
+                if (unsubscribeAnnouncements) unsubscribeAnnouncements();
                 await signOut(auth);
                 localStorage.removeItem('adbossAppUserId');
                 setTimeout(() => { location.reload(); }, 300);
             } catch (error) {
-                console.error("Error logging out:", error);
+                console.error("लॉगआउट में त्रुटि:", error);
                 window.showMessage(`लॉगआउट में त्रुटि: ${error.message}`);
                 hideLoadingScreen();
             }
@@ -1587,9 +1667,7 @@
             }
         }
         
-        // Handle ad click to earn coins (for normal ads)
         async function handleAdClick(event) {
-            // Prevent the click from propagating to child elements if they also have listeners
             event.stopPropagation(); 
 
             if (!applicationUserId) {
@@ -1601,21 +1679,14 @@
                 return;
             }
 
-            canClickAd = false; // Disable clicks
-            // Determine which status message to update based on the screen
+            canClickAd = false;
             const currentScreenId = document.querySelector('.screen.active').id;
-            let statusMessageElement = null;
-            if (currentScreenId === 'earn-screen') {
-                statusMessageElement = adClickStatus;
-            } else if (currentScreenId === 'earn-2x-ads-screen') {
-                statusMessageElement = ad2xClickStatus;
-            } else {
-                // For other screens, display a general message
-                window.showMessage("विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...");
-            }
+            let statusMessageElement = (currentScreenId === 'earn-screen') ? adClickStatus : (currentScreenId === 'earn-2x-ads-screen') ? ad2xClickStatus : null;
 
             if (statusMessageElement) {
                 statusMessageElement.textContent = "विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...";
+            } else {
+                 window.showMessage("विज्ञापन पर क्लिक का पता चला। सिक्के जोड़ रहा हूँ...");
             }
 
             const userRef = doc(collection(db, `users`), applicationUserId);
@@ -1623,10 +1694,10 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     let userData = userSnap.data();
-                    let newCoins = (userData.coins || 0) + 0.5; // 0.5 coins for normal ads
+                    let newCoins = (userData.coins || 0) + 0.5;
                     await updateDoc(userRef, { coins: newCoins });
                     currentUserCoins = newCoins;
-                    userCoinsSpan.textContent = currentUserCoins; // Update coins on home screen
+                    userCoinsSpan.textContent = currentUserCoins;
                     if (statusMessageElement) {
                         statusMessageElement.textContent = "आपको 0.5 सिक्के मिले!";
                     }
@@ -1634,13 +1705,13 @@
                 }
             } catch (error) {
                 console.error("विज्ञापन से सिक्के कमाने में त्रुटि:", error);
-                if (statusMessageElement) {
+                 if (statusMessageElement) {
                     statusMessageElement.textContent = `त्रुटि: ${error.message}`;
                 }
                 window.showMessage(`विज्ञापन से सिक्के कमाने में त्रुटि: ${error.message}`);
             } finally {
                 setTimeout(() => {
-                    canClickAd = true; // Re-enable click after cooldown
+                    canClickAd = true;
                     if (statusMessageElement) {
                         statusMessageElement.textContent = "";
                     }
@@ -1648,7 +1719,6 @@
             }
         }
 
-        // Handle ad click to earn 2X coins (for specific 2x ad)
         async function handle2xAdClick(event) {
             event.stopPropagation();
 
@@ -1661,7 +1731,7 @@
                 return;
             }
 
-            canClickAd = false; // Disable clicks
+            canClickAd = false;
             ad2xClickStatus.textContent = "विज्ञापन पर क्लिक का पता चला। 2X सिक्के जोड़ रहा हूँ...";
 
             const userRef = doc(collection(db, `users`), applicationUserId);
@@ -1669,7 +1739,7 @@
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
                     let userData = userSnap.data();
-                    let newCoins = (userData.coins || 0) + 1; // 1 coin for 2x ads
+                    let newCoins = (userData.coins || 0) + 1;
                     await updateDoc(userRef, { coins: newCoins });
                     currentUserCoins = newCoins;
                     userCoinsSpan.textContent = currentUserCoins;
@@ -1697,11 +1767,10 @@
             showScreen(earnScreen);
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             navEarn.classList.add('active');
-            earnInstructionText.textContent = "विज्ञापन देखकर सिक्के कमाएँ!"; // Updated instruction
-            adClickStatus.textContent = ""; // Clear status message on screen entry
-            canClickAd = true; // Reset cooldown when entering screen
+            earnInstructionText.textContent = "विज्ञापन देखकर सिक्के कमाएँ!";
+            adClickStatus.textContent = "";
+            canClickAd = true;
 
-            // Attach event listeners to all ad containers when the earn screen is shown
             const adContainers = earnScreen.querySelectorAll('.ad-container');
             adContainers.forEach(container => {
                 container.removeEventListener('click', handleAdClick);
@@ -1709,36 +1778,220 @@
             });
         }
 
-        // Helper function to update coins in Firebase and UI
         async function updateCoins(amount) {
             const userRef = doc(collection(db, `users`), applicationUserId);
             try {
                 let newCoins = currentUserCoins + amount;
-                if (newCoins < 0) newCoins = 0; // Ensure coins don't go negative
+                if (newCoins < 0) newCoins = 0;
                 await updateDoc(userRef, { coins: newCoins });
                 currentUserCoins = newCoins;
                 userCoinsSpan.textContent = currentUserCoins;
+                if (document.getElementById('color-prediction-game-screen').classList.contains('active')) {
+                    gameUserCoins.textContent = currentUserCoins;
+                }
             } catch (error) {
                 console.error("सिक्के अपडेट करने में त्रुटि:", error);
                 window.showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
             }
         }
 
-        // Function to show the Earn 2X Ads screen
         window.showEarn2xAdsScreen = function() {
             if (!applicationUserId) {
                 window.showMessage("सिक्के कमाने के लिए कृपया लॉग इन करें।");
                 return;
             }
             showScreen(earn2xAdsScreen);
-            ad2xClickStatus.textContent = ""; // Clear status message on screen entry
-            canClickAd = true; // Reset cooldown when entering screen
+            ad2xClickStatus.textContent = "";
+            canClickAd = true;
 
-            // Attach event listener to the 2x ad container
-            ad2xContainer.removeEventListener('click', handle2xAdClick); // Prevent duplicates
+            ad2xContainer.removeEventListener('click', handle2xAdClick);
             ad2xContainer.addEventListener('click', handle2xAdClick);
         }
 
+        window.showGameSelectionScreen = function() {
+            if (!applicationUserId) {
+                window.showMessage("गेम खेलने के लिए कृपया लॉग इन करें।");
+                return;
+            }
+            showScreen(gameSelectionScreen);
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            navGame.classList.add('active');
+        }
+
+        window.showColorPredictionGameScreen = function() {
+            if (!applicationUserId) {
+                window.showMessage("गेम खेलने के लिए कृपया लॉग इन करें।");
+                return;
+            }
+            showScreen(colorPredictionGameScreen);
+            gameUserName.textContent = currentUserName;
+            gameUserCoins.textContent = currentUserCoins;
+            resetColorPredictionGame();
+            startGameLoop();
+        }
+        function startGameLoop() {
+            stopColorPredictionGameLoop();
+            gameCountdown = 15;
+            gameTimerDisplay.textContent = gameCountdown;
+            gameStatusMessage.textContent = "रंग का अनुमान लगाएँ!";
+            colorCircle.className = 'color-circle';
+            colorCircle.textContent = '';
+            betAmountInput.disabled = false;
+            betGreenBtn.disabled = false;
+            betRedBtn.disabled = false;
+            isBettingOpen = true;
+            selectedBetColor = null;
+
+            gameInterval = setInterval(() => {
+                gameCountdown--;
+                gameTimerDisplay.textContent = gameCountdown;
+                if (gameCountdown <= 0) {
+                    clearInterval(gameInterval);
+                    isBettingOpen = false;
+                    revealColor();
+                }
+            }, 1000);
+        }
+        function stopColorPredictionGameLoop() {
+            clearInterval(gameInterval);
+            clearTimeout(colorChangeTimeout);
+        }
+        async function revealColor() {
+            const revealedColor = Math.random() < 0.5 ? 'green' : 'red';
+            colorCircle.classList.add(revealedColor);
+            colorCircle.textContent = revealedColor === 'green' ? 'हरा' : 'लाल';
+            betAmountInput.disabled = true;
+            betGreenBtn.disabled = true;
+            betRedBtn.disabled = true;
+
+            if (selectedBetColor !== null) {
+                await processBet(revealedColor);
+            } else {
+                gameStatusMessage.textContent = `यह ${revealedColor === 'green' ? 'हरा' : 'लाल'} था! आपने कोई शर्त नहीं लगाई।`;
+            }
+            colorChangeTimeout = setTimeout(startGameLoop, 5000);
+        }
+        async function processBet(revealedColor) {
+            const betAmount = parseInt(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount <= 0 || currentUserCoins < betAmount) {
+                gameStatusMessage.textContent = "अमान्य शर्त राशि या अपर्याप्त सिक्के।";
+                return;
+            }
+            let newCoins = currentUserCoins;
+            if (selectedBetColor === revealedColor) {
+                newCoins += betAmount; // Win amount is bet amount (x2 total)
+                gameStatusMessage.textContent = `आप जीते! आपको ${betAmount} सिक्के मिले!`;
+            } else {
+                newCoins -= betAmount;
+                gameStatusMessage.textContent = `आप हार गए। आपने ${betAmount} सिक्के खो दिए।`;
+            }
+            await updateCoins(newCoins - currentUserCoins);
+        }
+        function resetColorPredictionGame() {
+            stopColorPredictionGameLoop();
+            gameTimerDisplay.textContent = '15';
+            gameStatusMessage.textContent = 'रंग का अनुमान लगाएँ!';
+            colorCircle.className = 'color-circle';
+            colorCircle.textContent = '';
+            betAmountInput.value = '';
+            betAmountInput.disabled = false;
+            betGreenBtn.disabled = false;
+            betRedBtn.disabled = false;
+            selectedBetColor = null;
+            isBettingOpen = true;
+        }
+
+        // --- ANNOUNCEMENT FUNCTIONS (REVISED) ---
+
+        function loadAnnouncements() {
+            if (unsubscribeAnnouncements) {
+                unsubscribeAnnouncements();
+                console.log("पिछला घोषणा श्रोता अलग किया गया।");
+            }
+            if (!db || !applicationUserId) {
+                console.warn("घोषणाएँ लोड करने के लिए Firestore या उपयोगकर्ता ID उपलब्ध नहीं है।");
+                displayDefaultAnnouncement();
+                return;
+            }
+
+            const announcementsRef = collection(db, "announcements");
+            const q = query(announcementsRef, orderBy("createdAt", "desc"));
+
+            console.log("घोषणाओं के लिए सुनना शुरू कर रहा है...");
+            unsubscribeAnnouncements = onSnapshot(q, (querySnapshot) => {
+                console.log(`स्नैपशॉट प्राप्त हुआ। ${querySnapshot.docs.length} दस्तावेज़ मिले।`);
+                const now = new Date();
+                
+                const validAnnouncementDoc = querySnapshot.docs.find(doc => {
+                    const data = doc.data();
+                    console.log(`--- दस्तावेज़ की जाँच (${doc.id}):`, data);
+
+                    if (!data.createdAt) {
+                        console.log(`   -> अमान्य: 'createdAt' फ़ील्ड गायब है।`);
+                        return false;
+                    }
+
+                    const isActive = data.status === 'active';
+                    if (!isActive) {
+                        console.log(`   -> छोड़ा गया: स्थिति '${data.status}' है (सक्रिय नहीं)।`);
+                        return false;
+                    }
+
+                    const isTargetedCorrectly = !data.targetUserId || data.targetUserId === applicationUserId;
+                    if (!isTargetedCorrectly) {
+                        console.log(`   -> छोड़ा गया: लक्षित उपयोगकर्ता ID मेल नहीं खाती।`);
+                        return false;
+                    }
+
+                    if (data.type === 'temporary') {
+                        if (!data.displayUntil || !data.displayUntil.toDate) {
+                            console.log(`   -> छोड़ा गया: अस्थायी घोषणा में 'displayUntil' टाइमस्टैम्प नहीं है।`);
+                            return false;
+                        }
+                        const displayUntilDate = data.displayUntil.toDate();
+                        if (now >= displayUntilDate) {
+                            console.log(`   -> छोड़ा गया: अस्थायी घोषणा समाप्त हो गई है।`);
+                            return false;
+                        }
+                    }
+                    
+                    console.log(`   -> मान्य! इस घोषणा का उपयोग किया जाएगा।`);
+                    return true;
+                });
+
+                if (validAnnouncementDoc) {
+                    const latestAnnouncement = { id: validAnnouncementDoc.id, ...validAnnouncementDoc.data() };
+                    console.log("अंतिम प्रदर्शित घोषणा:", latestAnnouncement);
+                    announcementTitle.textContent = latestAnnouncement.title || "महत्वपूर्ण घोषणा!";
+                    announcementMessagePreview.textContent = latestAnnouncement.message;
+                    announcementSection.classList.remove('hidden');
+                    announcementSection.onclick = () => {
+                        showAnnouncementDetail(latestAnnouncement);
+                    };
+                } else {
+                    console.log("कोई मान्य घोषणा नहीं मिली। डिफ़ॉल्ट पर वापस जा रहा है।");
+                    displayDefaultAnnouncement();
+                }
+
+            }, (error) => {
+                console.error("घोषणाएँ लोड करने में त्रुटि:", error);
+                window.showMessage(`घोषणाएँ लोड करने में त्रुटि: ${error.message}`);
+                displayDefaultAnnouncement();
+            });
+        }
+
+        function displayDefaultAnnouncement() {
+            announcementTitle.textContent = "घोषणा";
+            announcementMessagePreview.textContent = "अभी कोई नई घोषणा नहीं है।";
+            announcementSection.classList.remove('hidden');
+            announcementSection.onclick = () => window.showMessage("अभी कोई नई घोषणा नहीं है।");
+        }
+
+        function showAnnouncementDetail(announcement) {
+            announcementDetailTitle.textContent = announcement.title || "घोषणा";
+            announcementDetailMessage.textContent = announcement.message;
+            showScreen(announcementDetailScreen);
+        }
 
         // Event Listeners
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen(document.getElementById('have-account-screen')));
@@ -1747,32 +2000,45 @@
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         copyIdBtn.addEventListener('click', copyUserId);
         withdrawalBtn.addEventListener('click', handleWithdrawal);
+        submitUpiBtn.addEventListener('click', submitUpiId);
         accountAgeBtn.addEventListener('click', showDetailedAccountAge);
         scoreboardBtn.addEventListener('click', showScoreboardScreen);
         chatForm.addEventListener('submit', sendMessage);
-        tellQuestionBtn.addEventListener('click', handleTellQuestion);
         
-        // Profile Event Listeners
         saveNameBtn.addEventListener('click', updateUserName);
-        applyReferralBtn.addEventListener('click', applyReferralCode);
-        getReferralCodeBtn.addEventListener('click', displayOwnReferralCode);
+        applyReferralBtn.addEventListener('click', () => {}); // Placeholder
+        getReferralCodeBtn.addEventListener('click', () => {}); // Placeholder
         logoutBtn.addEventListener('click', handleLogout);
 
-        // Navigation Bar Event Listeners
         navHome.addEventListener('click', () => { if (applicationUserId) showHomePage(currentUserName, applicationUserId, currentUserCoins); });
         navEarn.addEventListener('click', () => { if (applicationUserId) showEarnScreen(); }); 
-        navChat.addEventListener('click', () => { if (applicationUserId) showChatScreen(); });
-        // Removed navGame click listener as games are removed
+        navChat.addEventListener('click', () => { if (applicationUserId) showChatIntro(); });
+        navGame.addEventListener('click', () => { if (applicationUserId) showGameSelectionScreen(); });
         navProfile.addEventListener('click', showProfileScreen);
 
-        // Earn 2X Button Listener
         earn2xButton.addEventListener('click', window.showEarn2xAdsScreen);
 
+        betGreenBtn.addEventListener('click', async () => { 
+            if (isBettingOpen) { 
+                selectedBetColor = 'green'; 
+                gameStatusMessage.textContent = `आपने हरा चुना है।`; 
+            } 
+        });
+        betRedBtn.addEventListener('click', async () => { 
+            if (isBettingOpen) { 
+                selectedBetColor = 'red'; 
+                gameStatusMessage.textContent = `आपने लाल चुना है।`; 
+            } 
+        });
 
-        // Initial App Flow
         window.onload = () => {
             showLoadingScreen();
-            initializeFirebase();
+            setTimeout(() => {
+                showScreen(introScreen);
+                setTimeout(() => {
+                    initializeFirebase();
+                }, 2000);
+            }, 1000);
         };
     </script>
 </body>
