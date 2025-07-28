@@ -389,6 +389,40 @@
         #send-chat-btn:hover {
             background-color: #4338ca;
         }
+
+        /* Ad container styling for simulated ads (removed from HTML, but keeping style in case needed later) */
+        .ad-container {
+            cursor: pointer; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 0.75rem;
+            overflow: hidden; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            max-width: 25rem;
+            height: 150px; /* Fixed height for ad placeholders */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9fafb;
+            color: #6b7280;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .ad-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .coin-display {
+            background-color: #e0e7ff; /* हल्का नीला */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+            display: inline-block; /* ताकि यह सामग्री के आकार का हो */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -463,6 +497,14 @@
             </button>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 gradient-text">प्रोफ़ाइल</h2>
             
+            <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
+                <p class="text-lg font-semibold text-gray-700 mb-2">आपकी उपयोगकर्ता ID:</p>
+                <div class="flex items-center justify-between">
+                    <p id="display-user-id" class="font-mono text-gray-600 break-all text-sm"></p>
+                    <button id="copy-id-btn" class="ml-2 px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded-md hover:bg-gray-300 transition">कॉपी करें</button>
+                </div>
+            </div>
+
             <div class="bg-white p-6 rounded-xl shadow-md w-full max-w-xs mb-6 text-left">
                 <p class="text-lg font-semibold text-gray-700 mb-2">आपका नाम:</p>
                 <input type="text" id="profile-name-input" class="mb-2 w-full" placeholder="अपना नाम दर्ज करें">
@@ -566,12 +608,13 @@
         const mainScreen = document.getElementById('main-screen');
         const newUserNameInput = document.getElementById('new-user-name-input');
         const existingUserIdInput = document.getElementById('existing-user-id-input');
-        const welcomeMessage = document.getElementById('welcome-message'); // This will be unused in the new flow
-        const displayUserId = document.getElementById('display-user-id'); // This will be unused in the new flow
-        const copyIdBtn = document.getElementById('copy-id-btn'); // This will be unused in the new flow
-        const userCoinsSpan = document.getElementById('user-coins'); // This will be unused in the new flow
+        const displayUserId = document.getElementById('display-user-id');
+        const copyIdBtn = document.getElementById('copy-id-btn');
+        // const userCoinsSpan = document.getElementById('user-coins'); // Removed as earn screen is gone
+        // const userCoins2xSpan = document.getElementById('user-coins-2x'); // Removed as earn screen is gone
         const bottomNav = document.getElementById('bottom-nav');
         const navChat = document.getElementById('nav-chat'); 
+        // const navEarn = document.getElementById('nav-earn'); // Removed Earn nav item
         const navProfile = document.getElementById('nav-profile');
         const loadingScreen = document.getElementById('loading-screen');
 
@@ -594,12 +637,28 @@
         const chatForm = document.getElementById('chat-form');
         const chatInput = document.getElementById('chat-input');
 
+        // Removed earn-related DOM elements
+        // const earnScreen = document.getElementById('earn-screen'); 
+        // const earnInstructionText = document.getElementById('earn-instruction-text'); 
+        // const adClickStatus = document.getElementById('ad-click-status'); 
+        // const earn2xButton = document.getElementById('earn-2x-button');
+        // const adContainer1 = document.getElementById('ad-container-1'); 
+        // const adContainer2 = document.getElementById('ad-container-2'); 
+
+        // const earn2xAdsScreen = document.getElementById('earn-2x-ads-screen'); 
+        // const ad2xClickStatus = document.getElementById('ad-2x-click-status');
+        // const ad2xContainer1 = document.getElementById('ad-2x-container-1'); 
+        // const ad2xContainer2 = document.getElementById('ad-2x-container-2'); 
+
         const inputModal = document.getElementById('input-modal');
         const inputModalTitle = document.getElementById('input-modal-title');
         const inputModalField = document.getElementById('input-modal-field');
         const inputModalSubmitBtn = document.getElementById('input-modal-submit-btn');
         const inputModalCancelBtn = document.getElementById('input-modal-cancel-btn');
 
+        // Removed ad-related variables
+        // let canClickAd = true;
+        // const adClickCooldownTime = 5000; 
 
         function showLoadingScreen() {
             loadingScreen.classList.remove('hidden');
@@ -632,6 +691,7 @@
             });
             screenToShowElement.classList.add('active');
 
+            // Only chat and profile screens have nav
             const screensWithNav = ['chat-screen', 'profile-screen']; 
             if (screensWithNav.includes(screenToShowElement.id)) {
                 bottomNav.classList.remove('hidden');
@@ -644,6 +704,8 @@
             backButtons.forEach(btn => {
                 btn.style.display = noBackScreens.includes(screenToShowElement.id) ? 'none' : 'flex';
             });
+
+            // Removed ad listener attachments
         }
 
         window.goBack = function() { 
@@ -740,7 +802,7 @@
                     const userData = userSnap.data();
 
                     currentUserName = userData.name || "उपयोगकर्ता";
-                    currentUserCoins = userData.coins || 0; // Keep coins for profile display
+                    currentUserCoins = userData.coins || 0; 
                     applicationUserId = appUserIdToLoad;
 
                     showChatIntro(); // Directly go to chat intro after loading user data
@@ -823,7 +885,7 @@
                 localStorage.setItem('arvindAppUserId', userId); // Changed key
                 applicationUserId = userId;
                 currentUserName = userData.name;
-                currentUserCoins = userData.coins || 0; // Keep coins for profile display
+                currentUserCoins = userData.coins || 0; 
 
                 window.showMessage("लॉगिन सफल!", () => {
                     showChatIntro(); // Directly go to chat intro
@@ -840,6 +902,7 @@
                 window.showMessage("कृपया लॉग इन करें।");
                 return;
             }
+            displayUserId.textContent = applicationUserId; // Display user ID
             profileNameInput.value = currentUserName;
             const userRef = doc(collection(db, `users`), applicationUserId);
             getDoc(userRef).then(userSnap => {
@@ -980,6 +1043,30 @@
                 hideLoadingScreen();
             }
         }
+
+        // Removed updateCoins function as it's no longer needed for earn functionality
+        // async function updateCoins(amount) {
+        //     const userRef = doc(collection(db, `users`), applicationUserId);
+        //     try {
+        //         let newCoins = currentUserCoins + amount;
+        //         if (newCoins < 0) newCoins = 0; 
+        //         await updateDoc(userRef, { coins: newCoins });
+        //         currentUserCoins = newCoins;
+        //         userCoinsSpan.textContent = currentUserCoins; 
+        //         userCoins2xSpan.textContent = currentUserCoins; 
+        //     } catch (error) {
+        //         console.error("सिक्के अपडेट करने में त्रुटि:", error);
+        //         window.showMessage(`सिक्के अपडेट करने में त्रुटि: ${error.message}`);
+        //     }
+        // }
+
+        // Removed ad click handlers
+        // async function handleAdClick() { /* ... */ }
+        // async function handle2xAdClick() { /* ... */ }
+
+        // Removed showEarnScreen and showEarn2xAdsScreen functions
+        // function showEarnScreen() { /* ... */ }
+        // window.showEarn2xAdsScreen = function() { /* ... */ }
         
         // Event Listeners
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen(document.getElementById('have-account-screen')));
@@ -987,6 +1074,22 @@
         document.getElementById('create-user-btn').addEventListener('click', createNewUser);
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         chatForm.addEventListener('submit', sendMessage);
+        copyIdBtn.addEventListener('click', () => { // Copy ID functionality
+            const userIdText = displayUserId.textContent;
+            if (userIdText) {
+                const textArea = document.createElement("textarea");
+                textArea.value = userIdText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    window.showMessage("उपयोगकर्ता ID कॉपी हो गई!");
+                } catch (err) {
+                    window.showMessage("ID कॉपी करने में विफल।");
+                }
+                document.body.removeChild(textArea);
+            }
+        });
         
         saveNameBtn.addEventListener('click', updateUserName);
         applyReferralBtn.addEventListener('click', () => { window.showMessage("यह सुविधा अभी उपलब्ध नहीं है।"); }); // Placeholder
@@ -995,6 +1098,8 @@
 
         navChat.addEventListener('click', () => { if (applicationUserId) showChatScreen(); }); // Directly show chat screen
         navProfile.addEventListener('click', showProfileScreen);
+        // Removed earn nav item listener
+        // earn2xButton.addEventListener('click', window.showEarn2xAdsScreen); // Removed listener for 2x earn button
 
         window.onload = () => {
             showLoadingScreen();
