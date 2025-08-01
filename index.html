@@ -7,57 +7,329 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Base styles for the body and app wrapper */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #e0f2f7; /* Lighter, more inviting background */
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
         .app-wrapper {
             width: 100%;
-            max-width: 42rem;
+            max-width: 42rem; /* Slightly wider for better content display */
             min-height: 100vh;
             background-color: #ffffff;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            box-shadow: 0 0 30px rgba(0,0,0,0.1); /* More prominent shadow */
+            border-radius: 1.5rem; /* Rounded corners for the entire app container */
+            overflow: hidden; /* Ensures content stays within rounded corners */
         }
+        /* Screen transitions */
         .screen {
             display: none;
             flex-direction: column;
             flex-grow: 1;
             width: 100%;
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeInScale 0.6s ease-out forwards; /* Smoother animation */
         }
         .screen.active {
             display: flex;
         }
+        /* Gradient text for titles */
         .gradient-text {
-            background: linear-gradient(45deg, #4f46e5, #ec4899);
+            background: linear-gradient(45deg, #6366f1, #ec4899); /* Deeper indigo to vibrant pink */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        /* Primary button styling */
         .button-primary {
-            background-color: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #6366f1; /* Tailwind indigo-500 */
+            color: white;
+            padding: 1rem 2rem; /* Larger padding */
+            border-radius: 9999px; /* Fully rounded (pill shape) */
+            font-weight: 700; /* Bolder text */
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3); /* Shadow matching button color */
+            letter-spacing: 0.025em; /* Slight letter spacing */
+            text-transform: uppercase; /* Uppercase text */
         }
-        .button-primary:hover:not(:disabled) { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); }
-        .button-primary:disabled { background-color: #a5b4fc; cursor: not-allowed; }
-        .button-secondary { background-color: #e0e7ff; color: #4f46e5; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
-        .button-secondary:hover { background-color: #c7d2fe; }
-        .bottom-nav { display: flex; border-top: 1px solid #e5e7eb; background-color: #ffffff; }
-        .nav-item { flex: 1; text-align: center; padding: 0.75rem 0; color: #6b7280; cursor: pointer; transition: all 0.2s ease; border-top: 3px solid transparent; }
-        .nav-item.active { color: #4f46e5; border-top-color: #4f46e5; }
-        .nav-item:hover { background-color: #f9fafb; }
-        .nav-item svg { margin: 0 auto 0.25rem; }
+        .button-primary:hover:not(:disabled) {
+            background-color: #4f46e5; /* Darker indigo on hover */
+            transform: translateY(-3px); /* More pronounced lift effect */
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+        }
+        .button-primary:disabled {
+            background-color: #a5b4fc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        /* Secondary button styling */
+        .button-secondary {
+            background-color: #e0e7ff; /* Lighter indigo background */
+            color: #4f46e5; /* Indigo text */
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .button-secondary:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        /* Bottom navigation bar */
+        .bottom-nav {
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05); /* Shadow for depth */
+            border-top-left-radius: 1.5rem; /* Match app wrapper radius */
+            border-top-right-radius: 1.5rem;
+        }
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem 0;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-top: 3px solid transparent;
+            display: flex; /* For vertical alignment of icon and text */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem; /* Smaller text for nav items */
+        }
+        .nav-item.active {
+            color: #6366f1; /* Active color */
+            border-top-color: #6366f1;
+            font-weight: 600;
+        }
+        .nav-item:hover {
+            background-color: #f3f4f6; /* Lighter hover background */
+        }
+        .nav-item svg {
+            margin: 0 auto 0.25rem;
+            width: 1.75rem; /* Slightly larger icons */
+            height: 1.75rem;
+        }
         
-        .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 40; }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
-        .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
-        .exam-question { scroll-margin-top: 80px; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Modal styling */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Darker backdrop */
+            z-index: 40;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95); /* Slightly smaller initially */
+            z-index: 50;
+            animation: modalPop 0.3s ease-out forwards; /* Pop animation */
+            border-radius: 1.5rem; /* Rounded corners for modals */
+            padding: 2.5rem; /* More padding */
+        }
+        /* Subject selection grid */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Slightly wider columns */
+            gap: 1.25rem; /* More spacing */
+        }
+        /* Exam question styling */
+        .exam-question {
+            scroll-margin-top: 80px;
+            background-color: #ffffff;
+            padding: 1.75rem; /* More padding */
+            border-radius: 1.25rem; /* Rounded corners */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Subtle shadow */
+            transition: transform 0.2s ease-out;
+        }
+        .exam-question:hover {
+            transform: translateY(-2px); /* Slight lift on hover */
+        }
+
+        /* Keyframe animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        /* Custom styling for inputs and selects */
+        input[type="text"], textarea, select {
+            border: 1px solid #cbd5e1; /* slate-300 */
+            border-radius: 0.75rem; /* rounded-lg */
+            padding: 0.75rem 1rem; /* p-3 */
+            width: 100%;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); /* subtle inner shadow */
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #6366f1; /* indigo-500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* focus ring */
+        }
+
+        /* Custom radio/checkbox styling */
+        input[type="radio"], input[type="checkbox"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 1.25rem; /* h-5 w-5 */
+            height: 1.25rem;
+            border: 2px solid #9ca3af; /* gray-400 */
+            border-radius: 0.375rem; /* rounded-md */
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        input[type="radio"] {
+            border-radius: 50%; /* fully rounded for radio */
+        }
+        input[type="radio"]:checked, input[type="checkbox"]:checked {
+            background-color: #6366f1; /* indigo-500 */
+            border-color: #6366f1;
+        }
+        input[type="radio"]:checked::before {
+            content: '';
+            display: block;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: white;
+            margin: 3px; /* Center the dot */
+        }
+        input[type="checkbox"]:checked::before {
+            content: '✔'; /* Checkmark for checkbox */
+            display: block;
+            color: white;
+            font-size: 0.75rem;
+            line-height: 1;
+            text-align: center;
+            margin-top: 1px;
+        }
+        
+        /* Specific styling for subject selection labels */
+        .subject-grid label {
+            transition: all 0.2s ease;
+            border: 2px solid #e2e8f0; /* slate-200 */
+            border-radius: 1rem; /* More rounded */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .subject-grid label:hover {
+            border-color: #a5b4fc; /* Light indigo on hover */
+            transform: translateY(-1px);
+        }
+        .subject-grid label.has-[:checked]:bg-indigo-100 {
+            background-color: #e0e7ff; /* Lighter indigo when checked */
+            border-color: #6366f1; /* Stronger border when checked */
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Back button styling */
+        .back-btn {
+            background-color: #f1f5f9; /* slate-100 */
+            color: #475569; /* slate-600 */
+            border-radius: 9999px; /* fully rounded */
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .back-btn:hover {
+            background-color: #e2e8f0; /* slate-200 */
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Announcement Box */
+        #announcement-box {
+            background-color: #eef2ff; /* Lightest indigo */
+            border-left: 5px solid #6366f1; /* Stronger border */
+            color: #4338ca; /* Darker indigo text */
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Scoreboard list items */
+        #scoreboard-list div {
+            border-radius: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        #scoreboard-list div:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #scoreboard-list div.bg-indigo-100 {
+             background-color: #e0e7ff; /* Lighter indigo for 'You' */
+             border-color: #6366f1;
+        }
+
+        /* Chat bubble styling */
+        #chat-messages div {
+            border-radius: 1.25rem; /* More rounded bubbles */
+            padding: 0.85rem 1.25rem;
+            max-width: 80%; /* Allow more space for messages */
+            word-wrap: break-word; /* Ensure long words wrap */
+        }
+        #chat-messages div.bg-indigo-500 {
+            background-color: #6366f1; /* Primary color for sent messages */
+        }
+        #chat-messages div.bg-slate-200 {
+            background-color: #e2e8f0; /* Lighter background for received messages */
+        }
+        #chat-input {
+            border-radius: 9999px; /* Pill shape for input */
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+        #chat-form button {
+            background-color: #6366f1;
+            border-radius: 9999px;
+            padding: 0.75rem; /* Larger send button */
+            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            transition: all 0.2s ease;
+        }
+        #chat-form button:hover {
+            background-color: #4f46e5;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Countdown box for All India JEE+Advanced */
+        .bg-amber-500 {
+            background-color: #f59e0b; /* Tailwind amber-500 */
+            box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
+            animation: pulse 2s infinite ease-in-out; /* Subtle pulse animation */
+        }
     </style>
 </head>
 <body>
@@ -65,147 +337,168 @@
         <main class="flex-grow flex flex-col">
             <!-- Loading Screen -->
             <div id="loading-screen" class="screen active flex-col justify-center items-center p-8">
-                <div class="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600"></div>
-                <h1 class="text-3xl font-bold mt-6 gradient-text">Future JEE Crackers</h1>
-                <p class="text-slate-500 mt-2">by ARVIND DARA BISHNOI</p>
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
+                <h1 class="text-4xl font-bold mt-8 gradient-text">Future JEE Crackers</h1>
+                <p class="text-slate-500 mt-3 text-lg">by ARVIND DARA BISHNOI</p>
             </div>
 
             <!-- Original Intro/Login Screens -->
-            <div id="intro-screen" class="screen justify-center items-center">
-                <h1 class="text-5xl font-bold gradient-text">ARVIND DARA BISHNOI</h1>
+            <div id="intro-screen" class="screen justify-center items-center p-8">
+                <h1 class="text-6xl font-extrabold gradient-text text-center leading-tight">ARVIND DARA BISHNOI</h1>
+                <p class="text-slate-600 text-center mt-4 text-lg">Your path to JEE success starts here.</p>
             </div>
-            <div id="main-screen" class="screen flex-col justify-center items-center p-8 space-y-4">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Welcome!</h2>
-                <button id="have-account-btn" class="button-primary w-full max-w-sm">Existing Account</button>
-                <button id="new-user-btn" class="button-secondary w-full max-w-sm">New User</button>
+            <div id="main-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
+                <h2 class="text-4xl font-bold text-gray-800 mb-8">Welcome! 👋</h2>
+                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता (Existing Account)</button>
+                <button id="new-user-btn" class="button-secondary w-full max-w-sm">नया उपयोगकर्ता (New User)</button>
             </div>
-            <div id="new-user-screen" class="screen flex-col justify-center items-center p-8 space-y-4">
-                <button class="back-btn absolute top-4 left-4 p-2 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                <h2 class="text-2xl font-bold text-gray-800">What is your full name?</h2>
-                <input type="text" id="new-user-name-input" placeholder="Enter your full name" class="p-3 border rounded-lg w-full max-w-sm">
-                <button id="create-user-btn" class="button-primary w-full max-w-sm">Create Account</button>
+            <div id="new-user-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
+                <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                <h2 class="text-3xl font-bold text-gray-800">आपका पूरा नाम क्या है?</h2>
+                <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <button id="create-user-btn" class="button-primary w-full max-w-sm">खाता बनाएँ (Create Account)</button>
             </div>
-            <div id="have-account-screen" class="screen flex-col justify-center items-center p-8 space-y-4">
-                <button class="back-btn absolute top-4 left-4 p-2 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                <h2 class="text-2xl font-bold text-gray-800">Enter your ID</h2>
-                <input type="text" id="existing-user-id-input" placeholder="Enter your User ID" class="p-3 border rounded-lg w-full max-w-sm">
-                <button id="login-btn" class="button-primary w-full max-w-sm">Log In</button>
+            <div id="have-account-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
+                <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                <h2 class="text-3xl font-bold text-gray-800">अपनी आईडी दर्ज करें</h2>
+                <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता आईडी दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <button id="login-btn" class="button-primary w-full max-w-sm">लॉग इन करें (Log In)</button>
             </div>
 
             <!-- Home Screen -->
-            <div id="home-screen" class="screen flex-col p-4 md:p-6 space-y-4 overflow-y-auto">
-                <header>
-                    <h1 id="welcome-message" class="text-2xl font-bold text-slate-800">Hello!</h1>
-                    <p class="text-slate-500">Ready to conquer JEE?</p>
+            <div id="home-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
+                <header class="pb-4 border-b border-slate-100">
+                    <h1 id="welcome-message" class="text-3xl font-bold text-slate-800">नमस्ते!</h1>
+                    <p class="text-slate-500 text-lg mt-1">JEE जीतने के लिए तैयार हैं?</p>
                 </header>
                 <div id="announcement-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
-                    <p class="font-bold">Announcement</p>
+                    <p class="font-bold">घोषणा (Announcement)</p>
                     <p id="announcement-text"></p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                    <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-6 rounded-xl shadow-lg hover:bg-indigo-700 transition text-left space-y-2">
-                        <h2 class="text-xl font-bold">JEE Main Preparation</h2>
-                        <p class="text-indigo-200">Practice tests by syllabus.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
+                    <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-7 rounded-2xl shadow-xl hover:bg-indigo-700 transition text-left space-y-2 transform hover:scale-105">
+                        <h2 class="text-2xl font-bold">JEE मुख्य तैयारी</h2>
+                        <p class="text-indigo-200 text-base">पाठ्यक्रम के अनुसार अभ्यास टेस्ट।</p>
                     </button>
-                    <button id="daily-rank-test-btn" class="bg-pink-600 text-white p-6 rounded-xl shadow-lg hover:bg-pink-700 transition text-left space-y-2">
-                        <h2 class="text-xl font-bold">Daily JEE Rank Series</h2>
-                        <p class="text-pink-200">Compete in a live test.</p>
+                    <button id="daily-rank-test-btn" class="bg-pink-600 text-white p-7 rounded-2xl shadow-xl hover:bg-pink-700 transition text-left space-y-2 transform hover:scale-105">
+                        <h2 class="text-2xl font-bold">दैनिक JEE रैंक श्रृंखला</h2>
+                        <p class="text-pink-200 text-base">एक लाइव टेस्ट में प्रतिस्पर्धा करें।</p>
                     </button>
-                    <button id="scoreboard-btn" class="bg-green-600 text-white p-6 rounded-xl shadow-lg hover:bg-green-700 transition text-left space-y-2">
-                        <h2 class="text-xl font-bold">Daily Score Board</h2>
-                        <p class="text-green-200">Check ranks and top performers.</p>
+                    <button id="scoreboard-btn" class="bg-green-600 text-white p-7 rounded-2xl shadow-xl hover:bg-green-700 transition text-left space-y-2 transform hover:scale-105">
+                        <h2 class="text-2xl font-bold">दैनिक स्कोर बोर्ड</h2>
+                        <p class="text-green-200 text-base">रैंक और शीर्ष प्रदर्शन करने वालों की जाँच करें।</p>
                     </button>
-                    <div class="bg-amber-500 text-white p-6 rounded-xl shadow-lg text-left space-y-2">
-                        <h2 class="text-xl font-bold">All India JEE+Advanced</h2>
-                        <p id="all-india-test-countdown" class="text-amber-200">Starts in 7 days!</p>
+                    <div class="bg-amber-500 text-white p-7 rounded-2xl shadow-xl text-left space-y-2 animate-pulse-subtle">
+                        <h2 class="text-2xl font-bold">अखिल भारतीय JEE+एडवांस्ड</h2>
+                        <p id="all-india-test-countdown" class="text-amber-200 text-base">7 दिनों में शुरू होगा!</p>
                     </div>
                 </div>
                 <div class="pt-6">
-                    <button id="feedback-btn" class="w-full text-center py-4 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition font-semibold">What new features do you want?</button>
+                    <button id="feedback-btn" class="w-full text-center py-4 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition font-semibold text-lg shadow-md">आप कौन सी नई सुविधाएँ चाहते हैं?</button>
                 </div>
             </div>
             
             <!-- Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
-                <header class="p-4 border-b font-bold text-lg text-center">Global Chat</header>
+                <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट (Global Chat)</header>
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col-reverse"></div>
-                <form id="chat-form" class="p-4 border-t flex gap-2">
-                    <input type="text" id="chat-input" placeholder="Type a message..." class="flex-grow p-3 border rounded-full">
-                    <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
+                <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
+                    <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
+                    <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
                 </form>
             </div>
 
             <!-- Profile Screen -->
             <div id="profile-screen" class="screen flex-col p-6 space-y-6 overflow-y-auto">
-                 <h2 class="text-3xl font-bold text-gray-800 gradient-text">Profile</h2>
-                <div class="bg-slate-100 p-4 rounded-lg">
-                    <p class="font-semibold text-gray-700 mb-1">Your User ID:</p>
+                 <h2 class="text-4xl font-bold text-gray-800 gradient-text mb-4">प्रोफाइल (Profile)</h2>
+                <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
+                    <p class="font-semibold text-gray-700 mb-2 text-lg">आपकी उपयोगकर्ता आईडी:</p>
                     <div class="flex items-center justify-between">
-                        <p id="display-user-id" class="font-mono text-gray-600 break-all text-sm"></p>
-                        <button id="copy-id-btn" class="ml-2 px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded-md hover:bg-gray-300 transition">Copy</button>
+                        <p id="display-user-id" class="font-mono text-gray-600 break-all text-sm bg-slate-200 p-2 rounded-md flex-grow mr-2"></p>
+                        <button id="copy-id-btn" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">कॉपी करें</button>
                     </div>
                 </div>
-                <div class="bg-slate-100 p-4 rounded-lg">
-                    <p class="font-semibold text-gray-700 mb-1">Your Name:</p>
-                    <input type="text" id="profile-name-input" class="p-2 border rounded-lg w-full mb-2">
-                    <button id="save-name-btn" class="button-primary w-full text-sm py-2">Save Name</button>
+                <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
+                    <p class="font-semibold text-gray-700 mb-2 text-lg">आपका नाम:</p>
+                    <input type="text" id="profile-name-input" class="p-3 border rounded-lg w-full mb-3 text-base">
+                    <button id="save-name-btn" class="button-primary w-full text-base py-3">नाम सहेजें</button>
                 </div>
-                <div class="bg-slate-100 p-4 rounded-lg">
-                    <p class="font-semibold text-gray-700 mb-1">भाषा चुनें (Language):</p>
-                    <select id="language-select" class="w-full p-3 border rounded-lg bg-white">
+                <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
+                    <p class="font-semibold text-gray-700 mb-2 text-lg">भाषा चुनें (Language):</p>
+                    <select id="language-select" class="w-full p-3 border rounded-lg bg-white text-base">
                         <option value="english">English</option>
                         <option value="hindi" selected>हिंदी (Hindi)</option>
                     </select>
                 </div>
-                <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full text-center">Check Channel</a>
-                <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg">Logout</button>
+                <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full text-center text-lg py-4">चैनल देखें (Check Channel)</a>
+                <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-md text-lg">लॉग आउट (Logout)</button>
             </div>
 
             <!-- JEE Screens -->
-            <div id="jee-prep-setup-screen" class="screen flex-col p-4 md:p-6 space-y-4 overflow-y-auto">
-                <header class="flex items-center">
-                    <button class="back-btn p-2 rounded-full hover:bg-slate-200 mr-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                    <h1 class="text-2xl font-bold">Create Your Test</h1>
+            <div id="jee-prep-setup-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
+                <header class="flex items-center pb-4 border-b border-slate-100">
+                    <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 class="text-3xl font-bold">अपना टेस्ट बनाएँ</h1>
                 </header>
-                <div class="space-y-6 pt-4">
+                <div class="space-y-8 pt-4">
                     <div>
-                        <h3 class="font-semibold mb-2">1. Select Class</h3>
-                        <select id="class-select" class="w-full p-3 border rounded-lg bg-white"><option value="11">Class 11</option><option value="12">Class 12</option><option value="11,12" selected>Full Syllabus (11th + 12th)</option></select>
+                        <h3 class="font-semibold mb-3 text-xl">1. कक्षा चुनें</h3>
+                        <select id="class-select" class="w-full p-3 border rounded-lg bg-white text-base"><option value="11">कक्षा 11</option><option value="12">कक्षा 12</option><option value="11,12" selected>पूरा पाठ्यक्रम (11वीं + 12वीं)</option></select>
                     </div>
                     <div>
-                        <h3 class="font-semibold mb-2">2. Select Subjects</h3>
+                        <h3 class="font-semibold mb-3 text-xl">2. विषय चुनें</h3>
                         <div id="subject-selection" class="subject-grid"></div>
                     </div>
                     <div>
-                        <h3 class="font-semibold mb-2">3. Select Difficulty</h3>
-                        <div class="flex gap-4"><label class="flex-1"><input type="radio" name="difficulty" value="Basic" class="mr-2">Basic</label><label class="flex-1"><input type="radio" name="difficulty" value="JEE Main" class="mr-2" checked>JEE Main</label><label class="flex-1"><input type="radio" name="difficulty" value="JEE Advanced" class="mr-2">JEE Advanced</label></div>
+                        <h3 class="font-semibold mb-3 text-xl">3. कठिनाई चुनें</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="difficulty" value="Basic" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
+                                <span class="font-semibold text-base">मूल (Basic)</span>
+                            </label>
+                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="difficulty" value="JEE Main" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500" checked>
+                                <span class="font-semibold text-base">JEE मुख्य</span>
+                            </label>
+                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
+                                <input type="radio" name="difficulty" value="JEE Advanced" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
+                                <span class="font-semibold text-base">JEE एडवांस्ड</span>
+                            </label>
+                        </div>
                     </div>
-                    <button id="generate-test-btn" class="w-full button-primary py-4 font-bold shadow-lg">Generate Test</button>
+                    <button id="generate-test-btn" class="w-full button-primary py-4 font-bold shadow-lg text-xl">टेस्ट बनाएँ</button>
                 </div>
             </div>
             <div id="exam-screen" class="screen flex-col">
-                <header class="sticky top-0 bg-white shadow-md z-10 p-4 flex justify-between items-center">
-                    <h1 id="exam-title" class="text-xl font-bold">Test in Progress</h1>
-                    <div id="exam-timer" class="font-bold text-lg text-indigo-600">03:00:00</div>
+                <header class="sticky top-0 bg-white shadow-md z-10 p-4 flex justify-between items-center border-b border-slate-200">
+                    <h1 id="exam-title" class="text-xl font-bold text-slate-800">टेस्ट प्रगति पर है</h1>
+                    <div id="exam-timer" class="font-bold text-2xl text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full shadow-inner">03:00:00</div>
                 </header>
                 <div id="exam-content" class="p-4 md:p-6 space-y-8 overflow-y-auto flex-grow bg-slate-50"></div>
-                <footer class="sticky bottom-0 bg-white p-4 border-t"><button id="submit-exam-btn" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition">Submit Test</button></footer>
+                <footer class="sticky bottom-0 bg-white p-4 border-t border-slate-200 shadow-md">
+                    <button id="submit-exam-btn" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition text-lg shadow-lg">टेस्ट जमा करें</button>
+                </footer>
             </div>
             <div id="result-screen" class="screen flex-col justify-center items-center p-8">
-                 <h1 class="text-4xl font-bold mb-4 gradient-text">Test Complete!</h1>
-                 <div class="text-center bg-slate-100 p-8 rounded-2xl shadow-lg w-full max-w-md">
-                    <p class="text-lg text-slate-600">Your Score</p><p id="result-score" class="text-7xl font-bold my-4">--/300</p>
-                    <div class="grid grid-cols-3 gap-4 text-center"><p class="font-semibold">Correct</p><p id="result-correct" class="text-2xl font-bold text-green-600">0</p><p class="font-semibold">Incorrect</p><p id="result-incorrect" class="text-2xl font-bold text-red-600">0</p><p class="font-semibold">Unanswered</p><p id="result-unanswered" class="text-2xl font-bold text-slate-500">0</p></div>
+                 <h1 class="text-5xl font-bold mb-6 gradient-text">टेस्ट पूरा हुआ! 🎉</h1>
+                 <div class="text-center bg-slate-100 p-10 rounded-3xl shadow-2xl w-full max-w-md">
+                    <p class="text-xl text-slate-600 mb-2">आपका स्कोर</p>
+                    <p id="result-score" class="text-8xl font-extrabold my-4 text-indigo-600">--/300</p>
+                    <div class="grid grid-cols-3 gap-4 text-center mt-6">
+                        <div><p class="font-semibold text-slate-700">सही</p><p id="result-correct" class="text-3xl font-bold text-green-600">0</p></div>
+                        <div><p class="font-semibold text-slate-700">गलत</p><p id="result-incorrect" class="text-3xl font-bold text-red-600">0</p></div>
+                        <div><p class="font-semibold text-slate-700">अनुत्तरित</p><p id="result-unanswered" class="text-3xl font-bold text-slate-500">0</p></div>
+                    </div>
                  </div>
-                 <button id="back-to-home-btn" class="mt-12 bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition">Back to Home</button>
+                 <button id="back-to-home-btn" class="mt-12 button-primary py-4 px-10 text-xl shadow-lg">होम पर वापस जाएँ</button>
             </div>
-            <div id="scoreboard-screen" class="screen flex-col p-4 md:p-6">
-                <header class="flex items-center mb-4">
-                    <button class="back-btn p-2 rounded-full hover:bg-slate-200 mr-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                    <h1 class="text-2xl font-bold">Daily Test Scoreboard</h1>
+            <div id="scoreboard-screen" class="screen flex-col p-6 md:p-8">
+                <header class="flex items-center mb-6 pb-4 border-b border-slate-100">
+                    <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 class="text-3xl font-bold">दैनिक टेस्ट स्कोरबोर्ड</h1>
                 </header>
-                <div id="scoreboard-info" class="text-center text-slate-500 p-2 bg-slate-100 rounded-md mb-4">Scores are updated 2 hours after test submission.</div>
-                <div id="scoreboard-list" class="space-y-2 overflow-y-auto flex-grow"><p class="text-center text-slate-500 p-8">Loading scoreboard...</p></div>
+                <div id="scoreboard-info" class="text-center text-slate-500 p-3 bg-slate-100 rounded-lg mb-6 text-sm shadow-sm">टेस्ट जमा करने के 2 घंटे बाद स्कोर अपडेट किए जाते हैं।</div>
+                <div id="scoreboard-list" class="space-y-3 overflow-y-auto flex-grow"><p class="text-center text-slate-500 p-8">स्कोरबोर्ड लोड हो रहा है...</p></div>
             </div>
 
         </main>
@@ -225,22 +518,25 @@
                 <span>प्रोफाइल</span>
             </div>
         </nav>
-        <footer id="app-footer" class="text-center p-2 text-xs text-slate-400 opacity-50 hidden">Created by Arvind Dara Bishnoi</footer>
+        <footer id="app-footer" class="text-center p-3 text-xs text-slate-400 opacity-60 hidden bg-white">Arvind Dara Bishnoi द्वारा निर्मित</footer>
     </div>
     
     <!-- Modals Container -->
     <div id="modal-container" class="hidden">
         <div class="modal-backdrop"></div>
-        <div id="message-modal" class="modal bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm text-center">
-            <h3 id="message-modal-title" class="text-xl font-bold mb-4">Alert</h3>
-            <p id="message-modal-text" class="text-slate-600 mb-6"></p>
-            <button id="message-modal-ok-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">OK</button>
+        <div id="message-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-sm text-center">
+            <h3 id="message-modal-title" class="text-2xl font-bold mb-4 text-slate-800">Alert</h3>
+            <p id="message-modal-text" class="text-slate-600 mb-6 text-lg"></p>
+            <button id="message-modal-ok-btn" class="w-full button-primary py-3 text-lg">ठीक है (OK)</button>
         </div>
-        <div id="feedback-modal" class="modal bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-md hidden">
-             <h3 class="text-xl font-bold mb-4">Your Feedback</h3>
-             <p class="text-slate-600 mb-4">What new features or improvements would you like? (Once per day)</p>
-             <textarea id="feedback-input" class="w-full p-2 border rounded-lg h-28" placeholder="Type here..."></textarea>
-             <div class="flex gap-4 mt-4"><button id="feedback-cancel-btn" class="flex-1 bg-slate-200 py-2 rounded-lg">Cancel</button><button id="feedback-submit-btn" class="flex-1 bg-indigo-600 text-white py-2 rounded-lg">Submit</button></div>
+        <div id="feedback-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-md hidden">
+             <h3 class="text-2xl font-bold mb-4 text-slate-800">आपकी प्रतिक्रिया (Your Feedback)</h3>
+             <p class="text-slate-600 mb-4 text-base">आप कौन सी नई सुविधाएँ या सुधार चाहते हैं? (प्रति दिन एक बार)</p>
+             <textarea id="feedback-input" class="w-full p-3 border rounded-lg h-32 text-base" placeholder="यहाँ टाइप करें..."></textarea>
+             <div class="flex gap-4 mt-6">
+                <button id="feedback-cancel-btn" class="flex-1 bg-slate-200 py-3 rounded-lg text-lg font-semibold hover:bg-slate-300 transition">रद्द करें</button>
+                <button id="feedback-submit-btn" class="flex-1 button-primary py-3 text-lg">जमा करें</button>
+            </div>
         </div>
     </div>
 
