@@ -622,6 +622,8 @@
     </div>
 
     <script type="module">
+        // Debugging: Script parsing started.
+        console.log("Script parsing started."); 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
@@ -639,16 +641,18 @@
             messagingSenderId: "341922555843",
             appId: "1:341922555843:web:cefd0e44e5d8afae4fbf76"
         };
+        // Firebase कॉन्फ़िगरेशन का अंत
+
         let app, db, auth, currentUser, userData, applicationUserId, currentUserName;
         let screenHistory = [];
         let unsubscribeChat = null;
         let currentExamData = null;
         let examTimerInterval = null;
-        let generationTimerInterval = null; // Timer for AI generation
+        let generationTimerInterval = null; // AI जनरेशन के लिए टाइमर
         let tabSwitchCount = 0;
         let modalOkCallback = null;
-        let currentPollId = null; // To store the ID of the currently active poll
-        let remainingExamTime = 0; // Added for persistent timer
+        let currentPollId = null; // वर्तमान सक्रिय पोल की आईडी स्टोर करने के लिए
+        let remainingExamTime = 0; // लगातार टाइमर के लिए जोड़ा गया
 
         // --- DOM ELEMENTS ---
         const allScreens = document.querySelectorAll('.screen');
@@ -658,7 +662,7 @@
         const messageModal = { el: document.getElementById('message-modal'), title: document.getElementById('message-modal-title'), text: document.getElementById('message-modal-text'), okBtn: document.getElementById('message-modal-ok-btn') };
         const feedbackModal = { el: document.getElementById('feedback-modal'), input: document.getElementById('feedback-input'), submitBtn: document.getElementById('feedback-submit-btn'), cancelBtn: document.getElementById('feedback-cancel-btn') };
         
-        // Poll specific elements
+        // पोल विशिष्ट तत्व
         const pollBox = document.getElementById('poll-box');
         const pollQuestionText = document.getElementById('poll-question-text');
         const thumbsUpBtn = document.getElementById('thumbs-up-btn');
@@ -669,7 +673,7 @@
 
         // --- CORE APP FLOW ---
         function showScreen(screenId, isNav = false) {
-            console.log(`Showing screen: ${screenId}`);
+            console.log(`स्क्रीन दिखा रहा है: ${screenId}`);
             const currentActive = document.querySelector('.screen.active');
             if (currentActive && currentActive.id !== screenId && !isNav) {
                 screenHistory.push(currentActive.id);
@@ -691,12 +695,12 @@
                 unsubscribeChat = null;
             }
 
-            // Pause timer when not on exam screen
+            // परीक्षा स्क्रीन पर न होने पर टाइमर रोकें
             if (screenId !== 'exam-screen' && examTimerInterval) {
                 clearInterval(examTimerInterval);
                 examTimerInterval = null;
             }
-            // Resume timer when returning to exam screen
+            // परीक्षा स्क्रीन पर लौटने पर टाइमर फिर से शुरू करें
             else if (screenId === 'exam-screen' && remainingExamTime > 0 && !examTimerInterval) {
                 startTimer(remainingExamTime);
             }
@@ -707,12 +711,12 @@
                 const lastScreenId = screenHistory.pop();
                 showScreen(lastScreenId, true);
             } else {
-                showScreen('main-screen', true); // Go back to main screen if history is empty
+                showScreen('main-screen', true); // इतिहास खाली होने पर मुख्य स्क्रीन पर वापस जाएँ
             }
         }
 
-        function showModal(content, title = "अलर्ट", onOk) { // Changed default title to Hindi
-            console.log(`Showing modal: ${title} - ${content}`);
+        function showModal(content, title = "अलर्ट", onOk) { // शीर्षक को हिंदी में बदला गया
+            console.log(`मोडल दिखा रहा है: ${title} - ${content}`);
             messageModal.title.textContent = title;
             messageModal.text.innerHTML = content;
             modalContainer.classList.remove('hidden');
@@ -721,7 +725,7 @@
             modalOkCallback = onOk;
         }
         function hideModals() { 
-            console.log("Hiding modals.");
+            console.log("मोडल छिपा रहा है।");
             modalContainer.classList.add('hidden'); 
             if (typeof modalOkCallback === 'function') {
                 const callback = modalOkCallback;
@@ -731,14 +735,14 @@
         }
 
         // --- FIREBASE & AUTH ---
-        // Global unhandled promise rejection listener for better debugging
+        // बेहतर डीबगिंग के लिए वैश्विक अनहैंडल्ड प्रॉमिस रिजेक्शन लिसनर
         window.addEventListener('unhandledrejection', (event) => {
-            console.error('Unhandled promise rejection:', event.promise, 'Reason:', event.reason);
-            showModal(`एक अप्रत्याशित त्रुटि हुई: ${event.reason.message || event.reason}. कृपया कंसोल देखें।`, "त्रुटि"); // Hindi translation
+            console.error('अनहैंडल्ड प्रॉमिस रिजेक्शन:', event.promise, 'कारण:', event.reason);
+            showModal(`एक अप्रत्याशित त्रुटि हुई: ${event.reason.message || event.reason}. कृपया कंसोल देखें।`, "त्रुटि"); // हिंदी अनुवाद
         });
 
         async function initializeFirebase() {
-            console.log("Initializing Firebase...");
+            console.log("Firebase शुरू कर रहा है...");
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
@@ -746,24 +750,24 @@
                 // onAuthStateChanged लिसनर का उपयोग Firebase प्रमाणीकरण स्थिति में परिवर्तन को ट्रैक करने के लिए किया जाता है।
                 // यह सुनिश्चित करता है कि हम हमेशा वर्तमान में प्रमाणित उपयोगकर्ता को जानते हैं।
                 onAuthStateChanged(auth, async (user) => {
-                    console.log("onAuthStateChanged fired. User:", user ? user.uid : "null");
+                    console.log("onAuthStateChanged फायर हुआ। उपयोगकर्ता:", user ? user.uid : "null");
                     if (user) {
-                        currentUser = user; // Set global currentUser
-                        await findAndLinkAppUserByAuthUid(currentUser.uid); // Always try to find/link app user
+                        currentUser = user; // वैश्विक currentUser सेट करें
+                        await findAndLinkAppUserByAuthUid(currentUser.uid); // हमेशा ऐप उपयोगकर्ता को खोजने/लिंक करने का प्रयास करें
                     } else {
-                        console.log("No Firebase user, signing in anonymously.");
+                        console.log("कोई Firebase उपयोगकर्ता नहीं, गुमनाम रूप से साइन इन कर रहा है।");
                         // यदि कोई Firebase उपयोगकर्ता नहीं है, तो गुमनाम रूप से साइन इन करें। onAuthStateChanged फिर से फायर होगा।
                         await signInAnonymously(auth);
                     }
                 });
             } catch (error) { 
-                console.error("Firebase Init Error:", error); 
-                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।", "त्रुटि"); // Added Hindi title
+                console.error("Firebase प्रारंभ त्रुटि:", error); 
+                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।", "त्रुटि"); // हिंदी शीर्षक जोड़ा गया
             }
         }
         
         async function findAndLinkAppUserByAuthUid(authUid) {
-            console.log("Attempting to find and link app user by authUid:", authUid);
+            console.log("authUid द्वारा ऐप उपयोगकर्ता को खोजने और लिंक करने का प्रयास कर रहा है:", authUid);
             const storedAppUserId = localStorage.getItem('arvindAppUserId');
             let userDocFound = false;
 
@@ -775,15 +779,15 @@
                     applicationUserId = storedAppUserId;
                     currentUserName = userData.name || "उपयोगकर्ता";
                     userDocFound = true;
-                    console.log("Found app user by stored ID and matching authUid.");
+                    console.log("भंडारित आईडी और मिलान authUid द्वारा ऐप उपयोगकर्ता मिला।");
                 } else {
-                    console.warn("Stored appUserId invalid or mismatched with current authUid. Clearing localStorage.");
+                    console.warn("भंडारित ऐपयूजरआईडी अमान्य या वर्तमान authUid से मेल नहीं खा रहा है। स्थानीय भंडारण साफ़ कर रहा है।");
                     localStorage.removeItem('arvindAppUserId');
                 }
             }
 
             if (!userDocFound) {
-                // If not found by stored ID, search by authUid in Firestore
+                // यदि भंडारित आईडी द्वारा नहीं मिला, तो Firestore में authUid द्वारा खोजें
                 const q = query(collection(db, "users"), where("authUid", "==", authUid), limit(1));
                 const querySnap = await getDocs(q);
 
@@ -792,36 +796,36 @@
                     userData = userDoc.data();
                     applicationUserId = userDoc.id;
                     currentUserName = userData.name || "उपयोगकर्ता";
-                    localStorage.setItem('arvindAppUserId', applicationUserId); // Save to local storage
+                    localStorage.setItem('arvindAppUserId', applicationUserId); // स्थानीय भंडारण में सहेजें
                     userDocFound = true;
-                    console.log("Found app user by authUid in Firestore.");
+                    console.log("Firestore में authUid द्वारा ऐप उपयोगकर्ता मिला।");
                 }
             }
 
             if (userDocFound) {
                 setupAppForUser();
             } else {
-                // No existing app user document for this Firebase Auth UID.
-                // This means it's a new Firebase Auth user (could be a fresh email signup, or a new anonymous user).
-                console.log("No existing app user document found for this Firebase Auth UID. Redirecting to main screen.");
+                // इस Firebase Auth UID के लिए कोई मौजूदा ऐप उपयोगकर्ता दस्तावेज़ नहीं मिला।
+                // इसका मतलब है कि यह एक नया Firebase Auth उपयोगकर्ता है (एक नया ईमेल साइनअप, या एक नया गुमनाम उपयोगकर्ता हो सकता है)।
+                console.log("इस Firebase Auth UID के लिए कोई मौजूदा ऐप उपयोगकर्ता दस्तावेज़ नहीं मिला। मुख्य स्क्रीन पर रीडायरेक्ट कर रहा है।");
                 showScreen('main-screen');
             }
         }
 
 
         async function setupAppForUser() {
-            console.log("Setting up app for user:", currentUserName);
+            console.log("उपयोगकर्ता के लिए ऐप सेटअप कर रहा है:", currentUserName);
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
             try {
                 await loadPoll();
-                console.log("Poll loaded successfully.");
+                console.log("पोल सफलतापूर्वक लोड हुआ।");
             } catch (error) {
-                console.error("Error during loadPoll in setupAppForUser:", error);
+                console.error("setupAppForUser में loadPoll के दौरान त्रुटि:", error);
                 showModal("पोल लोड करने में त्रुटि हुई।", "त्रुटि");
             }
             bottomNav.classList.remove('hidden');
             appFooter.classList.remove('hidden');
-            console.log("Showing home screen.");
+            console.log("होम स्क्रीन दिखा रहा है।");
             showScreen('home-screen', true);
         }
         
@@ -831,19 +835,19 @@
         }
         
         async function loadPoll() {
-            console.log("Loading poll...");
+            console.log("पोल लोड कर रहा है...");
             try {
                 const q = query(collection(db, "polls"), orderBy("createdAt", "desc"), limit(1));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const poll = querySnapshot.docs[0].data();
-                    currentPollId = querySnapshot.docs[0].id; // Store the poll ID
+                    currentPollId = querySnapshot.docs[0].id; // पोल आईडी स्टोर करें
                     pollQuestionText.textContent = poll.questionText;
                     thumbsUpCount.textContent = poll.thumbsUpCount || 0;
                     thumbsDownCount.textContent = poll.thumbsDownCount || 0;
                     pollBox.classList.remove('hidden');
 
-                    // Check if user has already voted
+                    // जांचें कि क्या उपयोगकर्ता ने पहले ही वोट कर दिया है
                     const userRef = doc(db, "users", applicationUserId);
                     const userSnap = await getDoc(userRef);
                     if (userSnap.exists()) {
@@ -859,11 +863,11 @@
                         }
                     }
                 } else {
-                    pollBox.classList.add('hidden'); // Hide if no poll
-                    console.log("No poll found, hiding poll box.");
+                    pollBox.classList.add('hidden'); // यदि कोई पोल नहीं है तो छिपाएँ
+                    console.log("कोई पोल नहीं मिला, पोल बॉक्स छिपा रहा है।");
                 }
             } catch (error) { 
-                console.error("Error loading poll:", error); 
+                console.error("पोल लोड करने में त्रुटि:", error); 
             }
         }
 
@@ -880,7 +884,7 @@
                 const pollRef = doc(db, "polls", currentPollId);
                 const userRef = doc(db, "users", applicationUserId);
 
-                // Check again in case of race condition (though Firestore rules should prevent)
+                // रेस कंडीशन के मामले में फिर से जांचें (हालांकि Firestore नियम इसे रोकना चाहिए)
                 const userSnap = await getDoc(userRef);
                 const userVotedPolls = userSnap.data().votedPolls || {};
                 if (userVotedPolls[currentPollId]) {
@@ -889,17 +893,17 @@
                     return;
                 }
 
-                // Update poll counts
+                // पोल काउंट अपडेट करें
                 await updateDoc(pollRef, {
                     [`${voteType}Count`]: increment(1)
                 });
 
-                // Mark poll as voted for this user
+                // इस उपयोगकर्ता के लिए पोल को वोट के रूप में चिह्नित करें
                 await updateDoc(userRef, {
                     [`votedPolls.${currentPollId}`]: true
                 });
 
-                // Update UI immediately
+                // UI को तुरंत अपडेट करें
                 if (voteType === 'thumbsUp') {
                     thumbsUpCount.textContent = parseInt(thumbsUpCount.textContent) + 1;
                 } else {
@@ -909,9 +913,9 @@
                 showModal("आपका वोट सफलतापूर्वक दर्ज कर लिया गया है!", "वोट सफल");
 
             } catch (error) {
-                console.error("Error submitting vote:", error);
+                console.error("वोट जमा करने में त्रुटि:", error);
                 showModal("वोट जमा करने में त्रुटि। कृपया पुनः प्रयास करें।", "त्रुटि");
-                thumbsUpBtn.disabled = false; // Re-enable if error
+                thumbsUpBtn.disabled = false; // त्रुटि होने पर फिर से सक्षम करें
                 thumbsDownBtn.disabled = false;
                 voteStatusMessage.textContent = "वोट जमा करने में त्रुटि हुई।";
             }
@@ -943,12 +947,12 @@
             const btn = isPractice ? document.getElementById('generate-test-btn') : null;
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> तैयार हो रहा है...`; // Hindi translation
+                btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> तैयार हो रहा है...`; // हिंदी अनुवाद
             }
 
             try {
                 const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
-                if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                if (!response.ok) throw new Error(`API त्रुटि: ${response.statusText}`);
                 const result = await response.json();
                 const parsedData = JSON.parse(result.candidates[0].content.parts[0].text);
                 
@@ -958,8 +962,8 @@
                 }
                 return parsedData;
             } catch (error) { 
-                console.error("Test Gen Error:", error); 
-                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि"); // Hindi translation
+                console.error("टेस्ट जनरेशन त्रुटि:", error); 
+                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि"); // हिंदी अनुवाद
                 return null;
             } finally {
                 if (btn) {
@@ -980,7 +984,7 @@
                 document.getElementById('exam-content').appendChild(qEl);
             });
             showScreen('exam-screen');
-            startTimer(180 * 60); // 3 hours
+            startTimer(180 * 60); // 3 घंटे
             if (examData.type === 'daily') {
                 tabSwitchCount = 0;
                 document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -990,9 +994,9 @@
         function handleVisibilityChange() {
             if (document.visibilityState === 'hidden' && document.getElementById('exam-screen').classList.contains('active') && currentExamData.type === 'daily') {
                 tabSwitchCount++;
-                showModal(`चेतावनी: टैब बदलना प्रतिबंधित है। आपका रैंक प्रभावित हो सकता है। स्विच: ${tabSwitchCount}`, "धोखाधड़ी की चेतावनी"); // Hindi translation
+                showModal(`चेतावनी: टैब बदलना प्रतिबंधित है। आपका रैंक प्रभावित हो सकता है। स्विच: ${tabSwitchCount}`, "धोखाधड़ी की चेतावनी"); // हिंदी अनुवाद
                 if (tabSwitchCount >= 3) {
-                    showModal("आपने 3 से अधिक बार टैब बदला है। आपका टेस्ट अपने आप जमा हो जाएगा।", "टेस्ट समाप्त", () => submitExam(true)); // Hindi translation
+                    showModal("आपने 3 से अधिक बार टैब बदला है। आपका टेस्ट अपने आप जमा हो जाएगा।", "टेस्ट समाप्त", () => submitExam(true)); // हिंदी अनुवाद
                 }
             }
         }
@@ -1009,13 +1013,13 @@
             updateTimerDisplay();
             if (remainingExamTime <= 0) {
                 clearInterval(examTimerInterval);
-                showModal("समय समाप्त!", "समय समाप्त", () => submitExam()); // Hindi translation
+                showModal("समय समाप्त!", "समय समाप्त", () => submitExam()); // हिंदी अनुवाद
             }
         }
 
         function updateTimerDisplay() {
             const timerEl = document.getElementById('exam-timer');
-            if (!timerEl) return; // If timer element doesn't exist
+            if (!timerEl) return; // यदि टाइमर तत्व मौजूद नहीं है
             
             let h = Math.floor(remainingExamTime / 3600);
             let m = Math.floor((remainingExamTime % 3600) / 60);
@@ -1040,14 +1044,14 @@
                 try {
                     const dailyTestId = getTodayDateString();
                     await addDoc(collection(db, "dailyTestSubmissions"), { 
-                        userId: currentUser.uid, // Use Firebase Auth UID
+                        userId: currentUser.uid, // Firebase Auth UID का उपयोग करें
                         userName: currentUserName, 
                         score: finalScore, 
                         cheated, 
                         submittedAt: serverTimestamp(),
                         paperDate: dailyTestId
                     });
-                    showModal(`टेस्ट सफलतापूर्वक जमा हो गया है। आपका स्कोर ${finalScore} है। परिणाम 2 घंटे बाद स्कोरबोर्ड पर अपडेट किया जाएगा।`, "सफलता", () => showScreen('home-screen', true)); // Hindi translation
+                    showModal(`टेस्ट सफलतापूर्वक जमा हो गया है। आपका स्कोर ${finalScore} है। परिणाम 2 घंटे बाद स्कोरबोर्ड पर अपडेट किया जाएगा।`, "सफलता", () => showScreen('home-screen', true)); // हिंदी अनुवाद
                 } catch (e) { console.error(e); showModal("टेस्ट जमा करने में त्रुटि।", "त्रुटि"); }
             } else {
                 document.getElementById('result-score').textContent = `${score}/${currentExamData.questions.length * 4}`;
@@ -1065,17 +1069,17 @@
             const today = getTodayDateString();
             
             const submissionsRef = collection(db, "dailyTestSubmissions");
-            // Use Firebase Auth UID for query
+            // Firebase Auth UID के लिए क्वेरी का उपयोग करें
             const q = query(submissionsRef, where("userId", "==", currentUser.uid), where("paperDate", "==", today));
             const submissionSnap = await getDocs(q);
 
             if (!submissionSnap.empty) {
-                showModal("आप आज का टेस्ट पहले ही दे चुके हैं। कृपया कल फिर प्रयास करें।", "पहले ही प्रयास किया गया"); // Hindi translation
+                showModal("आप आज का टेस्ट पहले ही दे चुके हैं। कृपया कल फिर प्रयास करें।", "पहले ही प्रयास किया गया"); // हिंदी अनुवाद
                 btn.disabled = false;
                 return;
             }
 
-            showModal("आज का टेस्ट लोड हो रहा है...", "कृपया प्रतीक्षा करें"); // Hindi translation
+            showModal("आज का टेस्ट लोड हो रहा है...", "कृपया प्रतीक्षा करें"); // हिंदी अनुवाद
             const paperRef = doc(db, "dailyPaper", today);
             const paperSnap = await getDoc(paperRef);
             let paperData;
@@ -1084,14 +1088,14 @@
                 paperData = paperSnap.data();
             } else {
                 const baseText = "आज के लिए एक नया टेस्ट पेपर बना रहा हूँ...";
-                showModal(baseText, "टेस्ट बना रहा है"); // Hindi translation
+                showModal(baseText, "टेस्ट बना रहा है"); // हिंदी अनुवाद
                 let seconds = 0;
                 const modalTextEl = document.getElementById('message-modal-text');
-                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // Hindi translation
+                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // हिंदी अनुवाद
                 generationTimerInterval = setInterval(() => {
                     seconds++;
                     if(!modalContainer.classList.contains('hidden')) {
-                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // Hindi translation
+                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // हिंदी अनुवाद
                     } else {
                         clearInterval(generationTimerInterval);
                     }
@@ -1104,13 +1108,13 @@
                 if (paperData) {
                     await setDoc(paperRef, { ...paperData, createdAt: serverTimestamp() });
                 } else {
-                    showModal("आज का टेस्ट बनाने में विफल। कृपया बाद में पुनः प्रयास करें।", "त्रुटि"); // Hindi translation
+                    showModal("आज का टेस्ट बनाने में विफल। कृपया बाद में पुनः प्रयास करें।", "त्रुटि"); // हिंदी अनुवाद
                     btn.disabled = false;
                     return;
                 }
             }
             
-            showModal("टेस्ट एक समय-बद्ध परीक्षा है। टैब बदलने पर आपका स्कोर 0 हो सकता है। क्या आप तैयार हैं?", "चेतावनी", () => { // Hindi translation
+            showModal("टेस्ट एक समय-बद्ध परीक्षा है। टैब बदलने पर आपका स्कोर 0 हो सकता है। क्या आप तैयार हैं?", "चेतावनी", () => { // हिंदी अनुवाद
                 hideModals();
                 currentExamData = paperData;
                 currentExamData.type = 'daily';
@@ -1122,7 +1126,7 @@
         async function loadScoreboard() {
             showScreen('scoreboard-screen');
             const listEl = document.getElementById('scoreboard-list');
-            listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`; // Hindi translation
+            listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`; // हिंदी अनुवाद
             try {
                 const today = getTodayDateString();
                 // Firestore से केवल आज के सबमिशन प्राप्त करें।
@@ -1130,7 +1134,7 @@
                 const q = query(collection(db, "dailyTestSubmissions"), where("paperDate", "==", today));
                 const snap = await getDocs(q);
                 if (snap.empty) { 
-                    listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; // Hindi translation
+                    listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; // हिंदी अनुवाद
                     return; 
                 }
 
@@ -1152,22 +1156,22 @@
                 scoresToShow.sort((a, b) => b.score - a.score);
 
                 if (scoresToShow.length === 0) {
-                    listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`; // Hindi translation
+                    listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`; // हिंदी अनुवाद
                     return;
                 }
                 
                 listEl.innerHTML = '';
                 scoresToShow.forEach((data, i) => {
-                    // Use Firebase Auth UID for comparison
+                    // Firebase Auth UID के लिए तुलना का उपयोग करें
                     const isMe = data.userId === currentUser.uid;
                     const itemEl = document.createElement('div');
                     itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-indigo-100 border-2 border-indigo-500' : 'bg-slate-100'}`;
-                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(धोखाधड़ी)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`; // Hindi translation
+                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(धोखाधड़ी)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`; // हिंदी अनुवाद
                     listEl.appendChild(itemEl);
                 });
             } catch (error) { 
-                console.error("Scoreboard Error:", error); 
-                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`; // Hindi translation
+                console.error("स्कोरबोर्ड त्रुटि:", error); 
+                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`; // हिंदी अनुवाद
             }
         }
 
@@ -1175,7 +1179,7 @@
             const userDoc = await getDoc(doc(db, "users", applicationUserId));
             const lastFeedback = userDoc.data().lastFeedbackTimestamp;
             if (lastFeedback && (new Date() - lastFeedback.toDate()) / (1000 * 3600) < 24) {
-                showModal("आप प्रतिदिन केवल एक बार प्रतिक्रिया जमा कर सकते हैं।", "कूलडाउन"); return; // Hindi translation
+                showModal("आप प्रतिदिन केवल एक बार प्रतिक्रिया जमा कर सकते हैं।", "कूलडाउन"); return; // हिंदी अनुवाद
             }
             feedbackModal.input.value = '';
             modalContainer.classList.remove('hidden');
@@ -1185,38 +1189,38 @@
 
         async function submitFeedback() {
             const text = feedbackModal.input.value.trim();
-            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।", "त्रुटि"); return; } // Added Hindi title
+            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।", "त्रुटि"); return; } // हिंदी शीर्षक जोड़ा गया
             feedbackModal.submitBtn.disabled = true;
             try {
                 await addDoc(collection(db, "feedback"), { 
-                    userId: currentUser.uid, // Use Firebase Auth UID
+                    userId: currentUser.uid, // Firebase Auth UID का उपयोग करें
                     userName: currentUserName, 
                     feedback: text, 
                     createdAt: serverTimestamp() 
                 });
                 await updateDoc(doc(db, "users", applicationUserId), { lastFeedbackTimestamp: serverTimestamp() });
                 hideModals();
-                showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "सफलता"); // Hindi translation
-            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।", "त्रुटि"); // Added Hindi title
+                showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "सफलता"); // हिंदी अनुवाद
+            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।", "त्रुटि"); // हिंदी शीर्षक जोड़ा गया
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
         // --- AUTHENTICATION LOGIC ---
 
-        // Handles guest (anonymous) sign-in and user document creation
+        // गेस्ट (गुमनाम) साइन-इन और उपयोगकर्ता दस्तावेज़ निर्माण को संभालता है
         async function handleGuestSignIn() {
             const name = document.getElementById('new-user-name-input').value.trim();
             if (!name) { showModal("कृपया अपना नाम दर्ज करें।", "त्रुटि"); return; }
 
             // यदि कोई वर्तमान Firebase उपयोगकर्ता नहीं है, तो गुमनाम रूप से साइन इन करें
             if (!auth.currentUser) {
-                console.log("handleGuestSignIn: No current Firebase user, attempting anonymous sign-in.");
+                console.log("handleGuestSignIn: कोई वर्तमान Firebase उपयोगकर्ता नहीं, गुमनाम साइन-इन का प्रयास कर रहा है।");
                 try {
                     await signInAnonymously(auth);
                     // onAuthStateChanged को नए उपयोगकर्ता को प्रोसेस करने के लिए कुछ समय दें
                     await new Promise(resolve => setTimeout(resolve, 500)); 
                 } catch (anonError) {
-                    console.error("Error signing in anonymously for guest user:", anonError);
+                    console.error("गेस्ट उपयोगकर्ता के लिए गुमनाम रूप से साइन इन करने में त्रुटि:", anonError);
                     showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
                     return;
                 }
@@ -1224,12 +1228,12 @@
 
             // सुनिश्चित करें कि Firebase उपयोगकर्ता उपलब्ध है
             if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("handleGuestSignIn: auth.currentUser or its UID is still not available after sign-in attempt.");
+                console.error("handleGuestSignIn: auth.currentUser या इसका UID साइन-इन प्रयास के बाद भी उपलब्ध नहीं है।");
                 showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं है। कृपया पुनः प्रयास करें।", "त्रुटि");
                 return;
             }
 
-            console.log("Attempting to create guest user document with Firebase UID:", auth.currentUser.uid);
+            console.log("Firebase UID के साथ गेस्ट उपयोगकर्ता दस्तावेज़ बनाने का प्रयास कर रहा है:", auth.currentUser.uid);
             try {
                 const newAppUserId = crypto.randomUUID();
                 const userDocRef = doc(db, "users", newAppUserId);
@@ -1250,12 +1254,12 @@
                 userData = { name: name, userId: newAppUserId, authUid: auth.currentUser.uid, authType: 'anonymous' };
                 setupAppForUser(); // ऐप सेटअप करने के लिए आगे बढ़ें
             } catch (error) {
-                console.error("Error creating guest user document in Firestore:", error);
+                console.error("Firestore में गेस्ट उपयोगकर्ता दस्तावेज़ बनाने में त्रुटि:", error);
                 showModal("गेस्ट खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि");
             }
         }
 
-        // Handles email/password signup and user document creation
+        // ईमेल/पासवर्ड साइनअप और उपयोगकर्ता दस्तावेज़ निर्माण को संभालता है
         async function handleEmailSignup() {
             const name = document.getElementById('signup-name-input').value.trim();
             const email = document.getElementById('signup-email-input').value.trim();
@@ -1301,7 +1305,7 @@
                 });
 
             } catch (error) {
-                console.error("Error during email signup:", error);
+                console.error("ईमेल साइनअप के दौरान त्रुटि:", error);
                 let errorMessage = "खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।";
                 if (error.code === 'auth/email-already-in-use') {
                     errorMessage = "यह ईमेल पहले से ही उपयोग में है। कृपया किसी अन्य ईमेल का उपयोग करें या लॉग इन करें।";
@@ -1314,7 +1318,7 @@
             }
         }
 
-        // Handles email/password login
+        // ईमेल/पासवर्ड लॉगिन को संभालता है
         async function handleEmailLogin() {
             const email = document.getElementById('login-email-input').value.trim();
             const password = document.getElementById('login-password-input').value.trim();
@@ -1334,7 +1338,7 @@
                 showModal("सफलतापूर्वक लॉग इन किया गया!", "सफलता");
 
             } catch (error) {
-                console.error("Error during email login:", error);
+                console.error("ईमेल लॉगिन के दौरान त्रुटि:", error);
                 let errorMessage = "लॉग इन करने में त्रुटि। कृपया पुनः प्रयास करें।";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                     errorMessage = "अमान्य ईमेल या पासवर्ड।";
@@ -1346,64 +1350,87 @@
         }
 
 
-        // Handles login with existing app-specific ID
+        // मौजूदा ऐप-विशिष्ट आईडी के साथ लॉगिन को संभालता है
         async function loginExistingUser() {
             const userId = document.getElementById('existing-user-id-input').value.trim();
             if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।", "त्रुटि"); return; }
             
-            // सुनिश्चित करें कि currentUser उपलब्ध है आगे बढ़ने से पहले
+            // आगे बढ़ने से पहले currentUser उपलब्ध है यह सुनिश्चित करें
+            // यदि नहीं, तो गुमनाम साइन-इन का प्रयास करें और प्रमाणीकरण स्थिति की प्रतीक्षा करें।
+            // यह सुनिश्चित करता है कि ऐप आईडी को लिंक करने का प्रयास करते समय हमारे पास हमेशा एक Firebase उपयोगकर्ता (यहां तक कि गुमनाम) हो।
             if (!auth.currentUser) {
-                console.error("Firebase currentUser is null before getDoc in loginExistingUser. Attempting anonymous sign-in.");
+                console.log("loginExistingUser: कोई वर्तमान Firebase उपयोगकर्ता नहीं, गुमनाम साइन-इन का प्रयास कर रहा है।");
                 try {
                     await signInAnonymously(auth);
-                    await new Promise(resolve => setTimeout(resolve, 500)); // प्रमाणीकरण स्थिति अपडेट होने की प्रतीक्षा करें
+                    // नए उपयोगकर्ता को प्रोसेस करने के लिए onAuthStateChanged को थोड़ा समय दें
+                    await new Promise(resolve => setTimeout(resolve, 500)); 
                 } catch (anonError) {
-                    console.error("Error during anonymous sign-in for existing user login:", anonError);
+                    console.error("मौजूदा उपयोगकर्ता लॉगिन के लिए गुमनाम साइन-इन के दौरान त्रुटि:", anonError);
                     showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
                     return;
                 }
             }
 
             if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("loginExistingUser: auth.currentUser or its UID is still not available after sign-in attempt.");
+                console.error("loginExistingUser: auth.currentUser या इसका UID साइन-इन प्रयास के बाद भी उपलब्ध नहीं है।");
                 showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं। कृपया पुनः प्रयास करें।", "त्रुटि");
                 return;
             }
 
-            console.log("Attempting to read user document for userId:", userId, "with current Firebase UID:", auth.currentUser.uid);
+            console.log("उपयोगकर्ता आईडी के लिए उपयोगकर्ता दस्तावेज़ पढ़ने का प्रयास कर रहा है:", userId, "वर्तमान Firebase UID के साथ:", auth.currentUser.uid);
 
             try {
-                const userDoc = await getDoc(doc(db, "users", userId)); 
+                const userDocRef = doc(db, "users", userId);
+                const userDoc = await getDoc(userDocRef); 
                 if (!userDoc.exists()) {
-                    showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।", "त्रुटि"); // Hindi translation
+                    showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।", "त्रुटि"); // हिंदी अनुवाद
                     return;
                 }
                 
-                // सत्यापित करें कि मौजूदा उपयोगकर्ता आईडी वर्तमान प्रमाणित Firebase उपयोगकर्ता से संबंधित है
-                if (userDoc.data().authUid !== auth.currentUser.uid) {
-                    console.warn(`Auth UID mismatch: Stored ${userDoc.data().authUid}, Current ${auth.currentUser.uid}`);
-                    showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि", () => {
-                        showScreen('main-screen'); // मोडल बंद होने के बाद मुख्य स्क्रीन पर रीडायरेक्ट करें
-                    });
-                    return;
+                const storedAuthUid = userDoc.data().authUid;
+                const storedAuthType = userDoc.data().authType; // authType प्राप्त करें
+                const currentAuthUid = auth.currentUser.uid;
+
+                if (storedAuthUid !== currentAuthUid) {
+                    // बेमेल पाया गया
+                    if (storedAuthType === 'anonymous' && auth.currentUser.isAnonymous) {
+                        // यदि भंडारित खाता गुमनाम है और वर्तमान Firebase उपयोगकर्ता गुमनाम है,
+                        // तो हम ऐप आईडी को नई गुमनाम Firebase UID से फिर से संबद्ध कर सकते हैं।
+                        console.warn(`ऐप आईडी ${userId} के लिए गुमनाम Auth UID बेमेल का पता चला। नई गुमनाम UID से फिर से संबद्ध कर रहा है: ${currentAuthUid}`);
+                        await updateDoc(userDocRef, { authUid: currentAuthUid });
+                        // अब ऐप आईडी वर्तमान गुमनाम सत्र से जुड़ी हुई है।
+                        localStorage.setItem('arvindAppUserId', userId); // सुनिश्चित करें कि यह संग्रहीत है
+                        await findAndLinkAppUserByAuthUid(currentAuthUid); // नए लिंक के साथ डेटा पुनः लोड करें
+                        showModal("गेस्ट आईडी सफलतापूर्वक पुनः संबद्ध की गई।", "सफलता"); // हिंदी अनुवाद
+                        return; // सफल पुनः संबद्धता के बाद बाहर निकलें
+                    } else {
+                        // यदि यह एक गुमनाम खाता नहीं है, या वर्तमान Firebase उपयोगकर्ता गुमनाम नहीं है,
+                        // तो यह एक वास्तविक बेमेल है।
+                        console.warn(`Auth UID बेमेल: भंडारित ${storedAuthUid}, वर्तमान ${currentAuthUid}। गुमनाम पुनः संबद्धता का परिदृश्य नहीं।`);
+                        showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि", () => {
+                            showScreen('main-screen'); // मोडल बंद होने के बाद मुख्य स्क्रीन पर रीडायरेक्ट करें
+                        });
+                        return;
+                    }
                 }
 
+                // यदि UID मेल खाते हैं, या यदि पुनः संबद्धता हुई है, तो सामान्य रूप से आगे बढ़ें
                 localStorage.setItem('arvindAppUserId', userId);
-                await findAndLinkAppUserByAuthUid(auth.currentUser.uid); // यह सफल होने पर setupAppForUser को कॉल करेगा
+                await findAndLinkAppUserByAuthUid(auth.currentUser.uid); // यह उपयोगकर्ता के लिए ऐप सेटअप करेगा
             } catch (error) {
-                console.error("Error during loginExistingUser:", error);
-                showModal(`लॉग इन करने में त्रुटि: ${error.message}. कृपया पुनः प्रयास करें।`, "त्रुटि"); // Hindi translation
+                console.error("loginExistingUser के दौरान त्रुटि:", error);
+                showModal(`लॉग इन करने में त्रुटि: ${error.message}. कृपया पुनः प्रयास करें।`, "त्रुटि"); // हिंदी अनुवाद
             }
         }
 
 
         function loadMessages() {
             const chatMessages = document.getElementById('chat-messages');
-            // Order by timestamp ascending to show older messages at the top
+            // पुराने संदेशों को शीर्ष पर दिखाने के लिए टाइमस्टैम्प आरोही क्रम में ऑर्डर करें
             const q = query(collection(db, "chats"), orderBy("timestamp", "asc"), limit(50));
             unsubscribeChat = onSnapshot(q, (querySnapshot) => {
                 chatMessages.innerHTML = "";
-                // No need to reverse if ordered by asc
+                // यदि आरोही क्रम में ऑर्डर किया गया है तो उलटने की आवश्यकता नहीं है
                 querySnapshot.docs.forEach(doc => {
                     const msg = doc.data();
                     const bubble = document.createElement('div');
@@ -1412,7 +1439,7 @@
                     bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
-                // Scroll to the bottom to show the latest messages
+                // नवीनतम संदेशों को दिखाने के लिए नीचे स्क्रॉल करें
                 if(chatMessages.scrollHeight > chatMessages.clientHeight) {
                   chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
@@ -1430,11 +1457,11 @@
         
         async function updateUserName() {
             const newName = document.getElementById('profile-name-input').value.trim();
-            if (!newName) { showModal("नाम खाली नहीं हो सकता।", "त्रुटि"); return; } // Added Hindi title
+            if (!newName) { showModal("नाम खाली नहीं हो सकता।", "त्रुटि"); return; } // हिंदी शीर्षक जोड़ा गया
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
-            showModal("नाम सफलतापूर्वक अपडेट किया गया!", "सफलता"); // Added Hindi title
+            showModal("नाम सफलतापूर्वक अपडेट किया गया!", "सफलता"); // हिंदी शीर्षक जोड़ा गया
         }
         
         function handleLogout() {
@@ -1448,40 +1475,40 @@
         
         // --- EVENT LISTENERS ---
         window.addEventListener('load', () => {
-            console.log("Window loaded. Starting initial screen sequence.");
-            document.getElementById('loading-screen').classList.add('active'); // Ensure loading screen is active first
+            console.log("विंडो लोड हुई। प्रारंभिक स्क्रीन अनुक्रम शुरू कर रहा है।");
+            document.getElementById('loading-screen').classList.add('active'); // सुनिश्चित करें कि लोडिंग स्क्रीन पहले सक्रिय है
             setTimeout(() => {
-                document.getElementById('loading-screen').classList.remove('active'); // Hide loading screen
-                document.getElementById('intro-screen').classList.add('active'); // Show intro screen
-                initializeFirebase(); // Directly call Firebase init
-            }, 1000); // 1 second delay to show loading
+                document.getElementById('loading-screen').classList.remove('active'); // लोडिंग स्क्रीन छिपाएँ
+                document.getElementById('intro-screen').classList.add('active'); // परिचय स्क्रीन दिखाएँ
+                initializeFirebase(); // सीधे Firebase init को कॉल करें
+            }, 1000); // लोडिंग दिखाने के लिए 1 सेकंड की देरी
         });
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
         document.getElementById('email-signup-btn').addEventListener('click', () => showScreen('email-signup-screen'));
-        document.getElementById('email-login-btn').addEventListener('click', () => showScreen('email-login-screen')); // New button for email login
-        document.getElementById('continue-as-guest-btn').addEventListener('click', () => showScreen('new-user-screen')); // Redirect to the screen where guest name is entered
+        document.getElementById('email-login-btn').addEventListener('click', () => showScreen('email-login-screen')); // ईमेल लॉगिन के लिए नया बटन
+        document.getElementById('continue-as-guest-btn').addEventListener('click', () => showScreen('new-user-screen')); // उस स्क्रीन पर रीडायरेक्ट करें जहाँ गेस्ट का नाम दर्ज किया जाता है
         
-        document.getElementById('create-guest-user-btn').addEventListener('click', handleGuestSignIn); // Renamed from create-user-btn
-        document.getElementById('signup-btn').addEventListener('click', handleEmailSignup); // New signup button
-        document.getElementById('email-login-submit-btn').addEventListener('click', handleEmailLogin); // New login button for email/password
+        document.getElementById('create-guest-user-btn').addEventListener('click', handleGuestSignIn); // create-user-btn से नाम बदला गया
+        document.getElementById('signup-btn').addEventListener('click', handleEmailSignup); // नया साइनअप बटन
+        document.getElementById('email-login-submit-btn').addEventListener('click', handleEmailLogin); // ईमेल/पासवर्ड के लिए नया लॉगिन बटन
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('copy-id-btn').addEventListener('click', () => {
-            // Create a temporary input element
+            // एक अस्थायी इनपुट तत्व बनाएँ
             const tempInput = document.createElement('input');
             tempInput.value = applicationUserId;
             document.body.appendChild(tempInput);
             tempInput.select();
             try {
-                // Use document.execCommand('copy') for better compatibility in iframes
+                // iframes में बेहतर संगतता के लिए document.execCommand('copy') का उपयोग करें
                 document.execCommand('copy');
-                showModal("आईडी कॉपी हो गया!", "सफलता"); // Hindi translation
+                showModal("आईडी कॉपी हो गया!", "सफलता"); // हिंदी अनुवाद
             } catch (err) {
-                console.error('Failed to copy text:', err);
-                showModal("आईडी कॉपी करने में विफल। कृपया मैन्युअल रूप से कॉपी करें।", "त्रुटि"); // Hindi translation
+                console.error('टेक्स्ट कॉपी करने में विफल:', err);
+                showModal("आईडी कॉपी करने में विफल। कृपया मैन्युअल रूप से कॉपी करें।", "त्रुटि"); // हिंदी अनुवाद
             }
             document.body.removeChild(tempInput);
         });
@@ -1501,7 +1528,7 @@
         document.getElementById('scoreboard-btn').addEventListener('click', loadScoreboard);
         document.getElementById('feedback-btn').addEventListener('click', openFeedbackModal);
         
-        // Poll button event listeners
+        // पोल बटन इवेंट लिसनर
         thumbsUpBtn.addEventListener('click', () => submitVote('thumbsUp'));
         thumbsDownBtn.addEventListener('click', () => submitVote('thumbsDown'));
 
@@ -1509,11 +1536,11 @@
             const btn = document.getElementById('generate-test-btn');
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
             if (subjects.length === 0) {
-                showModal("कृपया कम से कम एक विषय चुनें।", "त्रुटि"); // Added Hindi title
+                showModal("कृपया कम से कम एक विषय चुनें।", "त्रुटि"); // हिंदी शीर्षक जोड़ा गया
                 return;
             }
 
-            // The loading state is now handled inside generateTest itself
+            // लोडिंग स्थिति अब generateTest के अंदर ही संभाली जाती है
             const examData = await generateTest(true); 
 
             if (examData) {
@@ -1524,7 +1551,7 @@
 
         document.getElementById('submit-exam-btn').addEventListener('click', () => {
             if (currentExamData.type === 'daily') {
-                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "पुष्टि जमा करें", () => submitExam()); // Hindi translation
+                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "पुष्टि जमा करें", () => submitExam()); // हिंदी अनुवाद
             } else {
                 submitExam();
             }
