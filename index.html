@@ -380,35 +380,38 @@
             <!-- Original Intro/Login Screens -->
             <div id="intro-screen" class="screen justify-center items-center p-8">
                 <h1 class="text-6xl font-extrabold gradient-text text-center leading-tight">ARVIND DARA BISHNOI</h1>
-                <p class="text-slate-600 text-center mt-4 text-lg">Your path to JEE success starts here.</p>
+                <p class="text-slate-600 text-center mt-4 text-lg">JEE में सफलता का आपका मार्ग यहाँ से शुरू होता है।</p>
             </div>
             <div id="main-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
-                <h2 class="text-4xl font-bold text-gray-800 mb-8">Welcome! 👋</h2>
-                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता (Existing Account)</button>
-                <button id="new-user-btn" class="button-secondary w-full max-w-sm">नया उपयोगकर्ता (New User)</button>
+                <h2 class="text-4xl font-bold text-gray-800 mb-8">स्वागत है! 👋</h2>
+                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता</button>
+                <button id="new-user-btn" class="button-secondary w-full max-w-sm">नया उपयोगकर्ता</button>
             </div>
             <div id="new-user-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
                 <h2 class="text-3xl font-bold text-gray-800">आपका पूरा नाम क्या है?</h2>
                 <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
-                <button id="create-user-btn" class="button-primary w-full max-w-sm">खाता बनाएँ (Create Account)</button>
+                <button id="create-user-btn" class="button-primary w-full max-w-sm">खाता बनाएँ</button>
             </div>
             <div id="have-account-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
                 <h2 class="text-3xl font-bold text-gray-800">अपनी आईडी दर्ज करें</h2>
                 <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता आईडी दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
-                <button id="login-btn" class="button-primary w-full max-w-sm">लॉग इन करें (Log In)</button>
+                <button id="login-btn" class="button-primary w-full max-w-sm">लॉग इन करें</button>
             </div>
 
             <!-- Home Screen -->
             <div id="home-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
-                <header class="pb-4 border-b border-slate-100">
-                    <h1 id="welcome-message" class="text-3xl font-bold text-slate-800">नमस्ते!</h1>
-                    <p class="text-slate-500 text-lg mt-1">JEE जीतने के लिए तैयार हैं?</p>
+                <header class="pb-4 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h1 id="welcome-message" class="text-3xl font-bold text-slate-800">नमस्ते!</h1>
+                        <p class="text-slate-500 text-lg mt-1">JEE जीतने के लिए तैयार हैं?</p>
+                    </div>
+                    <i class="fas fa-graduation-cap text-5xl gradient-text opacity-80"></i>
                 </header>
                 <!-- Poll Box (formerly Announcement Box) -->
                 <div id="poll-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
-                    <p class="font-bold mb-2">आज का पोल (Today's Poll)</p>
+                    <p class="font-bold mb-2">आज का पोल</p>
                     <p id="poll-question-text" class="text-lg mb-4"></p>
                     <div class="flex justify-around items-center gap-4">
                         <button id="thumbs-up-btn" class="vote-btn flex-1 bg-green-500 hover:bg-green-600">
@@ -421,31 +424,46 @@
                     <p id="vote-status-message" class="vote-status-message text-center"></p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
-                    <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-7 rounded-2xl shadow-xl hover:bg-indigo-700 transition text-left space-y-2 transform hover:scale-105">
-                        <h2 class="text-2xl font-bold">JEE मुख्य तैयारी</h2>
-                        <p class="text-indigo-200 text-base">पाठ्यक्रम के अनुसार अभ्यास टेस्ट।</p>
+                    <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-7 rounded-2xl shadow-xl hover:bg-indigo-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">JEE मुख्य तैयारी</h2>
+                            <p class="text-indigo-200 text-base">पाठ्यक्रम के अनुसार अभ्यास टेस्ट।</p>
+                        </div>
+                        <i class="fas fa-book-open text-4xl opacity-70"></i>
                     </button>
-                    <button id="daily-rank-test-btn" class="bg-pink-600 text-white p-7 rounded-2xl shadow-xl hover:bg-pink-700 transition text-left space-y-2 transform hover:scale-105">
-                        <h2 class="text-2xl font-bold">दैनिक JEE रैंक श्रृंखला</h2>
-                        <p class="text-pink-200 text-base">एक लाइव टेस्ट में प्रतिस्पर्धा करें।</p>
+                    <button id="daily-rank-test-btn" class="bg-pink-600 text-white p-7 rounded-2xl shadow-xl hover:bg-pink-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">दैनिक JEE रैंक श्रृंखला</h2>
+                            <p class="text-pink-200 text-base">एक लाइव टेस्ट में प्रतिस्पर्धा करें।</p>
+                        </div>
+                        <i class="fas fa-trophy text-4xl opacity-70"></i>
                     </button>
-                    <button id="scoreboard-btn" class="bg-green-600 text-white p-7 rounded-2xl shadow-xl hover:bg-green-700 transition text-left space-y-2 transform hover:scale-105">
-                        <h2 class="text-2xl font-bold">दैनिक स्कोर बोर्ड</h2>
-                        <p class="text-green-200 text-base">रैंक और शीर्ष प्रदर्शन करने वालों की जाँच करें।</p>
+                    <button id="scoreboard-btn" class="bg-green-600 text-white p-7 rounded-2xl shadow-xl hover:bg-green-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">दैनिक स्कोर बोर्ड</h2>
+                            <p class="text-green-200 text-base">रैंक और शीर्ष प्रदर्शन करने वालों की जाँच करें।</p>
+                        </div>
+                        <i class="fas fa-clipboard-list text-4xl opacity-70"></i>
                     </button>
-                    <div class="bg-amber-500 text-white p-7 rounded-2xl shadow-xl text-left space-y-2 animate-pulse-subtle">
-                        <h2 class="text-2xl font-bold">अखिल भारतीय JEE+एडवांस्ड</h2>
-                        <p id="all-india-test-countdown" class="text-amber-200 text-base">7 दिनों में शुरू होगा!</p>
+                    <div class="bg-amber-500 text-white p-7 rounded-2xl shadow-xl text-left space-y-2 animate-pulse-subtle flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">अखिल भारतीय JEE+एडवांस्ड</h2>
+                            <p id="all-india-test-countdown" class="text-amber-200 text-base">7 दिनों में शुरू होगा!</p>
+                        </div>
+                        <i class="fas fa-star text-4xl opacity-70"></i>
                     </div>
                 </div>
                 <div class="pt-6">
-                    <button id="feedback-btn" class="w-full text-center py-4 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition font-semibold text-lg shadow-md">आप कौन सी नई सुविधाएँ चाहते हैं?</button>
+                    <button id="feedback-btn" class="w-full text-center py-4 bg-slate-200 text-slate-700 rounded-xl hover:bg-slate-300 transition font-semibold text-lg shadow-md flex items-center justify-center gap-3">
+                        <i class="fas fa-comment-dots"></i>
+                        <span>आप कौन सी नई सुविधाएँ चाहते हैं?</span>
+                    </button>
                 </div>
             </div>
             
             <!-- Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
-                <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट (Global Chat)</header>
+                <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट</header>
                 <!-- Changed flex-col-reverse to flex-col to display messages from bottom to top -->
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
@@ -456,7 +474,7 @@
 
             <!-- Profile Screen -->
             <div id="profile-screen" class="screen flex-col p-6 space-y-6 overflow-y-auto">
-                 <h2 class="text-4xl font-bold text-gray-800 gradient-text mb-4">प्रोफाइल (Profile)</h2>
+                 <h2 class="text-4xl font-bold text-gray-800 gradient-text mb-4">प्रोफाइल</h2>
                 <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
                     <p class="font-semibold text-gray-700 mb-2 text-lg">आपकी उपयोगकर्ता आईडी:</p>
                     <div class="flex items-center justify-between">
@@ -470,14 +488,14 @@
                     <button id="save-name-btn" class="button-primary w-full text-base py-3">नाम सहेजें</button>
                 </div>
                 <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
-                    <p class="font-semibold text-gray-700 mb-2 text-lg">भाषा चुनें (Language):</p>
+                    <p class="font-semibold text-gray-700 mb-2 text-lg">भाषा चुनें:</p>
                     <select id="language-select" class="w-full p-3 border rounded-lg bg-white text-base">
                         <option value="english">English</option>
-                        <option value="hindi" selected>हिंदी (Hindi)</option>
+                        <option value="hindi" selected>हिंदी</option>
                     </select>
                 </div>
-                <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full text-center text-lg py-4">चैनल देखें (Check Channel)</a>
-                <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-md text-lg">लॉग आउट (Logout)</button>
+                <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full text-center text-lg py-4">चैनल देखें</a>
+                <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-md text-lg">लॉग आउट</button>
             </div>
 
             <!-- JEE Screens -->
@@ -500,7 +518,7 @@
                         <div class="flex flex-wrap gap-4">
                             <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
                                 <input type="radio" name="difficulty" value="Basic" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
-                                <span class="font-semibold text-base">मूल (Basic)</span>
+                                <span class="font-semibold text-base">मूल</span>
                             </label>
                             <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
                                 <input type="radio" name="difficulty" value="JEE Main" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500" checked>
@@ -573,10 +591,10 @@
         <div id="message-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-sm text-center">
             <h3 id="message-modal-title" class="text-2xl font-bold mb-4 text-slate-800">Alert</h3>
             <p id="message-modal-text" class="text-slate-600 mb-6 text-lg"></p>
-            <button id="message-modal-ok-btn" class="w-full button-primary py-3 text-lg">ठीक है (OK)</button>
+            <button id="message-modal-ok-btn" class="w-full button-primary py-3 text-lg">ठीक है</button>
         </div>
         <div id="feedback-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-md hidden">
-             <h3 class="text-2xl font-bold mb-4 text-slate-800">आपकी प्रतिक्रिया (Your Feedback)</h3>
+             <h3 class="text-2xl font-bold mb-4 text-slate-800">आपकी प्रतिक्रिया</h3>
              <p class="text-slate-600 mb-4 text-base">आप कौन सी नई सुविधाएँ या सुधार चाहते हैं? (प्रति दिन एक बार)</p>
              <textarea id="feedback-input" class="w-full p-3 border rounded-lg h-32 text-base" placeholder="यहाँ टाइप करें..."></textarea>
              <div class="flex gap-4 mt-6">
@@ -694,6 +712,12 @@
         }
 
         // --- FIREBASE & AUTH ---
+        // Global unhandled promise rejection listener for better debugging
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.promise, 'Reason:', event.reason);
+            showModal(`एक अप्रत्याशित त्रुटि हुई: ${event.reason.message || event.reason}. कृपया कंसोल देखें।`, "त्रुटि"); // Hindi translation
+        });
+
         async function initializeFirebase() {
             console.log("Initializing Firebase...");
             try {
@@ -719,32 +743,39 @@
                 });
             } catch (error) { 
                 console.error("Firebase Init Error:", error); 
-                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।"); 
+                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।", "त्रुटि"); // Added Hindi title
             }
         }
         
         async function loadUserData(appUserIdToLoad) {
             console.log("Attempting to load user data for appUserId:", appUserIdToLoad);
             const userRef = doc(db, "users", appUserIdToLoad);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-                console.log("User data found in Firestore for appUserId.");
-                userData = userSnap.data();
-                // Crucial: Verify that the stored appUserId is linked to the current Firebase Auth UID
-                if (userData.authUid !== currentUser.uid) {
-                    console.warn("Stored appUserId's authUid does not match current Firebase user's UID. Forcing re-login.");
-                    localStorage.removeItem('arvindAppUserId'); // Clear invalid local storage
-                    showModal("यह आईडी आपके खाते से संबद्ध नहीं है। कृपया एक नया खाता बनाएँ या सही आईडी से लॉग इन करें।", "लॉगिन त्रुटि");
-                    showScreen('main-screen'); // Go back to main screen to choose new/existing user
-                    return;
+            try {
+                const userSnap = await getDoc(userRef); // Potential error here
+                if (userSnap.exists()) {
+                    console.log("User data found in Firestore for appUserId.");
+                    userData = userSnap.data();
+                    // Crucial: Verify that the stored appUserId is linked to the current Firebase Auth UID
+                    if (userData.authUid !== currentUser.uid) {
+                        console.warn("Stored appUserId's authUid does not match current Firebase user's UID. Forcing re-login.");
+                        localStorage.removeItem('arvindAppUserId'); // Clear invalid local storage
+                        showModal("यह आईडी आपके खाते से संबद्ध नहीं है। कृपया एक नया खाता बनाएँ या सही आईडी से लॉग इन करें।", "लॉगिन त्रुटि");
+                        showScreen('main-screen'); // Go back to main screen to choose new/existing user
+                        return;
+                    }
+                    applicationUserId = appUserIdToLoad;
+                    currentUserName = userData.name || "उपयोगकर्ता";
+                    setupAppForUser();
+                } else {
+                    console.log("User data NOT found in Firestore for appUserId. Clearing local storage and showing main screen.");
+                    localStorage.removeItem('arvindAppUserId');
+                    showScreen('main-screen');
                 }
-                applicationUserId = appUserIdToLoad;
-                currentUserName = userData.name || "उपयोगकर्ता";
-                setupAppForUser();
-            } else {
-                console.log("User data NOT found in Firestore for appUserId. Clearing local storage and showing main screen.");
-                localStorage.removeItem('arvindAppUserId');
-                showScreen('main-screen');
+            } catch (error) {
+                console.error("Error loading user data from Firestore:", error);
+                showModal("उपयोगकर्ता डेटा लोड करने में त्रुटि। कृपया पुनः प्रयास करें।", "त्रुटि");
+                localStorage.removeItem('arvindAppUserId'); // Clear potentially problematic ID
+                showScreen('main-screen'); // Go back to main screen
             }
         }
 
@@ -1130,7 +1161,7 @@
                 await updateDoc(doc(db, "users", applicationUserId), { lastFeedbackTimestamp: serverTimestamp() });
                 hideModals();
                 showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "सफलता"); // Hindi translation
-            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।"); // Hindi translation
+            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।", "त्रुटि"); // Added Hindi title
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
@@ -1220,7 +1251,7 @@
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
-            showModal("नाम सफलतापूर्वक अपडेट किया गया!"); // Hindi translation
+            showModal("नाम सफलतापूर्वक अपडेट किया गया!", "सफलता"); // Added Hindi title
         }
         
         function handleLogout() {
@@ -1246,12 +1277,12 @@
         messageModal.okBtn.addEventListener('click', hideModals);
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
-        document.getElementById('new-user-btn').addEventListener('click', createNewUser); // Directly call createNewUser
+        document.getElementById('new-user-btn').addEventListener('click', () => showScreen('new-user-screen')); // Reverted to show screen first
         document.getElementById('create-user-btn').addEventListener('click', createNewUser);
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('copy-id-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(applicationUserId).then(() => showModal("आईडी कॉपी हो गया!")); // Hindi translation
+            navigator.clipboard.writeText(applicationUserId).then(() => showModal("आईडी कॉपी हो गया!", "सफलता")); // Added Hindi title
         });
         document.getElementById('save-name-btn').addEventListener('click', updateUserName);
         document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -1277,7 +1308,7 @@
             const btn = document.getElementById('generate-test-btn');
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
             if (subjects.length === 0) {
-                showModal("कृपया कम से कम एक विषय चुनें।"); // Hindi translation
+                showModal("कृपया कम से कम एक विषय चुनें।", "त्रुटि"); // Added Hindi title
                 return;
             }
 
