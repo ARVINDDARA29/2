@@ -530,8 +530,16 @@
                         <h3 class="font-semibold mb-3 text-xl">2. विषय चुनें</h3>
                         <div id="subject-selection" class="subject-grid"></div>
                     </div>
+                    <!-- New section for Lesson Selection -->
+                    <div id="lesson-selection-section" class="hidden">
+                        <h3 class="font-semibold mb-3 text-xl">3. पाठ चुनें (वैकल्पिक)</h3>
+                        <div id="lesson-selection-container" class="space-y-3">
+                            <!-- Lessons will be dynamically loaded here -->
+                            <p class="text-slate-500">विषय चुनने के बाद पाठ यहाँ दिखाई देंगे।</p>
+                        </div>
+                    </div>
                     <div>
-                        <h3 class="font-semibold mb-3 text-xl">3. कठिनाई चुनें</h3>
+                        <h3 class="font-semibold mb-3 text-xl">4. कठिनाई चुनें</h3>
                         <div class="flex flex-wrap gap-4">
                             <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
                                 <input type="radio" name="difficulty" value="Basic" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
@@ -591,7 +599,7 @@
                 <span>होम</span>
             </div>
             <div id="nav-chat" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                 <span>चैट</span>
             </div>
             <div id="nav-profile" class="nav-item">
@@ -670,6 +678,10 @@
         const thumbsUpCount = document.getElementById('thumbs-up-count');
         const thumbsDownCount = document.getElementById('thumbs-down-count');
         const voteStatusMessage = document.getElementById('vote-status-message');
+
+        // पाठ चयन के लिए नए तत्व
+        const lessonSelectionSection = document.getElementById('lesson-selection-section');
+        const lessonSelectionContainer = document.getElementById('lesson-selection-container');
 
         // --- CORE APP FLOW ---
         function showScreen(screenId, isNav = false) {
@@ -921,6 +933,43 @@
             }
         }
 
+        // विषय-वार पाठों का पूर्वनिर्धारित डेटा
+        const JEE_LESSONS = {
+            "भौतिकी (Physics)": [
+                "गतिकी (Kinematics)", "न्यूटन के गति के नियम (Newton's Laws of Motion)", "कार्य, ऊर्जा और शक्ति (Work, Energy and Power)",
+                "घूर्णी गति (Rotational Motion)", "गुरुत्वाकर्षण (Gravitation)", "ठोसों के यांत्रिक गुण (Mechanical Properties of Solids)",
+                "तरलों के यांत्रिक गुण (Mechanical Properties of Fluids)", "ऊष्मागतिकी (Thermodynamics)", "गतिज सिद्धांत (Kinetic Theory)",
+                "दोलन (Oscillations)", "तरंगें (Waves)", "स्थिरविद्युतिकी (Electrostatics)", "विद्युत धारा (Current Electricity)",
+                "धारा का चुंबकीय प्रभाव (Magnetic Effects of Current)", "विद्युत चुम्बकीय प्रेरण (Electromagnetic Induction)",
+                "प्रत्यावर्ती धारा (Alternating Current)", "प्रकाशिकी (Optics)", "आधुनिक भौतिकी (Modern Physics)",
+                "अर्धचालक इलेक्ट्रॉनिक्स (Semiconductor Electronics)"
+            ],
+            "रसायन विज्ञान (Chemistry)": [
+                "रसायन विज्ञान की कुछ मूल अवधारणाएँ (Some Basic Concepts of Chemistry)", "परमाणु संरचना (Atomic Structure)",
+                "तत्वों का वर्गीकरण और गुणों में आवर्तिता (Classification of Elements and Periodicity in Properties)",
+                "रासायनिक बंधन और आणविक संरचना (Chemical Bonding and Molecular Structure)", "पदार्थ की अवस्थाएँ (States of Matter)",
+                "ऊष्मागतिकी (Thermodynamics)", "साम्यावस्था (Equilibrium)", "रेडॉक्स अभिक्रियाएँ (Redox Reactions)",
+                "हाइड्रोजन (Hydrogen)", "s-ब्लॉक तत्व (s-Block Elements)", "p-ब्लॉक तत्व (p-Block Elements)",
+                "कार्बनिक रसायन विज्ञान के कुछ मूल सिद्धांत और तकनीकें (Some Basic Principles and Techniques of Organic Chemistry)",
+                "हाइड्रोकार्बन (Hydrocarbons)", "पर्यावरण रसायन विज्ञान (Environmental Chemistry)", "ठोस अवस्था (Solid State)",
+                "विलयन (Solutions)", "विद्युत रसायन (Electrochemistry)", "रासायनिक बलगतिकी (Chemical Kinetics)",
+                "पृष्ठ रसायन (Surface Chemistry)", "d और f-ब्लॉक तत्व (d and f-Block Elements)", "उपसहसंयोजन यौगिक (Coordination Compounds)",
+                "हैलोएल्केन और हैलोएरीन (Haloalkanes and Haloarenes)", "एल्कोहल, फिनोल और ईथर (Alcohols, Phenols and Ethers)",
+                "एल्डिहाइड, कीटोन और कार्बोक्जिलिक एसिड (Aldehydes, Ketones and Carboxylic Acids)", "नाइट्रोजन युक्त कार्बनिक यौगिक (Organic Compounds Containing Nitrogen)",
+                "बायोमोलेक्यूल्स (Biomolecules)", "पॉलीमर (Polymers)", "दैनिक जीवन में रसायन विज्ञान (Chemistry in Everyday Life)"
+            ],
+            "गणित (Maths)": [
+                "समुच्चय, संबंध और फलन (Sets, Relations and Functions)", "जटिल संख्याएँ और द्विघात समीकरण (Complex Numbers and Quadratic Equations)",
+                "मैट्रिसेस और निर्धारक (Matrices and Determinants)", "क्रमचय और संचय (Permutations and Combinations)",
+                "गणितीय आगमन (Mathematical Induction)", "द्विपद प्रमेय और इसके अनुप्रयोग (Binomial Theorem and Its Applications)",
+                "अनुक्रम और श्रृंखला (Sequences and Series)", "सीमा, निरंतरता और अवकलनीयता (Limit, Continuity and Differentiability)",
+                "अवकलज के अनुप्रयोग (Applications of Derivatives)", "समाकलन (Integrals)", "समाकलन के अनुप्रयोग (Applications of Integrals)",
+                "अवकल समीकरण (Differential Equations)", "सीधी रेखाएँ (Straight Lines)", "शंकु परिच्छेद (Conic Sections)",
+                "त्रि-आयामी ज्यामिति का परिचय (Introduction to Three Dimensional Geometry)", "सदिश बीजगणित (Vector Algebra)",
+                "त्रि-आयामी ज्यामिति (Three Dimensional Geometry)", "सांख्यिकी और प्रायिकता (Statistics and Probability)",
+                "त्रिकोणमिति (Trigonometry)", "गणितीय तर्क (Mathematical Reasoning)"
+            ]
+        };
 
         function populateSubjects() {
             const container = document.getElementById('subject-selection');
@@ -931,17 +980,55 @@
                 label.innerHTML = `<input type="checkbox" name="subject" value="${subject}" class="mr-3 h-5 w-5 rounded text-indigo-600 focus:ring-indigo-500"><span class="font-semibold">${subject}</span>`;
                 container.appendChild(label);
             });
+
+            // विषय चयन में परिवर्तन होने पर पाठों को लोड करें
+            container.addEventListener('change', updateLessonSelection);
+            updateLessonSelection(); // प्रारंभिक लोड पर पाठों को लोड करें
         }
+
+        function updateLessonSelection() {
+            const selectedSubjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
+            lessonSelectionContainer.innerHTML = '';
+
+            if (selectedSubjects.length > 0) {
+                lessonSelectionSection.classList.remove('hidden');
+                selectedSubjects.forEach(subject => {
+                    const lessons = JEE_LESSONS[subject];
+                    if (lessons && lessons.length > 0) {
+                        const subjectHeader = document.createElement('p');
+                        subjectHeader.className = "font-bold text-lg mt-4 mb-2 text-slate-700";
+                        subjectHeader.textContent = `${subject} के पाठ:`;
+                        lessonSelectionContainer.appendChild(subjectHeader);
+
+                        lessons.forEach(lesson => {
+                            const label = document.createElement('label');
+                            label.className = "flex items-center p-2 border rounded-md bg-white cursor-pointer hover:bg-slate-50";
+                            label.innerHTML = `<input type="checkbox" name="lesson" value="${lesson}" data-subject="${subject}" class="mr-3 h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500"><span class="text-sm">${lesson}</span>`;
+                            lessonSelectionContainer.appendChild(label);
+                        });
+                    }
+                });
+            } else {
+                lessonSelectionSection.classList.add('hidden');
+                lessonSelectionContainer.innerHTML = '<p class="text-slate-500">विषय चुनने के बाद पाठ यहाँ दिखाई देंगे।</p>';
+            }
+        }
+
 
         async function generateTest(isPractice = true) {
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
+            const selectedLessons = [...document.querySelectorAll('input[name="lesson"]:checked')].map(el => el.value);
             
             const difficulty = isPractice ? document.querySelector('input[name="difficulty"]:checked').value : 'JEE Main';
             const classSelection = isPractice ? document.getElementById('class-select').value : '11,12';
             const questionCount = isPractice ? (25 * subjects.length) : 75;
-            const subjectString = isPractice ? subjects.join(', ') : "Physics, Chemistry, and Maths";
+            
+            let promptSubjectPart = subjects.join(', ');
+            if (selectedLessons.length > 0) {
+                promptSubjectPart += ` (विशेष रूप से इन पाठों से: ${selectedLessons.join(', ')})`; // हिंदी अनुवाद
+            }
 
-            const prompt = `Generate a ${difficulty} level practice test for JEE Main in HINDI language. Class: ${classSelection}. Subjects: ${subjectString}. Total Questions: ${questionCount}. For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation in Hindi. Ensure questions are unique.`;
+            const prompt = `Generate a ${difficulty} level practice test for JEE Main in HINDI language. Class: ${classSelection}. Subjects: ${promptSubjectPart}. Total Questions: ${questionCount}. For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation in Hindi. Ensure questions are unique.`;
             const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
 
             const btn = isPractice ? document.getElementById('generate-test-btn') : null;
@@ -949,6 +1036,19 @@
                 btn.disabled = true;
                 btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> तैयार हो रहा है...`; // हिंदी अनुवाद
             }
+
+            // टाइमर शुरू करें
+            let seconds = 0;
+            const baseText = "पेपर तैयार हो रहा है..."; // हिंदी अनुवाद
+            showModal(`${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`, "टेस्ट बना रहा है", null); // हिंदी अनुवाद
+            generationTimerInterval = setInterval(() => {
+                seconds++;
+                if(!modalContainer.classList.contains('hidden')) {
+                    messageModal.text.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // हिंदी अनुवाद
+                } else {
+                    clearInterval(generationTimerInterval);
+                }
+            }, 1000);
 
             try {
                 const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
@@ -966,6 +1066,7 @@
                 showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि"); // हिंदी अनुवाद
                 return null;
             } finally {
+                clearInterval(generationTimerInterval); // जनरेशन पूरी होने पर टाइमर बंद करें
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = "टेस्ट बनाएँ";
@@ -1540,7 +1641,7 @@
                 return;
             }
 
-            // लोडिंग स्थिति अब generateTest के अंदर ही संभाली जाती है
+            // The loading state is now handled inside generateTest itself
             const examData = await generateTest(true); 
 
             if (examData) {
