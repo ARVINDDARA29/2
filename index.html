@@ -6,6 +6,8 @@
     <title>Future JEE Crackers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Base styles for the body and app wrapper */
         body {
@@ -267,8 +269,8 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
-        /* Announcement Box */
-        #announcement-box {
+        /* Poll/Announcement Box */
+        #poll-box {
             background-color: #eef2ff; /* Lightest indigo */
             border-left: 5px solid #6366f1; /* Stronger border */
             color: #4338ca; /* Darker indigo text */
@@ -277,6 +279,39 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             animation: fadeIn 0.5s ease-in-out;
         }
+        #poll-box .vote-btn {
+            background-color: #6366f1;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        #poll-box .vote-btn:hover:not(:disabled) {
+            background-color: #4f46e5;
+            transform: translateY(-2px);
+        }
+        #poll-box .vote-btn:disabled {
+            background-color: #a5b4fc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #poll-box .vote-count {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #4f46e5;
+        }
+        #poll-box .vote-status-message {
+            font-style: italic;
+            color: #5a67d8;
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+        }
+
 
         /* Scoreboard list items */
         #scoreboard-list div {
@@ -371,9 +406,19 @@
                     <h1 id="welcome-message" class="text-3xl font-bold text-slate-800">नमस्ते!</h1>
                     <p class="text-slate-500 text-lg mt-1">JEE जीतने के लिए तैयार हैं?</p>
                 </header>
-                <div id="announcement-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
-                    <p class="font-bold">घोषणा (Announcement)</p>
-                    <p id="announcement-text"></p>
+                <!-- Poll Box (formerly Announcement Box) -->
+                <div id="poll-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
+                    <p class="font-bold mb-2">आज का पोल (Today's Poll)</p>
+                    <p id="poll-question-text" class="text-lg mb-4"></p>
+                    <div class="flex justify-around items-center gap-4">
+                        <button id="thumbs-up-btn" class="vote-btn flex-1 bg-green-500 hover:bg-green-600">
+                            <i class="fas fa-thumbs-up"></i> <span id="thumbs-up-count">0</span>
+                        </button>
+                        <button id="thumbs-down-btn" class="vote-btn flex-1 bg-red-500 hover:bg-red-600">
+                            <i class="fas fa-thumbs-down"></i> <span id="thumbs-down-count">0</span>
+                        </button>
+                    </div>
+                    <p id="vote-status-message" class="vote-status-message text-center"></p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
                     <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-7 rounded-2xl shadow-xl hover:bg-indigo-700 transition text-left space-y-2 transform hover:scale-105">
@@ -544,7 +589,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, Timestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
         const GEMINI_API_KEY = "AIzaSyCsxr987Sb41cI13aJ0PyfOYxCuNWH3p-0"; // API key will be provided by the environment
@@ -565,6 +610,8 @@
         let generationTimerInterval = null; // Timer for AI generation
         let tabSwitchCount = 0;
         let modalOkCallback = null;
+        let currentPollId = null; // To store the ID of the currently active poll
+        let remainingExamTime = 0; // Added for persistent timer
 
         // --- DOM ELEMENTS ---
         const allScreens = document.querySelectorAll('.screen');
@@ -574,8 +621,18 @@
         const messageModal = { el: document.getElementById('message-modal'), title: document.getElementById('message-modal-title'), text: document.getElementById('message-modal-text'), okBtn: document.getElementById('message-modal-ok-btn') };
         const feedbackModal = { el: document.getElementById('feedback-modal'), input: document.getElementById('feedback-input'), submitBtn: document.getElementById('feedback-submit-btn'), cancelBtn: document.getElementById('feedback-cancel-btn') };
         
+        // Poll specific elements
+        const pollBox = document.getElementById('poll-box');
+        const pollQuestionText = document.getElementById('poll-question-text');
+        const thumbsUpBtn = document.getElementById('thumbs-up-btn');
+        const thumbsDownBtn = document.getElementById('thumbs-down-btn');
+        const thumbsUpCount = document.getElementById('thumbs-up-count');
+        const thumbsDownCount = document.getElementById('thumbs-down-count');
+        const voteStatusMessage = document.getElementById('vote-status-message');
+
         // --- CORE APP FLOW ---
         function showScreen(screenId, isNav = false) {
+            console.log(`Showing screen: ${screenId}`);
             const currentActive = document.querySelector('.screen.active');
             if (currentActive && currentActive.id !== screenId && !isNav) {
                 screenHistory.push(currentActive.id);
@@ -596,6 +653,16 @@
                 unsubscribeChat();
                 unsubscribeChat = null;
             }
+
+            // Pause timer when not on exam screen
+            if (screenId !== 'exam-screen' && examTimerInterval) {
+                clearInterval(examTimerInterval);
+                examTimerInterval = null;
+            }
+            // Resume timer when returning to exam screen
+            else if (screenId === 'exam-screen' && remainingExamTime > 0 && !examTimerInterval) {
+                startTimer(remainingExamTime);
+            }
         }
 
         function goBack() {
@@ -608,6 +675,7 @@
         }
 
         function showModal(content, title = "Alert", onOk) {
+            console.log(`Showing modal: ${title} - ${content}`);
             messageModal.title.textContent = title;
             messageModal.text.innerHTML = content;
             modalContainer.classList.remove('hidden');
@@ -616,6 +684,7 @@
             modalOkCallback = onOk;
         }
         function hideModals() { 
+            console.log("Hiding modals.");
             modalContainer.classList.add('hidden'); 
             if (typeof modalOkCallback === 'function') {
                 const callback = modalOkCallback;
@@ -626,45 +695,72 @@
 
         // --- FIREBASE & AUTH ---
         async function initializeFirebase() {
+            console.log("Initializing Firebase...");
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
                 onAuthStateChanged(auth, async (user) => {
+                    console.log("onAuthStateChanged fired. User:", user ? user.uid : "null");
                     if (user) {
                         currentUser = user;
                         const storedAppUserId = localStorage.getItem('arvindAppUserId');
+                        console.log("Stored App User ID:", storedAppUserId);
                         if (storedAppUserId) {
                             await loadUserData(storedAppUserId);
                         } else {
+                            console.log("No stored App User ID, showing main screen.");
                             showScreen('main-screen');
                         }
                     } else {
+                        console.log("No Firebase user, signing in anonymously.");
                         await signInAnonymously(auth);
                     }
                 });
-            } catch (error) { console.error("Firebase Init Error:", error); showModal("App could not start. Please refresh."); }
+            } catch (error) { 
+                console.error("Firebase Init Error:", error); 
+                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।"); 
+            }
         }
         
         async function loadUserData(appUserIdToLoad) {
+            console.log("Attempting to load user data for appUserId:", appUserIdToLoad);
             const userRef = doc(db, "users", appUserIdToLoad);
             const userSnap = await getDoc(userRef);
             if (userSnap.exists()) {
+                console.log("User data found in Firestore for appUserId.");
                 userData = userSnap.data();
+                // Crucial: Verify that the stored appUserId is linked to the current Firebase Auth UID
+                if (userData.authUid !== currentUser.uid) {
+                    console.warn("Stored appUserId's authUid does not match current Firebase user's UID. Forcing re-login.");
+                    localStorage.removeItem('arvindAppUserId'); // Clear invalid local storage
+                    showModal("यह आईडी आपके खाते से संबद्ध नहीं है। कृपया एक नया खाता बनाएँ या सही आईडी से लॉग इन करें।", "लॉगिन त्रुटि");
+                    showScreen('main-screen'); // Go back to main screen to choose new/existing user
+                    return;
+                }
                 applicationUserId = appUserIdToLoad;
-                currentUserName = userData.name || "User";
+                currentUserName = userData.name || "उपयोगकर्ता";
                 setupAppForUser();
             } else {
+                console.log("User data NOT found in Firestore for appUserId. Clearing local storage and showing main screen.");
                 localStorage.removeItem('arvindAppUserId');
                 showScreen('main-screen');
             }
         }
 
         async function setupAppForUser() {
+            console.log("Setting up app for user:", currentUserName);
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
-            await loadAnnouncement();
+            try {
+                await loadPoll();
+                console.log("Poll loaded successfully.");
+            } catch (error) {
+                console.error("Error during loadPoll in setupAppForUser:", error);
+                showModal("पोल लोड करने में त्रुटि हुई।", "त्रुटि");
+            }
             bottomNav.classList.remove('hidden');
             appFooter.classList.remove('hidden');
+            console.log("Showing home screen.");
             showScreen('home-screen', true);
         }
         
@@ -673,17 +769,93 @@
             return new Date().toISOString().split('T')[0]; // YYYY-MM-DD in UTC
         }
         
-        async function loadAnnouncement() {
+        async function loadPoll() {
+            console.log("Loading poll...");
             try {
-                const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(1));
+                const q = query(collection(db, "polls"), orderBy("createdAt", "desc"), limit(1));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
-                    const ann = querySnapshot.docs[0].data();
-                    document.getElementById('announcement-text').textContent = ann.text;
-                    document.getElementById('announcement-box').classList.remove('hidden');
+                    const poll = querySnapshot.docs[0].data();
+                    currentPollId = querySnapshot.docs[0].id; // Store the poll ID
+                    pollQuestionText.textContent = poll.questionText;
+                    thumbsUpCount.textContent = poll.thumbsUpCount || 0;
+                    thumbsDownCount.textContent = poll.thumbsDownCount || 0;
+                    pollBox.classList.remove('hidden');
+
+                    // Check if user has already voted
+                    const userRef = doc(db, "users", applicationUserId);
+                    const userSnap = await getDoc(userRef);
+                    if (userSnap.exists()) {
+                        const userVotedPolls = userSnap.data().votedPolls || {};
+                        if (userVotedPolls[currentPollId]) {
+                            thumbsUpBtn.disabled = true;
+                            thumbsDownBtn.disabled = true;
+                            voteStatusMessage.textContent = "आपने इस पोल पर पहले ही वोट कर दिया है।";
+                        } else {
+                            thumbsUpBtn.disabled = false;
+                            thumbsDownBtn.disabled = false;
+                            voteStatusMessage.textContent = "वोट करने के लिए थम्स अप या थम्स डाउन दबाएँ।";
+                        }
+                    }
+                } else {
+                    pollBox.classList.add('hidden'); // Hide if no poll
+                    console.log("No poll found, hiding poll box.");
                 }
-            } catch (error) { console.error("Error loading announcement:", error); }
+            } catch (error) { 
+                console.error("Error loading poll:", error); 
+            }
         }
+
+        async function submitVote(voteType) {
+            if (!currentPollId || !applicationUserId) {
+                showModal("पोल या उपयोगकर्ता आईडी उपलब्ध नहीं है।");
+                return;
+            }
+
+            thumbsUpBtn.disabled = true;
+            thumbsDownBtn.disabled = true;
+
+            try {
+                const pollRef = doc(db, "polls", currentPollId);
+                const userRef = doc(db, "users", applicationUserId);
+
+                // Check again in case of race condition (though Firestore rules should prevent)
+                const userSnap = await getDoc(userRef);
+                const userVotedPolls = userSnap.data().votedPolls || {};
+                if (userVotedPolls[currentPollId]) {
+                    showModal("आपने इस पोल पर पहले ही वोट कर दिया है।", "वोट किया गया");
+                    voteStatusMessage.textContent = "आपने इस पोल पर पहले ही वोट कर दिया है।";
+                    return;
+                }
+
+                // Update poll counts
+                await updateDoc(pollRef, {
+                    [`${voteType}Count`]: increment(1)
+                });
+
+                // Mark poll as voted for this user
+                await updateDoc(userRef, {
+                    [`votedPolls.${currentPollId}`]: true
+                });
+
+                // Update UI immediately
+                if (voteType === 'thumbsUp') {
+                    thumbsUpCount.textContent = parseInt(thumbsUpCount.textContent) + 1;
+                } else {
+                    thumbsDownCount.textContent = parseInt(thumbsDownCount.textContent) + 1;
+                }
+                voteStatusMessage.textContent = "आपका वोट दर्ज कर लिया गया है!";
+                showModal("आपका वोट सफलतापूर्वक दर्ज कर लिया गया है!", "वोट सफल");
+
+            } catch (error) {
+                console.error("Error submitting vote:", error);
+                showModal("वोट जमा करने में त्रुटि। कृपया पुनः प्रयास करें।", "त्रुटि");
+                thumbsUpBtn.disabled = false; // Re-enable if error
+                thumbsDownBtn.disabled = false;
+                voteStatusMessage.textContent = "वोट जमा करने में त्रुटि हुई।";
+            }
+        }
+
 
         function populateSubjects() {
             const container = document.getElementById('subject-selection');
@@ -707,6 +879,12 @@
             const prompt = `Generate a ${difficulty} level practice test for JEE Main in HINDI language. Class: ${classSelection}. Subjects: ${subjectString}. Total Questions: ${questionCount}. For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation in Hindi. Ensure questions are unique.`;
             const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
 
+            const btn = isPractice ? document.getElementById('generate-test-btn') : null;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> तैयार हो रहा है...`; // Hindi translation
+            }
+
             try {
                 const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
                 if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
@@ -720,8 +898,13 @@
                 return parsedData;
             } catch (error) { 
                 console.error("Test Gen Error:", error); 
-                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।");
+                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि"); // Hindi translation
                 return null;
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "टेस्ट बनाएँ";
+                }
             }
         }
 
@@ -746,32 +929,37 @@
         function handleVisibilityChange() {
             if (document.visibilityState === 'hidden' && document.getElementById('exam-screen').classList.contains('active') && currentExamData.type === 'daily') {
                 tabSwitchCount++;
-                showModal(`चेतावनी: टैब बदलना प्रतिबंधित है। आपका रैंक प्रभावित हो सकता है। स्विच: ${tabSwitchCount}`, "धोखाधड़ी की चेतावनी");
+                showModal(`चेतावनी: टैब बदलना प्रतिबंधित है। आपका रैंक प्रभावित हो सकता है। स्विच: ${tabSwitchCount}`, "धोखाधड़ी की चेतावनी"); // Hindi translation
                 if (tabSwitchCount >= 3) {
-                    showModal("आपने 3 से अधिक बार टैब बदला है। आपका टेस्ट अपने आप जमा हो जाएगा।", "टेस्ट समाप्त", () => submitExam(true));
+                    showModal("आपने 3 से अधिक बार टैब बदला है। आपका टेस्ट अपने आप जमा हो जाएगा।", "टेस्ट समाप्त", () => submitExam(true)); // Hindi translation
                 }
             }
         }
 
         function startTimer(duration) {
             clearInterval(examTimerInterval);
-            let timer = duration;
-            const timerEl = document.getElementById('exam-timer');
-            const updateTimerDisplay = () => {
-                let h = Math.floor(timer / 3600);
-                let m = Math.floor((timer % 3600) / 60);
-                let s = timer % 60;
-                timerEl.textContent = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            };
+            remainingExamTime = duration;
             updateTimerDisplay();
-            examTimerInterval = setInterval(() => {
-                timer--;
-                updateTimerDisplay();
-                if (timer < 0) {
-                    clearInterval(examTimerInterval);
-                    showModal("समय समाप्त!", "Time Over", () => submitExam());
-                }
-            }, 1000);
+            examTimerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            remainingExamTime--;
+            updateTimerDisplay();
+            if (remainingExamTime <= 0) {
+                clearInterval(examTimerInterval);
+                showModal("समय समाप्त!", "समय समाप्त", () => submitExam()); // Hindi translation
+            }
+        }
+
+        function updateTimerDisplay() {
+            const timerEl = document.getElementById('exam-timer');
+            if (!timerEl) return; // If timer element doesn't exist
+            
+            let h = Math.floor(remainingExamTime / 3600);
+            let m = Math.floor((remainingExamTime % 3600) / 60);
+            let s = remainingExamTime % 60;
+            timerEl.textContent = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
         }
 
         async function submitExam(cheated = false) {
@@ -791,15 +979,15 @@
                 try {
                     const dailyTestId = getTodayDateString();
                     await addDoc(collection(db, "dailyTestSubmissions"), { 
-                        userId: currentUser.uid, // FIX: Use Firebase Auth UID
+                        userId: currentUser.uid, // Use Firebase Auth UID
                         userName: currentUserName, 
                         score: finalScore, 
                         cheated, 
                         submittedAt: serverTimestamp(),
                         paperDate: dailyTestId
                     });
-                    showModal(`टेस्ट सफलतापूर्वक जमा हो गया है। आपका स्कोर ${finalScore} है। परिणाम 2 घंटे बाद स्कोरबोर्ड पर अपडेट किया जाएगा।`, "सफलता", () => showScreen('home-screen', true));
-                } catch (e) { console.error(e); showModal("टेस्ट जमा करने में त्रुटि।", "Error"); }
+                    showModal(`टेस्ट सफलतापूर्वक जमा हो गया है। आपका स्कोर ${finalScore} है। परिणाम 2 घंटे बाद स्कोरबोर्ड पर अपडेट किया जाएगा।`, "सफलता", () => showScreen('home-screen', true)); // Hindi translation
+                } catch (e) { console.error(e); showModal("टेस्ट जमा करने में त्रुटि।", "त्रुटि"); }
             } else {
                 document.getElementById('result-score').textContent = `${score}/${currentExamData.questions.length * 4}`;
                 document.getElementById('result-correct').textContent = correct;
@@ -816,17 +1004,17 @@
             const today = getTodayDateString();
             
             const submissionsRef = collection(db, "dailyTestSubmissions");
-            // FIX: Use Firebase Auth UID for query
+            // Use Firebase Auth UID for query
             const q = query(submissionsRef, where("userId", "==", currentUser.uid), where("paperDate", "==", today));
             const submissionSnap = await getDocs(q);
 
             if (!submissionSnap.empty) {
-                showModal("आप आज का टेस्ट पहले ही दे चुके हैं। कृपया कल फिर प्रयास करें।", "Already Attempted");
+                showModal("आप आज का टेस्ट पहले ही दे चुके हैं। कृपया कल फिर प्रयास करें।", "पहले ही प्रयास किया गया"); // Hindi translation
                 btn.disabled = false;
                 return;
             }
 
-            showModal("आज का टेस्ट लोड हो रहा है...", "कृपया प्रतीक्षा करें");
+            showModal("आज का टेस्ट लोड हो रहा है...", "कृपया प्रतीक्षा करें"); // Hindi translation
             const paperRef = doc(db, "dailyPaper", today);
             const paperSnap = await getDoc(paperRef);
             let paperData;
@@ -835,14 +1023,14 @@
                 paperData = paperSnap.data();
             } else {
                 const baseText = "आज के लिए एक नया टेस्ट पेपर बना रहा हूँ...";
-                showModal(baseText, "Generating Test");
+                showModal(baseText, "टेस्ट बना रहा है"); // Hindi translation
                 let seconds = 0;
                 const modalTextEl = document.getElementById('message-modal-text');
-                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // Hindi translation
                 generationTimerInterval = setInterval(() => {
                     seconds++;
                     if(!modalContainer.classList.contains('hidden')) {
-                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`; // Hindi translation
                     } else {
                         clearInterval(generationTimerInterval);
                     }
@@ -855,13 +1043,13 @@
                 if (paperData) {
                     await setDoc(paperRef, { ...paperData, createdAt: serverTimestamp() });
                 } else {
-                    showModal("आज का टेस्ट बनाने में विफल। कृपया बाद में पुनः प्रयास करें।", "Error");
+                    showModal("आज का टेस्ट बनाने में विफल। कृपया बाद में पुनः प्रयास करें।", "त्रुटि"); // Hindi translation
                     btn.disabled = false;
                     return;
                 }
             }
             
-            showModal("टेस्ट एक समय-बद्ध परीक्षा है। टैब बदलने पर आपका स्कोर 0 हो सकता है। क्या आप तैयार हैं?", "चेतावनी", () => {
+            showModal("टेस्ट एक समय-बद्ध परीक्षा है। टैब बदलने पर आपका स्कोर 0 हो सकता है। क्या आप तैयार हैं?", "चेतावनी", () => { // Hindi translation
                 hideModals();
                 currentExamData = paperData;
                 currentExamData.type = 'daily';
@@ -873,13 +1061,13 @@
         async function loadScoreboard() {
             showScreen('scoreboard-screen');
             const listEl = document.getElementById('scoreboard-list');
-            listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`;
+            listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`; // Hindi translation
             try {
                 const today = getTodayDateString();
                 const q = query(collection(db, "dailyTestSubmissions"), where("paperDate", "==", today), orderBy("score", "desc"));
                 const snap = await getDocs(q);
                 if (snap.empty) { 
-                    listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; 
+                    listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; // Hindi translation
                     return; 
                 }
 
@@ -897,22 +1085,22 @@
                 });
 
                 if (scoresToShow.length === 0) {
-                    listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`;
+                    listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`; // Hindi translation
                     return;
                 }
                 
                 listEl.innerHTML = '';
                 scoresToShow.forEach((data, i) => {
-                    // FIX: Use Firebase Auth UID for comparison
+                    // Use Firebase Auth UID for comparison
                     const isMe = data.userId === currentUser.uid;
                     const itemEl = document.createElement('div');
                     itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-indigo-100 border-2 border-indigo-500' : 'bg-slate-100'}`;
-                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(You)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(Cheated)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`;
+                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(धोखाधड़ी)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`; // Hindi translation
                     listEl.appendChild(itemEl);
                 });
             } catch (error) { 
                 console.error("Scoreboard Error:", error); 
-                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरboard लोड नहीं हो सका।</p>`; 
+                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`; // Hindi translation
             }
         }
 
@@ -920,7 +1108,7 @@
             const userDoc = await getDoc(doc(db, "users", applicationUserId));
             const lastFeedback = userDoc.data().lastFeedbackTimestamp;
             if (lastFeedback && (new Date() - lastFeedback.toDate()) / (1000 * 3600) < 24) {
-                showModal("आप प्रति दिन केवल एक बार फ़ीडबैक जमा कर सकते हैं।", "Cooldown"); return;
+                showModal("आप प्रतिदिन केवल एक बार प्रतिक्रिया जमा कर सकते हैं।", "कूलडाउन"); return; // Hindi translation
             }
             feedbackModal.input.value = '';
             modalContainer.classList.remove('hidden');
@@ -930,43 +1118,67 @@
 
         async function submitFeedback() {
             const text = feedbackModal.input.value.trim();
-            if (text.length < 10) { showModal("कृपया अधिक विस्तृत फ़ीडबैक प्रदान करें।"); return; }
+            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।"); return; } // Hindi translation
             feedbackModal.submitBtn.disabled = true;
             try {
                 await addDoc(collection(db, "feedback"), { 
-                    userId: currentUser.uid, // FIX: Use Firebase Auth UID
+                    userId: currentUser.uid, // Use Firebase Auth UID
                     userName: currentUserName, 
                     feedback: text, 
                     createdAt: serverTimestamp() 
                 });
                 await updateDoc(doc(db, "users", applicationUserId), { lastFeedbackTimestamp: serverTimestamp() });
                 hideModals();
-                showModal("आपके फ़ीडबैक के लिए धन्यवाद!", "Success");
-            } catch (error) { console.error(error); showModal("फ़ीडबैक जमा करने में त्रुटि।");
+                showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "सफलता"); // Hindi translation
+            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।"); // Hindi translation
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
         // --- ORIGINAL APP LOGIC (ADAPTED) ---
         async function createNewUser() {
             const name = document.getElementById('new-user-name-input').value.trim();
-            if (!name) { showModal("कृपया अपना नाम दर्ज करें।"); return; }
-            const newUserId = crypto.randomUUID();
-            // We associate the custom UUID with the Firebase UID here
-            await setDoc(doc(db, "users", newUserId), { 
-                name: name, 
-                userId: newUserId, 
-                authUid: currentUser.uid, // Store the auth UID
-                createdAt: serverTimestamp() 
-            });
-            localStorage.setItem('arvindAppUserId', newUserId);
-            await loadUserData(newUserId);
+            if (!name) { showModal("कृपया अपना नाम दर्ज करें।"); return; } // Hindi translation
+            
+            try {
+                // First ensure we have a Firebase authenticated user
+                if (!currentUser) {
+                    console.log("No current Firebase user, signing in anonymously before user creation.");
+                    await signInAnonymously(auth);
+                    // This will trigger the onAuthStateChanged listener, which will recall loadUserData/setupAppForUser.
+                    // The createNewUser function will then be called again once currentUser is set.
+                    return; 
+                }
+
+                const newAppUserId = crypto.randomUUID();
+                
+                await setDoc(doc(db, "users", newAppUserId), { 
+                    name: name, 
+                    userId: newAppUserId, 
+                    authUid: currentUser.uid, // Link to Firebase UID
+                    createdAt: serverTimestamp(),
+                    lastActive: serverTimestamp() // Added lastActive timestamp
+                });
+                
+                localStorage.setItem('arvindAppUserId', newAppUserId);
+                await loadUserData(newAppUserId);
+            } catch (error) {
+                console.error("Error creating user:", error);
+                showModal("खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि"); // Hindi translation
+            }
         }
 
         async function loginExistingUser() {
             const userId = document.getElementById('existing-user-id-input').value.trim();
-            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।"); return; }
+            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।"); return; } // Hindi translation
             const userDoc = await getDoc(doc(db, "users", userId));
-            if (!userDoc.exists()) { showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।"); return; }
+            if (!userDoc.exists()) { showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।"); return; } // Hindi translation
+            
+            // Verify that the existing user ID belongs to the current authenticated Firebase user
+            if (userDoc.data().authUid !== currentUser.uid) {
+                showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि"); // Hindi translation
+                return;
+            }
+
             localStorage.setItem('arvindAppUserId', userId);
             await loadUserData(userId);
         }
@@ -1004,11 +1216,11 @@
         
         async function updateUserName() {
             const newName = document.getElementById('profile-name-input').value.trim();
-            if (!newName) { showModal("नाम खाली नहीं हो सकता।"); return; }
+            if (!newName) { showModal("नाम खाली नहीं हो सकता।"); return; } // Hindi translation
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
-            showModal("नाम सफलतापूर्वक अपडेट किया गया!");
+            showModal("नाम सफलतापूर्वक अपडेट किया गया!"); // Hindi translation
         }
         
         function handleLogout() {
@@ -1022,21 +1234,24 @@
         
         // --- EVENT LISTENERS ---
         window.addEventListener('load', () => {
+            console.log("Window loaded. Starting initial screen sequence.");
+            document.getElementById('loading-screen').classList.add('active'); // Ensure loading screen is active first
             setTimeout(() => {
-                document.getElementById('intro-screen').classList.add('active');
-                setTimeout(initializeFirebase, 1500);
-            }, 1000);
+                document.getElementById('loading-screen').classList.remove('active'); // Hide loading screen
+                document.getElementById('intro-screen').classList.add('active'); // Show intro screen
+                initializeFirebase(); // Directly call Firebase init
+            }, 1000); // 1 second delay to show loading
         });
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
-        document.getElementById('new-user-btn').addEventListener('click', () => showScreen('new-user-screen'));
+        document.getElementById('new-user-btn').addEventListener('click', createNewUser); // Directly call createNewUser
         document.getElementById('create-user-btn').addEventListener('click', createNewUser);
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('copy-id-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(applicationUserId).then(() => showModal("ID कॉपी हो गया!"));
+            navigator.clipboard.writeText(applicationUserId).then(() => showModal("आईडी कॉपी हो गया!")); // Hindi translation
         });
         document.getElementById('save-name-btn').addEventListener('click', updateUserName);
         document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -1054,36 +1269,20 @@
         document.getElementById('scoreboard-btn').addEventListener('click', loadScoreboard);
         document.getElementById('feedback-btn').addEventListener('click', openFeedbackModal);
         
+        // Poll button event listeners
+        thumbsUpBtn.addEventListener('click', () => submitVote('thumbsUp'));
+        thumbsDownBtn.addEventListener('click', () => submitVote('thumbsDown'));
+
         document.getElementById('generate-test-btn').addEventListener('click', async () => {
             const btn = document.getElementById('generate-test-btn');
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
             if (subjects.length === 0) {
-                showModal("कृपया कम से कम एक विषय चुनें।");
+                showModal("कृपया कम से कम एक विषय चुनें।"); // Hindi translation
                 return;
             }
 
-            btn.disabled = true;
-            btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> Generating...`;
-
-            const baseText = "आपका अभ्यास टेस्ट बना रहा हूँ...";
-            showModal(baseText, "कृपया प्रतीक्षा करें");
-            let seconds = 0;
-            const modalTextEl = document.getElementById('message-modal-text');
-            modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
-            generationTimerInterval = setInterval(() => {
-                seconds++;
-                if(!modalContainer.classList.contains('hidden')) {
-                    modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
-                } else {
-                    clearInterval(generationTimerInterval);
-                }
-            }, 1000);
-
-            const examData = await generateTest(true);
-
-            clearInterval(generationTimerInterval);
-            btn.disabled = false;
-            btn.textContent = "Generate Test";
+            // The loading state is now handled inside generateTest itself
+            const examData = await generateTest(true); 
 
             if (examData) {
                 hideModals();
@@ -1093,7 +1292,7 @@
 
         document.getElementById('submit-exam-btn').addEventListener('click', () => {
             if (currentExamData.type === 'daily') {
-                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "Confirm Submission", () => submitExam());
+                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "पुष्टि जमा करें", () => submitExam()); // Hindi translation
             } else {
                 submitExam();
             }
