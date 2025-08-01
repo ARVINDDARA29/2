@@ -401,7 +401,8 @@
             <!-- Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
                 <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट (Global Chat)</header>
-                <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col-reverse"></div>
+                <!-- Changed flex-col-reverse to flex-col to display messages from bottom to top -->
+                <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
                     <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
@@ -911,7 +912,7 @@
                 });
             } catch (error) { 
                 console.error("Scoreboard Error:", error); 
-                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`; 
+                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरboard लोड नहीं हो सका।</p>`; 
             }
         }
 
@@ -972,10 +973,12 @@
 
         function loadMessages() {
             const chatMessages = document.getElementById('chat-messages');
-            const q = query(collection(db, "chats"), orderBy("timestamp", "desc"), limit(50));
+            // Order by timestamp ascending to show older messages at the top
+            const q = query(collection(db, "chats"), orderBy("timestamp", "asc"), limit(50));
             unsubscribeChat = onSnapshot(q, (querySnapshot) => {
                 chatMessages.innerHTML = "";
-                querySnapshot.docs.reverse().forEach(doc => {
+                // No need to reverse if ordered by asc
+                querySnapshot.docs.forEach(doc => {
                     const msg = doc.data();
                     const bubble = document.createElement('div');
                     const isMe = msg.senderId === applicationUserId;
@@ -983,6 +986,7 @@
                     bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
+                // Scroll to the bottom to show the latest messages
                 if(chatMessages.scrollHeight > chatMessages.clientHeight) {
                   chatMessages.scrollTop = chatMessages.scrollHeight;
                 }
