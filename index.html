@@ -43,7 +43,8 @@
         .button-primary {
             background-color: #4f46e5; color: white; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .button-primary:hover { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); }
+        .button-primary:hover:not(:disabled) { background-color: #4338ca; transform: translateY(-2px); box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15); }
+        .button-primary:disabled { background-color: #a5b4fc; cursor: not-allowed; }
         .button-secondary { background-color: #e0e7ff; color: #4f46e5; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 600; transition: all 0.3s ease; }
         .button-secondary:hover { background-color: #c7d2fe; }
         .bottom-nav { display: flex; border-top: 1px solid #e5e7eb; background-color: #ffffff; }
@@ -52,7 +53,6 @@
         .nav-item:hover { background-color: #f9fafb; }
         .nav-item svg { margin: 0 auto 0.25rem; }
         
-        /* New Styles for JEE App */
         .modal-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6); z-index: 40; }
         .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 50; }
         .subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
@@ -92,7 +92,7 @@
                 <button id="login-btn" class="button-primary w-full max-w-sm">Log In</button>
             </div>
 
-            <!-- NEW Home Screen -->
+            <!-- Home Screen -->
             <div id="home-screen" class="screen flex-col p-4 md:p-6 space-y-4 overflow-y-auto">
                 <header>
                     <h1 id="welcome-message" class="text-2xl font-bold text-slate-800">Hello!</h1>
@@ -125,7 +125,7 @@
                 </div>
             </div>
             
-            <!-- Original Chat Screen -->
+            <!-- Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
                 <header class="p-4 border-b font-bold text-lg text-center">Global Chat</header>
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col-reverse"></div>
@@ -135,7 +135,7 @@
                 </form>
             </div>
 
-            <!-- Updated Profile Screen with Hindi Option -->
+            <!-- Profile Screen -->
             <div id="profile-screen" class="screen flex-col p-6 space-y-6 overflow-y-auto">
                  <h2 class="text-3xl font-bold text-gray-800 gradient-text">Profile</h2>
                 <div class="bg-slate-100 p-4 rounded-lg">
@@ -154,14 +154,14 @@
                     <p class="font-semibold text-gray-700 mb-1">भाषा चुनें (Language):</p>
                     <select id="language-select" class="w-full p-3 border rounded-lg bg-white">
                         <option value="english">English</option>
-                        <option value="hindi">हिंदी (Hindi)</option>
+                        <option value="hindi" selected>हिंदी (Hindi)</option>
                     </select>
                 </div>
                 <a href="http://www.youtube.com/@RAVI..BHAI_0029" target="_blank" class="button-secondary w-full text-center">Check Channel</a>
                 <button id="logout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg">Logout</button>
             </div>
 
-            <!-- NEW JEE Screens -->
+            <!-- JEE Screens -->
             <div id="jee-prep-setup-screen" class="screen flex-col p-4 md:p-6 space-y-4 overflow-y-auto">
                 <header class="flex items-center">
                     <button class="back-btn p-2 rounded-full hover:bg-slate-200 mr-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
@@ -180,7 +180,7 @@
                         <h3 class="font-semibold mb-2">3. Select Difficulty</h3>
                         <div class="flex gap-4"><label class="flex-1"><input type="radio" name="difficulty" value="Basic" class="mr-2">Basic</label><label class="flex-1"><input type="radio" name="difficulty" value="JEE Main" class="mr-2" checked>JEE Main</label><label class="flex-1"><input type="radio" name="difficulty" value="JEE Advanced" class="mr-2">JEE Advanced</label></div>
                     </div>
-                    <button id="generate-test-btn" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-lg hover:bg-indigo-700 transition shadow-lg">Generate Test</button>
+                    <button id="generate-test-btn" class="w-full button-primary py-4 font-bold shadow-lg">Generate Test</button>
                 </div>
             </div>
             <div id="exam-screen" class="screen flex-col">
@@ -204,29 +204,24 @@
                     <button class="back-btn p-2 rounded-full hover:bg-slate-200 mr-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
                     <h1 class="text-2xl font-bold">Daily Test Scoreboard</h1>
                 </header>
+                <div id="scoreboard-info" class="text-center text-slate-500 p-2 bg-slate-100 rounded-md mb-4">Scores are updated 2 hours after test submission.</div>
                 <div id="scoreboard-list" class="space-y-2 overflow-y-auto flex-grow"><p class="text-center text-slate-500 p-8">Loading scoreboard...</p></div>
             </div>
 
         </main>
         
-        <!-- Updated Bottom Nav with Hindi Labels -->
+        <!-- Bottom Nav -->
         <nav id="bottom-nav" class="bottom-nav hidden">
             <div id="nav-home" class="nav-item active">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                 <span>होम</span>
             </div>
             <div id="nav-chat" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                 <span>चैट</span>
             </div>
             <div id="nav-profile" class="nav-item">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <span>प्रोफाइल</span>
             </div>
         </nav>
@@ -252,10 +247,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, Timestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
-        const GEMINI_API_KEY = "AIzaSyC0VOj85W7lGkrQR22cGgW-HJvbprMHC1I";
+        const GEMINI_API_KEY = ""; // API key will be provided by the environment
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
         const firebaseConfig = {
             apiKey: "AIzaSyC3faZ16ZTsIUBEfI9dl55RnDklVeWIHts",
@@ -270,7 +265,9 @@
         let unsubscribeChat = null;
         let currentExamData = null;
         let examTimerInterval = null;
+        let generationTimerInterval = null; // Timer for AI generation
         let tabSwitchCount = 0;
+        let modalOkCallback = null;
 
         // --- DOM ELEMENTS ---
         const allScreens = document.querySelectorAll('.screen');
@@ -307,20 +304,28 @@
         function goBack() {
             if (screenHistory.length > 0) {
                 const lastScreenId = screenHistory.pop();
-                showScreen(lastScreenId, true); // Treat back as nav
+                showScreen(lastScreenId, true);
             } else {
                 showScreen('home-screen', true);
             }
         }
 
-        function showModal(content, title = "Alert") {
+        function showModal(content, title = "Alert", onOk) {
             messageModal.title.textContent = title;
             messageModal.text.innerHTML = content;
             modalContainer.classList.remove('hidden');
             messageModal.el.classList.remove('hidden');
             feedbackModal.el.classList.add('hidden');
+            modalOkCallback = onOk;
         }
-        function hideModals() { modalContainer.classList.add('hidden'); }
+        function hideModals() { 
+            modalContainer.classList.add('hidden'); 
+            if (typeof modalOkCallback === 'function') {
+                const callback = modalOkCallback;
+                modalOkCallback = null;
+                callback();
+            }
+        }
 
         // --- FIREBASE & AUTH ---
         async function initializeFirebase() {
@@ -359,7 +364,7 @@
         }
 
         async function setupAppForUser() {
-            document.getElementById('welcome-message').textContent = `Hello, ${currentUserName}!`;
+            document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
             await loadAnnouncement();
             bottomNav.classList.remove('hidden');
             appFooter.classList.remove('hidden');
@@ -367,6 +372,10 @@
         }
         
         // --- NEW JEE APP LOGIC ---
+        function getTodayDateString() {
+            return new Date().toISOString().split('T')[0]; // YYYY-MM-DD in UTC
+        }
+        
         async function loadAnnouncement() {
             try {
                 const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(1));
@@ -382,7 +391,7 @@
         function populateSubjects() {
             const container = document.getElementById('subject-selection');
             container.innerHTML = '';
-            ["Physics", "Chemistry", "Maths"].forEach(subject => {
+            ["भौतिकी (Physics)", "रसायन विज्ञान (Chemistry)", "गणित (Maths)"].forEach(subject => {
                 const label = document.createElement('label');
                 label.className = "flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500";
                 label.innerHTML = `<input type="checkbox" name="subject" value="${subject}" class="mr-3 h-5 w-5 rounded text-indigo-600 focus:ring-indigo-500"><span class="font-semibold">${subject}</span>`;
@@ -390,44 +399,47 @@
             });
         }
 
-        async function generateTest() {
-            const btn = document.getElementById('generate-test-btn');
-            btn.disabled = true;
-            btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>`;
-
+        async function generateTest(isPractice = true) {
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
-            if (subjects.length === 0) {
-                showModal("Please select at least one subject.");
-                btn.disabled = false; btn.textContent = "Generate Test"; return;
-            }
+            
+            const difficulty = isPractice ? document.querySelector('input[name="difficulty"]:checked').value : 'JEE Main';
+            const classSelection = isPractice ? document.getElementById('class-select').value : '11,12';
+            const questionCount = isPractice ? (25 * subjects.length) : 75;
+            const subjectString = isPractice ? subjects.join(', ') : "Physics, Chemistry, and Maths";
 
-            const isHindi = document.getElementById('language-select').value === 'hindi';
-            const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
-            const prompt = `Generate a ${difficulty} level practice test for JEE Main ${isHindi ? 'in Hindi language' : ''}. Class: ${document.getElementById('class-select').value}. Subjects: ${subjects.join(', ')}. Total Questions: ${25 * subjects.length}. For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation. Ensure questions are unique and not repeated from previous tests.`;
+            const prompt = `Generate a ${difficulty} level practice test for JEE Main in HINDI language. Class: ${classSelection}. Subjects: ${subjectString}. Total Questions: ${questionCount}. For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation in Hindi. Ensure questions are unique.`;
             const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
 
             try {
                 const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
                 if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
                 const result = await response.json();
-                currentExamData = JSON.parse(result.candidates[0].content.parts[0].text);
-                currentExamData.type = 'practice';
-                startExam(currentExamData);
-            } catch (error) { console.error("Test Gen Error:", error); showModal("Failed to generate test. Please try again.");
-            } finally { btn.disabled = false; btn.textContent = "Generate Test"; }
+                const parsedData = JSON.parse(result.candidates[0].content.parts[0].text);
+                
+                if (isPractice) {
+                    currentExamData = parsedData;
+                    currentExamData.type = 'practice';
+                }
+                return parsedData;
+            } catch (error) { 
+                console.error("Test Gen Error:", error); 
+                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।");
+                return null;
+            }
         }
 
         function startExam(examData) {
             document.getElementById('exam-content').innerHTML = '';
-            document.getElementById('exam-title').textContent = examData.type === 'daily' ? 'Daily Rank Test' : 'Practice Test';
+            document.getElementById('exam-title').textContent = examData.type === 'daily' ? 'दैनिक रैंक टेस्ट' : 'अभ्यास टेस्ट';
             examData.questions.forEach((q, i) => {
                 const qEl = document.createElement('div');
                 qEl.className = 'exam-question bg-white p-6 rounded-lg shadow-md';
-                qEl.innerHTML = `<p class="font-bold text-lg mb-4">Q ${i + 1} (${q.subject})</p><p class="mb-6">${q.question}</p><div class="space-y-3">${Object.entries(q.options).map(([k, v]) => `<label class="flex items-center p-3 border rounded-lg cursor-pointer has-[:checked]:bg-indigo-100"><input type="radio" name="q${i}" value="${k}" class="mr-4"><span>${k}. ${v}</span></label>`).join('')}</div>`;
+                qEl.id = `question-${i}`;
+                qEl.innerHTML = `<p class="font-bold text-lg mb-4">प्रश्न ${i + 1} (${q.subject})</p><p class="mb-6 text-lg">${q.question}</p><div class="space-y-3">${Object.entries(q.options).map(([k, v]) => `<label class="flex items-center p-3 border rounded-lg cursor-pointer has-[:checked]:bg-indigo-100"><input type="radio" name="q${i}" value="${k}" class="mr-4 h-5 w-5"><span><b>${k}.</b> ${v}</span></label>`).join('')}</div>`;
                 document.getElementById('exam-content').appendChild(qEl);
             });
             showScreen('exam-screen');
-            startTimer(180 * 60);
+            startTimer(180 * 60); // 3 hours
             if (examData.type === 'daily') {
                 tabSwitchCount = 0;
                 document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -437,8 +449,10 @@
         function handleVisibilityChange() {
             if (document.visibilityState === 'hidden' && document.getElementById('exam-screen').classList.contains('active') && currentExamData.type === 'daily') {
                 tabSwitchCount++;
-                showModal(`Warning: Switching tabs is not allowed. Your rank might be affected. Switches: ${tabSwitchCount}`, "Cheating Warning");
-                if (tabSwitchCount >= 3) submitExam(true);
+                showModal(`चेतावनी: टैब बदलना प्रतिबंधित है। आपका रैंक प्रभावित हो सकता है। स्विच: ${tabSwitchCount}`, "धोखाधड़ी की चेतावनी");
+                if (tabSwitchCount >= 3) {
+                    showModal("आपने 3 से अधिक बार टैब बदला है। आपका टेस्ट अपने आप जमा हो जाएगा।", "टेस्ट समाप्त", () => submitExam(true));
+                }
             }
         }
 
@@ -446,21 +460,19 @@
             clearInterval(examTimerInterval);
             let timer = duration;
             const timerEl = document.getElementById('exam-timer');
-            updateTimerDisplay(); // Initial display
-            
-            function updateTimerDisplay() {
+            const updateTimerDisplay = () => {
                 let h = Math.floor(timer / 3600);
                 let m = Math.floor((timer % 3600) / 60);
                 let s = timer % 60;
                 timerEl.textContent = `${h<10?'0'+h:h}:${m<10?'0'+m:m}:${s<10?'0'+s:s}`;
-            }
-            
+            };
+            updateTimerDisplay();
             examTimerInterval = setInterval(() => {
                 timer--;
                 updateTimerDisplay();
                 if (timer < 0) {
                     clearInterval(examTimerInterval);
-                    showModal("Time's up!", "Time Over", submitExam);
+                    showModal("समय समाप्त!", "Time Over", () => submitExam());
                 }
             }, 1000);
         }
@@ -469,20 +481,28 @@
             clearInterval(examTimerInterval);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             let correct = 0, incorrect = 0, unanswered = 0;
-            const userAnswers = currentExamData.questions.map((q, i) => {
+            currentExamData.questions.forEach((q, i) => {
                 const sel = document.querySelector(`input[name="q${i}"]:checked`);
-                if (!sel) { unanswered++; return null; }
-                if (sel.value === q.correct_answer) correct++; else incorrect++;
-                return sel.value;
+                if (!sel) { unanswered++; }
+                else if (sel.value === q.correct_answer) { correct++; } 
+                else { incorrect++; }
             });
             const score = (correct * 4) - (incorrect * 1);
 
             if (currentExamData.type === 'daily') {
                 const finalScore = cheated ? 0 : score;
                 try {
-                    await addDoc(collection(db, "dailyTestSubmissions"), { userId: currentUser.uid, userName: currentUserName, score: finalScore, cheated, submittedAt: serverTimestamp() });
-                    showModal(`Test submitted. Your score is ${finalScore}. Results will be on the scoreboard.`, "Success", () => showScreen('home-screen', true));
-                } catch (e) { console.error(e); showModal("Error submitting test.", "Error"); }
+                    const dailyTestId = getTodayDateString();
+                    await addDoc(collection(db, "dailyTestSubmissions"), { 
+                        userId: currentUser.uid, // FIX: Use Firebase Auth UID
+                        userName: currentUserName, 
+                        score: finalScore, 
+                        cheated, 
+                        submittedAt: serverTimestamp(),
+                        paperDate: dailyTestId
+                    });
+                    showModal(`टेस्ट सफलतापूर्वक जमा हो गया है। आपका स्कोर ${finalScore} है। परिणाम 2 घंटे बाद स्कोरबोर्ड पर अपडेट किया जाएगा।`, "सफलता", () => showScreen('home-screen', true));
+                } catch (e) { console.error(e); showModal("टेस्ट जमा करने में त्रुटि।", "Error"); }
             } else {
                 document.getElementById('result-score').textContent = `${score}/${currentExamData.questions.length * 4}`;
                 document.getElementById('result-correct').textContent = correct;
@@ -493,48 +513,117 @@
         }
 
         async function startDailyTest() {
-            showModal("This is a timed test. Switching tabs may result in a score of 0. Are you ready?", "Warning", async () => {
+            const btn = document.getElementById('daily-rank-test-btn');
+            btn.disabled = true;
+            
+            const today = getTodayDateString();
+            
+            const submissionsRef = collection(db, "dailyTestSubmissions");
+            // FIX: Use Firebase Auth UID for query
+            const q = query(submissionsRef, where("userId", "==", currentUser.uid), where("paperDate", "==", today));
+            const submissionSnap = await getDocs(q);
+
+            if (!submissionSnap.empty) {
+                showModal("आप आज का टेस्ट पहले ही दे चुके हैं। कृपया कल फिर प्रयास करें।", "Already Attempted");
+                btn.disabled = false;
+                return;
+            }
+
+            showModal("आज का टेस्ट लोड हो रहा है...", "कृपया प्रतीक्षा करें");
+            const paperRef = doc(db, "dailyPaper", today);
+            const paperSnap = await getDoc(paperRef);
+            let paperData;
+
+            if (paperSnap.exists()) {
+                paperData = paperSnap.data();
+            } else {
+                const baseText = "आज के लिए एक नया टेस्ट पेपर बना रहा हूँ...";
+                showModal(baseText, "Generating Test");
+                let seconds = 0;
+                const modalTextEl = document.getElementById('message-modal-text');
+                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+                generationTimerInterval = setInterval(() => {
+                    seconds++;
+                    if(!modalContainer.classList.contains('hidden')) {
+                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+                    } else {
+                        clearInterval(generationTimerInterval);
+                    }
+                }, 1000);
+
+                paperData = await generateTest(false);
+                
+                clearInterval(generationTimerInterval);
+
+                if (paperData) {
+                    await setDoc(paperRef, { ...paperData, createdAt: serverTimestamp() });
+                } else {
+                    showModal("आज का टेस्ट बनाने में विफल। कृपया बाद में पुनः प्रयास करें।", "Error");
+                    btn.disabled = false;
+                    return;
+                }
+            }
+            
+            showModal("टेस्ट एक समय-बद्ध परीक्षा है। टैब बदलने पर आपका स्कोर 0 हो सकता है। क्या आप तैयार हैं?", "चेतावनी", () => {
                 hideModals();
-                showScreen('loading-screen'); // Use loading screen
-                const isHindi = document.getElementById('language-select').value === 'hindi';
-                const prompt = `Generate a standard JEE Main mock test ${isHindi ? 'in Hindi language' : ''} with 75 questions (25 each from Physics, Chemistry, Maths). For each question, provide: a question text, four options (A, B, C, D), the correct option letter, and a brief explanation. Ensure questions are unique and not repeated from previous tests.`;
-                const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
-                try {
-                    const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
-                    if (!response.ok) throw new Error(`API Error`);
-                    const result = await response.json();
-                    currentExamData = JSON.parse(result.candidates[0].content.parts[0].text);
-                    currentExamData.type = 'daily';
-                    startExam(currentExamData);
-                } catch (error) { console.error("Daily Test Gen Error:", error); showModal("Could not start the daily test.", "Error", () => showScreen('home-screen', true)); }
+                currentExamData = paperData;
+                currentExamData.type = 'daily';
+                startExam(currentExamData);
             });
+            btn.disabled = false;
         }
         
         async function loadScoreboard() {
             showScreen('scoreboard-screen');
             const listEl = document.getElementById('scoreboard-list');
-            listEl.innerHTML = `<p class="text-center p-8">Loading...</p>`;
+            listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`;
             try {
-                const q = query(collection(db, "dailyTestSubmissions"), orderBy("score", "desc"), limit(50));
+                const today = getTodayDateString();
+                const q = query(collection(db, "dailyTestSubmissions"), where("paperDate", "==", today), orderBy("score", "desc"));
                 const snap = await getDocs(q);
-                if (snap.empty) { listEl.innerHTML = `<p class="text-center p-8">No submissions yet.</p>`; return; }
-                listEl.innerHTML = '';
-                snap.docs.forEach((docSnap, i) => {
+                if (snap.empty) { 
+                    listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; 
+                    return; 
+                }
+
+                const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+                const scoresToShow = [];
+                
+                snap.docs.forEach(docSnap => {
                     const data = docSnap.data();
+                    if (data.submittedAt && data.submittedAt.toDate) {
+                        const submissionTime = data.submittedAt.toDate();
+                        if (submissionTime < twoHoursAgo) {
+                            scoresToShow.push(data);
+                        }
+                    }
+                });
+
+                if (scoresToShow.length === 0) {
+                    listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`;
+                    return;
+                }
+                
+                listEl.innerHTML = '';
+                scoresToShow.forEach((data, i) => {
+                    // FIX: Use Firebase Auth UID for comparison
                     const isMe = data.userId === currentUser.uid;
                     const itemEl = document.createElement('div');
                     itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-indigo-100 border-2 border-indigo-500' : 'bg-slate-100'}`;
-                    itemEl.innerHTML = `<span class="font-bold w-12">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(You)' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`;
+                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(You)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(Cheated)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`;
                     listEl.appendChild(itemEl);
                 });
-            } catch (error) { console.error("Scoreboard Error:", error); listEl.innerHTML = `<p class="text-center text-red-500 p-8">Could not load scoreboard.</p>`; }
+            } catch (error) { 
+                console.error("Scoreboard Error:", error); 
+                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`; 
+            }
         }
 
         async function openFeedbackModal() {
             const userDoc = await getDoc(doc(db, "users", applicationUserId));
             const lastFeedback = userDoc.data().lastFeedbackTimestamp;
             if (lastFeedback && (new Date() - lastFeedback.toDate()) / (1000 * 3600) < 24) {
-                showModal("You can submit feedback once per day.", "Cooldown"); return;
+                showModal("आप प्रति दिन केवल एक बार फ़ीडबैक जमा कर सकते हैं।", "Cooldown"); return;
             }
             feedbackModal.input.value = '';
             modalContainer.classList.remove('hidden');
@@ -544,32 +633,43 @@
 
         async function submitFeedback() {
             const text = feedbackModal.input.value.trim();
-            if (text.length < 10) { showModal("Please provide more detailed feedback."); return; }
+            if (text.length < 10) { showModal("कृपया अधिक विस्तृत फ़ीडबैक प्रदान करें।"); return; }
             feedbackModal.submitBtn.disabled = true;
             try {
-                await addDoc(collection(db, "feedback"), { userId: currentUser.uid, userName: currentUserName, feedback: text, createdAt: serverTimestamp() });
+                await addDoc(collection(db, "feedback"), { 
+                    userId: currentUser.uid, // FIX: Use Firebase Auth UID
+                    userName: currentUserName, 
+                    feedback: text, 
+                    createdAt: serverTimestamp() 
+                });
                 await updateDoc(doc(db, "users", applicationUserId), { lastFeedbackTimestamp: serverTimestamp() });
                 hideModals();
-                showModal("Thank you for your feedback!", "Success");
-            } catch (error) { console.error(error); showModal("Error submitting feedback.");
+                showModal("आपके फ़ीडबैक के लिए धन्यवाद!", "Success");
+            } catch (error) { console.error(error); showModal("फ़ीडबैक जमा करने में त्रुटि।");
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
         // --- ORIGINAL APP LOGIC (ADAPTED) ---
         async function createNewUser() {
             const name = document.getElementById('new-user-name-input').value.trim();
-            if (!name) { showModal("Please enter your name."); return; }
+            if (!name) { showModal("कृपया अपना नाम दर्ज करें।"); return; }
             const newUserId = crypto.randomUUID();
-            await setDoc(doc(db, "users", newUserId), { name: name, userId: newUserId, createdAt: serverTimestamp() });
+            // We associate the custom UUID with the Firebase UID here
+            await setDoc(doc(db, "users", newUserId), { 
+                name: name, 
+                userId: newUserId, 
+                authUid: currentUser.uid, // Store the auth UID
+                createdAt: serverTimestamp() 
+            });
             localStorage.setItem('arvindAppUserId', newUserId);
             await loadUserData(newUserId);
         }
 
         async function loginExistingUser() {
             const userId = document.getElementById('existing-user-id-input').value.trim();
-            if (!userId) { showModal("Please enter your ID."); return; }
+            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।"); return; }
             const userDoc = await getDoc(doc(db, "users", userId));
-            if (!userDoc.exists()) { showModal("This User ID does not exist."); return; }
+            if (!userDoc.exists()) { showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।"); return; }
             localStorage.setItem('arvindAppUserId', userId);
             await loadUserData(userId);
         }
@@ -587,7 +687,9 @@
                     bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if(chatMessages.scrollHeight > chatMessages.clientHeight) {
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
             });
         }
 
@@ -602,15 +704,18 @@
         
         async function updateUserName() {
             const newName = document.getElementById('profile-name-input').value.trim();
-            if (!newName) { showModal("Name cannot be empty."); return; }
+            if (!newName) { showModal("नाम खाली नहीं हो सकता।"); return; }
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
-            showModal("Name updated successfully!");
+            document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
+            showModal("नाम सफलतापूर्वक अपडेट किया गया!");
         }
         
         function handleLogout() {
             signOut(auth).then(() => {
                 localStorage.removeItem('arvindAppUserId');
+                currentUser = null;
+                applicationUserId = null;
                 window.location.reload();
             });
         }
@@ -625,19 +730,17 @@
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
 
-        // Original App Listeners
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
         document.getElementById('new-user-btn').addEventListener('click', () => showScreen('new-user-screen'));
         document.getElementById('create-user-btn').addEventListener('click', createNewUser);
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('copy-id-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(applicationUserId).then(() => showModal("ID copied!"));
+            navigator.clipboard.writeText(applicationUserId).then(() => showModal("ID कॉपी हो गया!"));
         });
         document.getElementById('save-name-btn').addEventListener('click', updateUserName);
         document.getElementById('logout-btn').addEventListener('click', handleLogout);
 
-        // Nav Listeners
         document.getElementById('nav-home').addEventListener('click', () => showScreen('home-screen', true));
         document.getElementById('nav-chat').addEventListener('click', () => showScreen('chat-screen', true));
         document.getElementById('nav-profile').addEventListener('click', () => {
@@ -646,13 +749,55 @@
             showScreen('profile-screen', true);
         });
 
-        // JEE App Listeners
         document.getElementById('prep-by-syllabus-btn').addEventListener('click', () => { populateSubjects(); showScreen('jee-prep-setup-screen'); });
         document.getElementById('daily-rank-test-btn').addEventListener('click', startDailyTest);
         document.getElementById('scoreboard-btn').addEventListener('click', loadScoreboard);
         document.getElementById('feedback-btn').addEventListener('click', openFeedbackModal);
-        document.getElementById('generate-test-btn').addEventListener('click', generateTest);
-        document.getElementById('submit-exam-btn').addEventListener('click', () => submitExam());
+        
+        document.getElementById('generate-test-btn').addEventListener('click', async () => {
+            const btn = document.getElementById('generate-test-btn');
+            const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
+            if (subjects.length === 0) {
+                showModal("कृपया कम से कम एक विषय चुनें।");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> Generating...`;
+
+            const baseText = "आपका अभ्यास टेस्ट बना रहा हूँ...";
+            showModal(baseText, "कृपया प्रतीक्षा करें");
+            let seconds = 0;
+            const modalTextEl = document.getElementById('message-modal-text');
+            modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+            generationTimerInterval = setInterval(() => {
+                seconds++;
+                if(!modalContainer.classList.contains('hidden')) {
+                    modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
+                } else {
+                    clearInterval(generationTimerInterval);
+                }
+            }, 1000);
+
+            const examData = await generateTest(true);
+
+            clearInterval(generationTimerInterval);
+            btn.disabled = false;
+            btn.textContent = "Generate Test";
+
+            if (examData) {
+                hideModals();
+                startExam(examData);
+            }
+        });
+
+        document.getElementById('submit-exam-btn').addEventListener('click', () => {
+            if (currentExamData.type === 'daily') {
+                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "Confirm Submission", () => submitExam());
+            } else {
+                submitExam();
+            }
+        });
         document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen('home-screen', true));
         feedbackModal.cancelBtn.addEventListener('click', hideModals);
         feedbackModal.submitBtn.addEventListener('click', submitFeedback);
