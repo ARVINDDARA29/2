@@ -185,7 +185,7 @@
         }
 
         /* Custom styling for inputs and selects */
-        input[type="text"], textarea, select {
+        input[type="text"], input[type="email"], input[type="password"], textarea, select {
             border: 1px solid #cbd5e1; /* slate-300 */
             border-radius: 0.75rem; /* rounded-lg */
             padding: 0.75rem 1rem; /* p-3 */
@@ -193,7 +193,7 @@
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); /* subtle inner shadow */
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        input[type="text"]:focus, textarea:focus, select:focus {
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #6366f1; /* indigo-500 */
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* focus ring */
@@ -384,14 +384,31 @@
             </div>
             <div id="main-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <h2 class="text-4xl font-bold text-gray-800 mb-8">स्वागत है! 👋</h2>
-                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता</button>
-                <button id="new-user-btn" class="button-secondary w-full max-w-sm">नया उपयोगकर्ता</button>
+                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता (ऐप आईडी)</button>
+                <button id="email-signup-btn" class="button-secondary w-full max-w-sm">साइन अप करें (ईमेल/पासवर्ड)</button>
+                <button id="email-login-btn" class="button-secondary w-full max-w-sm">लॉग इन करें (ईमेल/पासवर्ड)</button>
+                <button id="continue-as-guest-btn" class="button-secondary w-full max-w-sm">गेस्ट के रूप में जारी रखें</button>
             </div>
             <div id="new-user-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
                 <h2 class="text-3xl font-bold text-gray-800">आपका पूरा नाम क्या है?</h2>
                 <input type="text" id="new-user-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
-                <button id="create-user-btn" class="button-primary w-full max-w-sm">खाता बनाएँ</button>
+                <button id="create-guest-user-btn" class="button-primary w-full max-w-sm">गेस्ट खाता बनाएँ</button>
+            </div>
+            <div id="email-signup-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
+                <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                <h2 class="text-3xl font-bold text-gray-800">खाता बनाएँ</h2>
+                <input type="text" id="signup-name-input" placeholder="अपना पूरा नाम दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <input type="email" id="signup-email-input" placeholder="ईमेल दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <input type="password" id="signup-password-input" placeholder="पासवर्ड दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <button id="signup-btn" class="button-primary w-full max-w-sm">साइन अप करें</button>
+            </div>
+             <div id="email-login-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
+                <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                <h2 class="text-3xl font-bold text-gray-800">लॉग इन करें</h2>
+                <input type="email" id="login-email-input" placeholder="ईमेल दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <input type="password" id="login-password-input" placeholder="पासवर्ड दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
+                <button id="email-login-submit-btn" class="button-primary w-full max-w-sm">लॉग इन करें</button>
             </div>
             <div id="have-account-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
@@ -589,7 +606,7 @@
     <div id="modal-container" class="hidden">
         <div class="modal-backdrop"></div>
         <div id="message-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-sm text-center">
-            <h3 id="message-modal-title" class="text-2xl font-bold mb-4 text-slate-800">Alert</h3>
+            <h3 id="message-modal-title" class="text-2xl font-bold mb-4 text-slate-800">अलर्ट</h3>
             <p id="message-modal-text" class="text-slate-600 mb-6 text-lg"></p>
             <button id="message-modal-ok-btn" class="w-full button-primary py-3 text-lg">ठीक है</button>
         </div>
@@ -606,10 +623,12 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
+        // नोट: वास्तविक दुनिया के अनुप्रयोगों में, API कुंजियों को सीधे कोड में हार्डकोड नहीं किया जाना चाहिए।
+        // उन्हें सर्वर-साइड या सुरक्षित वातावरण चर के माध्यम से प्रबंधित किया जाना चाहिए।
         const GEMINI_API_KEY = "AIzaSyCsxr987Sb41cI13aJ0PyfOYxCuNWH3p-0"; // API key will be provided by the environment
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
         const firebaseConfig = {
@@ -688,11 +707,11 @@
                 const lastScreenId = screenHistory.pop();
                 showScreen(lastScreenId, true);
             } else {
-                showScreen('home-screen', true);
+                showScreen('main-screen', true); // Go back to main screen if history is empty
             }
         }
 
-        function showModal(content, title = "Alert", onOk) {
+        function showModal(content, title = "अलर्ट", onOk) { // Changed default title to Hindi
             console.log(`Showing modal: ${title} - ${content}`);
             messageModal.title.textContent = title;
             messageModal.text.innerHTML = content;
@@ -724,20 +743,16 @@
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+                // onAuthStateChanged लिसनर का उपयोग Firebase प्रमाणीकरण स्थिति में परिवर्तन को ट्रैक करने के लिए किया जाता है।
+                // यह सुनिश्चित करता है कि हम हमेशा वर्तमान में प्रमाणित उपयोगकर्ता को जानते हैं।
                 onAuthStateChanged(auth, async (user) => {
                     console.log("onAuthStateChanged fired. User:", user ? user.uid : "null");
                     if (user) {
-                        currentUser = user;
-                        const storedAppUserId = localStorage.getItem('arvindAppUserId');
-                        console.log("Stored App User ID:", storedAppUserId);
-                        if (storedAppUserId) {
-                            await loadUserData(storedAppUserId);
-                        } else {
-                            console.log("No stored App User ID, showing main screen.");
-                            showScreen('main-screen');
-                        }
+                        currentUser = user; // Set global currentUser
+                        await findAndLinkAppUserByAuthUid(currentUser.uid); // Always try to find/link app user
                     } else {
                         console.log("No Firebase user, signing in anonymously.");
+                        // यदि कोई Firebase उपयोगकर्ता नहीं है, तो गुमनाम रूप से साइन इन करें। onAuthStateChanged फिर से फायर होगा।
                         await signInAnonymously(auth);
                     }
                 });
@@ -747,37 +762,52 @@
             }
         }
         
-        async function loadUserData(appUserIdToLoad) {
-            console.log("Attempting to load user data for appUserId:", appUserIdToLoad);
-            const userRef = doc(db, "users", appUserIdToLoad);
-            try {
-                const userSnap = await getDoc(userRef); // Potential error here
-                if (userSnap.exists()) {
-                    console.log("User data found in Firestore for appUserId.");
+        async function findAndLinkAppUserByAuthUid(authUid) {
+            console.log("Attempting to find and link app user by authUid:", authUid);
+            const storedAppUserId = localStorage.getItem('arvindAppUserId');
+            let userDocFound = false;
+
+            if (storedAppUserId) {
+                const userRef = doc(db, "users", storedAppUserId);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists() && userSnap.data().authUid === authUid) {
                     userData = userSnap.data();
-                    // Crucial: Verify that the stored appUserId is linked to the current Firebase Auth UID
-                    if (userData.authUid !== currentUser.uid) {
-                        console.warn("Stored appUserId's authUid does not match current Firebase user's UID. Forcing re-login.");
-                        localStorage.removeItem('arvindAppUserId'); // Clear invalid local storage
-                        showModal("यह आईडी आपके खाते से संबद्ध नहीं है। कृपया एक नया खाता बनाएँ या सही आईडी से लॉग इन करें।", "लॉगिन त्रुटि");
-                        showScreen('main-screen'); // Go back to main screen to choose new/existing user
-                        return;
-                    }
-                    applicationUserId = appUserIdToLoad;
+                    applicationUserId = storedAppUserId;
                     currentUserName = userData.name || "उपयोगकर्ता";
-                    setupAppForUser();
+                    userDocFound = true;
+                    console.log("Found app user by stored ID and matching authUid.");
                 } else {
-                    console.log("User data NOT found in Firestore for appUserId. Clearing local storage and showing main screen.");
+                    console.warn("Stored appUserId invalid or mismatched with current authUid. Clearing localStorage.");
                     localStorage.removeItem('arvindAppUserId');
-                    showScreen('main-screen');
                 }
-            } catch (error) {
-                console.error("Error loading user data from Firestore:", error);
-                showModal("उपयोगकर्ता डेटा लोड करने में त्रुटि। कृपया पुनः प्रयास करें।", "त्रुटि");
-                localStorage.removeItem('arvindAppUserId'); // Clear potentially problematic ID
-                showScreen('main-screen'); // Go back to main screen
+            }
+
+            if (!userDocFound) {
+                // If not found by stored ID, search by authUid in Firestore
+                const q = query(collection(db, "users"), where("authUid", "==", authUid), limit(1));
+                const querySnap = await getDocs(q);
+
+                if (!querySnap.empty) {
+                    const userDoc = querySnap.docs[0];
+                    userData = userDoc.data();
+                    applicationUserId = userDoc.id;
+                    currentUserName = userData.name || "उपयोगकर्ता";
+                    localStorage.setItem('arvindAppUserId', applicationUserId); // Save to local storage
+                    userDocFound = true;
+                    console.log("Found app user by authUid in Firestore.");
+                }
+            }
+
+            if (userDocFound) {
+                setupAppForUser();
+            } else {
+                // No existing app user document for this Firebase Auth UID.
+                // This means it's a new Firebase Auth user (could be a fresh email signup, or a new anonymous user).
+                console.log("No existing app user document found for this Firebase Auth UID. Redirecting to main screen.");
+                showScreen('main-screen');
             }
         }
+
 
         async function setupAppForUser() {
             console.log("Setting up app for user:", currentUserName);
@@ -1095,7 +1125,9 @@
             listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`; // Hindi translation
             try {
                 const today = getTodayDateString();
-                const q = query(collection(db, "dailyTestSubmissions"), where("paperDate", "==", today), orderBy("score", "desc"));
+                // Firestore से केवल आज के सबमिशन प्राप्त करें।
+                // 'orderBy' का उपयोग नहीं किया गया है ताकि इंडेक्स की आवश्यकता से बचा जा सके।
+                const q = query(collection(db, "dailyTestSubmissions"), where("paperDate", "==", today));
                 const snap = await getDocs(q);
                 if (snap.empty) { 
                     listEl.innerHTML = `<p class="text-center p-8">आज के लिए कोई सबमिशन नहीं है।</p>`; // Hindi translation
@@ -1103,17 +1135,21 @@
                 }
 
                 const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-                const scoresToShow = [];
+                let scoresToShow = [];
                 
                 snap.docs.forEach(docSnap => {
                     const data = docSnap.data();
                     if (data.submittedAt && data.submittedAt.toDate) {
                         const submissionTime = data.submittedAt.toDate();
+                        // क्लाइंट-साइड पर 2 घंटे से अधिक पुराने सबमिशन को फ़िल्टर करें
                         if (submissionTime < twoHoursAgo) {
                             scoresToShow.push(data);
                         }
                     }
                 });
+
+                // स्कोर के आधार पर क्लाइंट-साइड पर सॉर्ट करें
+                scoresToShow.sort((a, b) => b.score - a.score);
 
                 if (scoresToShow.length === 0) {
                     listEl.innerHTML = `<p class="text-center p-8">अभी तक कोई परिणाम घोषित नहीं हुआ है। परिणाम टेस्ट जमा करने के 2 घंटे बाद दिखाए जाते हैं।</p>`; // Hindi translation
@@ -1149,7 +1185,7 @@
 
         async function submitFeedback() {
             const text = feedbackModal.input.value.trim();
-            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।"); return; } // Hindi translation
+            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।", "त्रुटि"); return; } // Added Hindi title
             feedbackModal.submitBtn.disabled = true;
             try {
                 await addDoc(collection(db, "feedback"), { 
@@ -1165,54 +1201,201 @@
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
-        // --- ORIGINAL APP LOGIC (ADAPTED) ---
-        async function createNewUser() {
+        // --- AUTHENTICATION LOGIC ---
+
+        // Handles guest (anonymous) sign-in and user document creation
+        async function handleGuestSignIn() {
             const name = document.getElementById('new-user-name-input').value.trim();
-            if (!name) { showModal("कृपया अपना नाम दर्ज करें।"); return; } // Hindi translation
-            
-            try {
-                // First ensure we have a Firebase authenticated user
-                if (!currentUser) {
-                    console.log("No current Firebase user, signing in anonymously before user creation.");
+            if (!name) { showModal("कृपया अपना नाम दर्ज करें।", "त्रुटि"); return; }
+
+            // यदि कोई वर्तमान Firebase उपयोगकर्ता नहीं है, तो गुमनाम रूप से साइन इन करें
+            if (!auth.currentUser) {
+                console.log("handleGuestSignIn: No current Firebase user, attempting anonymous sign-in.");
+                try {
                     await signInAnonymously(auth);
-                    // This will trigger the onAuthStateChanged listener, which will recall loadUserData/setupAppForUser.
-                    // The createNewUser function will then be called again once currentUser is set.
-                    return; 
+                    // onAuthStateChanged को नए उपयोगकर्ता को प्रोसेस करने के लिए कुछ समय दें
+                    await new Promise(resolve => setTimeout(resolve, 500)); 
+                } catch (anonError) {
+                    console.error("Error signing in anonymously for guest user:", anonError);
+                    showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
+                    return;
                 }
-
-                const newAppUserId = crypto.randomUUID();
-                
-                await setDoc(doc(db, "users", newAppUserId), { 
-                    name: name, 
-                    userId: newAppUserId, 
-                    authUid: currentUser.uid, // Link to Firebase UID
-                    createdAt: serverTimestamp(),
-                    lastActive: serverTimestamp() // Added lastActive timestamp
-                });
-                
-                localStorage.setItem('arvindAppUserId', newAppUserId);
-                await loadUserData(newAppUserId);
-            } catch (error) {
-                console.error("Error creating user:", error);
-                showModal("खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि"); // Hindi translation
             }
-        }
 
-        async function loginExistingUser() {
-            const userId = document.getElementById('existing-user-id-input').value.trim();
-            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।"); return; } // Hindi translation
-            const userDoc = await getDoc(doc(db, "users", userId));
-            if (!userDoc.exists()) { showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।"); return; } // Hindi translation
-            
-            // Verify that the existing user ID belongs to the current authenticated Firebase user
-            if (userDoc.data().authUid !== currentUser.uid) {
-                showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि"); // Hindi translation
+            // सुनिश्चित करें कि Firebase उपयोगकर्ता उपलब्ध है
+            if (!auth.currentUser || !auth.currentUser.uid) {
+                console.error("handleGuestSignIn: auth.currentUser or its UID is still not available after sign-in attempt.");
+                showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं है। कृपया पुनः प्रयास करें।", "त्रुटि");
                 return;
             }
 
-            localStorage.setItem('arvindAppUserId', userId);
-            await loadUserData(userId);
+            console.log("Attempting to create guest user document with Firebase UID:", auth.currentUser.uid);
+            try {
+                const newAppUserId = crypto.randomUUID();
+                const userDocRef = doc(db, "users", newAppUserId);
+
+                await setDoc(userDocRef, {
+                    name: name,
+                    userId: newAppUserId,
+                    authUid: auth.currentUser.uid, // Firebase UID से लिंक करें
+                    createdAt: serverTimestamp(),
+                    lastActive: serverTimestamp(),
+                    authType: 'anonymous' // प्रमाणीकरण प्रकार जोड़ें
+                });
+                
+                localStorage.setItem('arvindAppUserId', newAppUserId);
+                // सीधे वैश्विक उपयोगकर्ता डेटा अपडेट करें
+                applicationUserId = newAppUserId;
+                currentUserName = name;
+                userData = { name: name, userId: newAppUserId, authUid: auth.currentUser.uid, authType: 'anonymous' };
+                setupAppForUser(); // ऐप सेटअप करने के लिए आगे बढ़ें
+            } catch (error) {
+                console.error("Error creating guest user document in Firestore:", error);
+                showModal("गेस्ट खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि");
+            }
         }
+
+        // Handles email/password signup and user document creation
+        async function handleEmailSignup() {
+            const name = document.getElementById('signup-name-input').value.trim();
+            const email = document.getElementById('signup-email-input').value.trim();
+            const password = document.getElementById('signup-password-input').value.trim();
+
+            if (!name || !email || !password) {
+                showModal("कृपया सभी फ़ील्ड भरें।", "त्रुटि");
+                return;
+            }
+            if (password.length < 6) {
+                showModal("पासवर्ड कम से कम 6 वर्णों का होना चाहिए।", "त्रुटि");
+                return;
+            }
+
+            try {
+                // Firebase के साथ नया उपयोगकर्ता बनाएँ
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const firebaseUser = userCredential.user;
+
+                // Firebase उपयोगकर्ता के लिए एक नया ऐप-विशिष्ट ID बनाएँ
+                const newAppUserId = crypto.randomUUID();
+                const userDocRef = doc(db, "users", newAppUserId);
+
+                await setDoc(userDocRef, {
+                    name: name,
+                    email: email, // ईमेल संग्रहीत करें (वैकल्पिक, लेकिन उपयोगी हो सकता है)
+                    userId: newAppUserId,
+                    authUid: firebaseUser.uid, // Firebase UID से लिंक करें
+                    createdAt: serverTimestamp(),
+                    lastActive: serverTimestamp(),
+                    authType: 'email' // प्रमाणीकरण प्रकार जोड़ें
+                });
+
+                localStorage.setItem('arvindAppUserId', newAppUserId);
+                // सीधे वैश्विक उपयोगकर्ता डेटा अपडेट करें
+                currentUser = firebaseUser; // सुनिश्चित करें कि currentUser अपडेटेड है
+                applicationUserId = newAppUserId;
+                currentUserName = name;
+                userData = { name: name, email: email, userId: newAppUserId, authUid: firebaseUser.uid, authType: 'email' };
+                
+                showModal("खाता सफलतापूर्वक बनाया गया!", "सफलता", () => {
+                    setupAppForUser(); // ऐप सेटअप करने के लिए आगे बढ़ें
+                });
+
+            } catch (error) {
+                console.error("Error during email signup:", error);
+                let errorMessage = "खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।";
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "यह ईमेल पहले से ही उपयोग में है। कृपया किसी अन्य ईमेल का उपयोग करें या लॉग इन करें।";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "अमान्य ईमेल प्रारूप।";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "पासवर्ड बहुत कमजोर है। कृपया एक मजबूत पासवर्ड चुनें।";
+                }
+                showModal(errorMessage, "साइन अप त्रुटि");
+            }
+        }
+
+        // Handles email/password login
+        async function handleEmailLogin() {
+            const email = document.getElementById('login-email-input').value.trim();
+            const password = document.getElementById('login-password-input').value.trim();
+
+            if (!email || !password) {
+                showModal("कृपया ईमेल और पासवर्ड दर्ज करें।", "त्रुटि");
+                return;
+            }
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const firebaseUser = userCredential.user;
+                
+                // Firebase Auth UID के आधार पर ऐप उपयोगकर्ता दस्तावेज़ को खोजें और लिंक करें
+                await findAndLinkAppUserByAuthUid(firebaseUser.uid);
+
+                showModal("सफलतापूर्वक लॉग इन किया गया!", "सफलता");
+
+            } catch (error) {
+                console.error("Error during email login:", error);
+                let errorMessage = "लॉग इन करने में त्रुटि। कृपया पुनः प्रयास करें।";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = "अमान्य ईमेल या पासवर्ड।";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "अमान्य ईमेल प्रारूप।";
+                }
+                showModal(errorMessage, "लॉगिन त्रुटि");
+            }
+        }
+
+
+        // Handles login with existing app-specific ID
+        async function loginExistingUser() {
+            const userId = document.getElementById('existing-user-id-input').value.trim();
+            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।", "त्रुटि"); return; }
+            
+            // सुनिश्चित करें कि currentUser उपलब्ध है आगे बढ़ने से पहले
+            if (!auth.currentUser) {
+                console.error("Firebase currentUser is null before getDoc in loginExistingUser. Attempting anonymous sign-in.");
+                try {
+                    await signInAnonymously(auth);
+                    await new Promise(resolve => setTimeout(resolve, 500)); // प्रमाणीकरण स्थिति अपडेट होने की प्रतीक्षा करें
+                } catch (anonError) {
+                    console.error("Error during anonymous sign-in for existing user login:", anonError);
+                    showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
+                    return;
+                }
+            }
+
+            if (!auth.currentUser || !auth.currentUser.uid) {
+                console.error("loginExistingUser: auth.currentUser or its UID is still not available after sign-in attempt.");
+                showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं। कृपया पुनः प्रयास करें।", "त्रुटि");
+                return;
+            }
+
+            console.log("Attempting to read user document for userId:", userId, "with current Firebase UID:", auth.currentUser.uid);
+
+            try {
+                const userDoc = await getDoc(doc(db, "users", userId)); 
+                if (!userDoc.exists()) {
+                    showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।", "त्रुटि"); // Hindi translation
+                    return;
+                }
+                
+                // सत्यापित करें कि मौजूदा उपयोगकर्ता आईडी वर्तमान प्रमाणित Firebase उपयोगकर्ता से संबंधित है
+                if (userDoc.data().authUid !== auth.currentUser.uid) {
+                    console.warn(`Auth UID mismatch: Stored ${userDoc.data().authUid}, Current ${auth.currentUser.uid}`);
+                    showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि", () => {
+                        showScreen('main-screen'); // मोडल बंद होने के बाद मुख्य स्क्रीन पर रीडायरेक्ट करें
+                    });
+                    return;
+                }
+
+                localStorage.setItem('arvindAppUserId', userId);
+                await findAndLinkAppUserByAuthUid(auth.currentUser.uid); // यह सफल होने पर setupAppForUser को कॉल करेगा
+            } catch (error) {
+                console.error("Error during loginExistingUser:", error);
+                showModal(`लॉग इन करने में त्रुटि: ${error.message}. कृपया पुनः प्रयास करें।`, "त्रुटि"); // Hindi translation
+            }
+        }
+
 
         function loadMessages() {
             const chatMessages = document.getElementById('chat-messages');
@@ -1247,7 +1430,7 @@
         
         async function updateUserName() {
             const newName = document.getElementById('profile-name-input').value.trim();
-            if (!newName) { showModal("नाम खाली नहीं हो सकता।"); return; } // Hindi translation
+            if (!newName) { showModal("नाम खाली नहीं हो सकता।", "त्रुटि"); return; } // Added Hindi title
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
@@ -1277,12 +1460,30 @@
         messageModal.okBtn.addEventListener('click', hideModals);
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
-        document.getElementById('new-user-btn').addEventListener('click', () => showScreen('new-user-screen')); // Reverted to show screen first
-        document.getElementById('create-user-btn').addEventListener('click', createNewUser);
+        document.getElementById('email-signup-btn').addEventListener('click', () => showScreen('email-signup-screen'));
+        document.getElementById('email-login-btn').addEventListener('click', () => showScreen('email-login-screen')); // New button for email login
+        document.getElementById('continue-as-guest-btn').addEventListener('click', () => showScreen('new-user-screen')); // Redirect to the screen where guest name is entered
+        
+        document.getElementById('create-guest-user-btn').addEventListener('click', handleGuestSignIn); // Renamed from create-user-btn
+        document.getElementById('signup-btn').addEventListener('click', handleEmailSignup); // New signup button
+        document.getElementById('email-login-submit-btn').addEventListener('click', handleEmailLogin); // New login button for email/password
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('copy-id-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(applicationUserId).then(() => showModal("आईडी कॉपी हो गया!", "सफलता")); // Added Hindi title
+            // Create a temporary input element
+            const tempInput = document.createElement('input');
+            tempInput.value = applicationUserId;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                // Use document.execCommand('copy') for better compatibility in iframes
+                document.execCommand('copy');
+                showModal("आईडी कॉपी हो गया!", "सफलता"); // Hindi translation
+            } catch (err) {
+                console.error('Failed to copy text:', err);
+                showModal("आईडी कॉपी करने में विफल। कृपया मैन्युअल रूप से कॉपी करें।", "त्रुटि"); // Hindi translation
+            }
+            document.body.removeChild(tempInput);
         });
         document.getElementById('save-name-btn').addEventListener('click', updateUserName);
         document.getElementById('logout-btn').addEventListener('click', handleLogout);
