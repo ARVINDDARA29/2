@@ -455,6 +455,13 @@
                         </div>
                         <i class="fas fa-trophy text-4xl opacity-70"></i>
                     </button>
+                     <button id="pyq-btn" class="bg-teal-600 text-white p-7 rounded-2xl shadow-xl hover:bg-teal-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold">पिछले वर्षों के प्रश्नपत्र</h2>
+                            <p class="text-teal-200 text-base">वास्तविक JEE प्रश्नपत्रों के साथ अभ्यास करें।</p>
+                        </div>
+                        <i class="fas fa-history text-4xl opacity-70"></i>
+                    </button>
                     <button id="scoreboard-btn" class="bg-green-600 text-white p-7 rounded-2xl shadow-xl hover:bg-green-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold">दैनिक स्कोर बोर्ड</h2>
@@ -462,7 +469,7 @@
                         </div>
                         <i class="fas fa-clipboard-list text-4xl opacity-70"></i>
                     </button>
-                    <div class="bg-amber-500 text-white p-7 rounded-2xl shadow-xl text-left space-y-2 animate-pulse-subtle flex items-center justify-between">
+                    <div class="bg-amber-500 text-white p-7 rounded-2xl shadow-xl text-left space-y-2 animate-pulse-subtle flex items-center justify-between col-span-1 md:col-span-2">
                         <div>
                             <h2 class="text-2xl font-bold">अखिल भारतीय JEE+एडवांस्ड</h2>
                             <p id="all-india-test-countdown" class="text-amber-200 text-base">7 दिनों में शुरू होगा!</p>
@@ -481,7 +488,6 @@
             <!-- Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
                 <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट</header>
-                <!-- Changed flex-col-reverse to flex-col to display messages from bottom to top -->
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
@@ -558,6 +564,29 @@
                     <button id="generate-test-btn" class="w-full button-primary py-4 font-bold shadow-lg text-xl">टेस्ट बनाएँ</button>
                 </div>
             </div>
+
+            <!-- PYQ Screens -->
+            <div id="pyq-year-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
+                <header class="flex items-center pb-4 border-b border-slate-100">
+                    <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 class="text-3xl font-bold">वर्ष चुनें</h1>
+                </header>
+                <div id="pyq-year-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4">
+                    <!-- Year buttons will be added here by JS -->
+                </div>
+            </div>
+
+            <div id="pyq-type-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
+                <header class="flex items-center pb-4 border-b border-slate-100">
+                    <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 id="pyq-type-title" class="text-3xl font-bold">परीक्षा का प्रकार चुनें</h1>
+                </header>
+                <div class="flex flex-col gap-4 pt-4">
+                     <button data-pyq-type="Main" class="pyq-type-btn button-primary w-full text-xl py-4">JEE Main</button>
+                     <button data-pyq-type="Advanced" class="pyq-type-btn button-primary w-full text-xl py-4">JEE Advanced</button>
+                </div>
+            </div>
+
             <div id="exam-screen" class="screen flex-col">
                 <header class="sticky top-0 bg-white shadow-md z-10 p-4 flex justify-between items-center border-b border-slate-200">
                     <h1 id="exam-title" class="text-xl font-bold text-slate-800">टेस्ट प्रगति पर है</h1>
@@ -648,8 +677,6 @@
         import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
-        // नोट: वास्तविक दुनिया के अनुप्रयोगों में, API कुंजियों को सीधे कोड में हार्डकोड नहीं किया जाना चाहिए।
-        // उन्हें सर्वर-साइड या सुरक्षित वातावरण चर के माध्यम से प्रबंधित किया जाना चाहिए।
         const GEMINI_API_KEY = "AIzaSyCsxr987Sb41cI13aJ0PyfOYxCuNWH3p-0"; // API key will be provided by the environment
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
         const firebaseConfig = {
@@ -660,18 +687,18 @@
             messagingSenderId: "341922555843",
             appId: "1:341922555843:web:cefd0e44e5d8afae4fbf76"
         };
-        // Firebase कॉन्फ़िगरेशन का अंत
 
         let app, db, auth, currentUser, userData, applicationUserId, currentUserName;
         let screenHistory = [];
         let unsubscribeChat = null;
         let currentExamData = null;
         let examTimerInterval = null;
-        let generationTimerInterval = null; // AI जनरेशन के लिए टाइमर
+        let generationTimerInterval = null;
         let tabSwitchCount = 0;
         let modalOkCallback = null;
-        let currentPollId = null; // वर्तमान सक्रिय पोल की आईडी स्टोर करने के लिए
-        let remainingExamTime = 0; // लगातार टाइमर के लिए जोड़ा गया
+        let currentPollId = null;
+        let remainingExamTime = 0;
+        let selectedPYQYear = null; // To store selected PYQ year
 
         // --- DOM ELEMENTS ---
         const allScreens = document.querySelectorAll('.screen');
@@ -680,8 +707,6 @@
         const modalContainer = document.getElementById('modal-container');
         const messageModal = { el: document.getElementById('message-modal'), title: document.getElementById('message-modal-title'), text: document.getElementById('message-modal-text'), okBtn: document.getElementById('message-modal-ok-btn') };
         const feedbackModal = { el: document.getElementById('feedback-modal'), input: document.getElementById('feedback-input'), submitBtn: document.getElementById('feedback-submit-btn'), cancelBtn: document.getElementById('feedback-cancel-btn') };
-        
-        // पोल विशिष्ट तत्व
         const pollBox = document.getElementById('poll-box');
         const pollQuestionText = document.getElementById('poll-question-text');
         const thumbsUpBtn = document.getElementById('thumbs-up-btn');
@@ -689,14 +714,12 @@
         const thumbsUpCount = document.getElementById('thumbs-up-count');
         const thumbsDownCount = document.getElementById('thumbs-down-count');
         const voteStatusMessage = document.getElementById('vote-status-message');
-
-        // पाठ चयन के लिए नए तत्व
         const lessonSelectionSection = document.getElementById('lesson-selection-section');
         const lessonSelectionContainer = document.getElementById('lesson-selection-container');
 
         // --- CORE APP FLOW ---
         function showScreen(screenId, isNav = false) {
-            console.log(`स्क्रीन दिखा रहा है: ${screenId}`);
+            console.log(`Showing screen: ${screenId}`);
             const currentActive = document.querySelector('.screen.active');
             if (currentActive && currentActive.id !== screenId && !isNav) {
                 screenHistory.push(currentActive.id);
@@ -718,12 +741,10 @@
                 unsubscribeChat = null;
             }
 
-            // परीक्षा स्क्रीन पर न होने पर टाइमर रोकें
             if (screenId !== 'exam-screen' && examTimerInterval) {
                 clearInterval(examTimerInterval);
                 examTimerInterval = null;
             }
-            // परीक्षा स्क्रीन पर लौटने पर टाइमर फिर से शुरू करें
             else if (screenId === 'exam-screen' && remainingExamTime > 0 && !examTimerInterval) {
                 startTimer(remainingExamTime);
             }
@@ -734,12 +755,12 @@
                 const lastScreenId = screenHistory.pop();
                 showScreen(lastScreenId, true);
             } else {
-                showScreen('main-screen', true); // इतिहास खाली होने पर मुख्य स्क्रीन पर वापस जाएँ
+                showScreen('home-screen', true);
             }
         }
 
         function showModal(content, title = "अलर्ट", onOk, duration = null) {
-            console.log(`मोडल दिखा रहा है: ${title} - ${content}`);
+            console.log(`Showing modal: ${title} - ${content}`);
             messageModal.title.textContent = title;
             messageModal.text.innerHTML = content;
             modalContainer.classList.remove('hidden');
@@ -747,14 +768,13 @@
             feedbackModal.el.classList.add('hidden');
             modalOkCallback = onOk;
             
-            // Auto-hide modal if duration is provided
             if (duration) {
                 setTimeout(hideModals, duration);
             }
         }
 
         function hideModals() { 
-            console.log("मोडल छिपा रहा है।");
+            console.log("Hiding modals.");
             modalContainer.classList.add('hidden'); 
             if (typeof modalOkCallback === 'function') {
                 const callback = modalOkCallback;
@@ -764,39 +784,35 @@
         }
 
         // --- FIREBASE & AUTH ---
-        // बेहतर डीबगिंग के लिए वैश्विक अनहैंडल्ड प्रॉमिस रिजेक्शन लिसनर
         window.addEventListener('unhandledrejection', (event) => {
-            console.error('अनहैंडल्ड प्रॉमिस रिजेक्शन:', event.promise, 'कारण:', event.reason);
-            showModal(`एक अप्रत्याशित त्रुटि हुई: ${event.reason.message || event.reason}. कृपया कंसोल देखें।`, "त्रुटि"); // हिंदी अनुवाद
+            console.error('Unhandled promise rejection:', event.promise, 'reason:', event.reason);
+            showModal(`An unexpected error occurred: ${event.reason.message || event.reason}. Please check the console.`, "Error");
         });
 
         async function initializeFirebase() {
-            console.log("Firebase शुरू कर रहा है...");
+            console.log("Initializing Firebase...");
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-                // onAuthStateChanged लिसनर का उपयोग Firebase प्रमाणीकरण स्थिति में परिवर्तन को ट्रैक करने के लिए किया जाता है।
-                // यह सुनिश्चित करता है कि हम हमेशा वर्तमान में प्रमाणित उपयोगकर्ता को जानते हैं।
                 onAuthStateChanged(auth, async (user) => {
-                    console.log("onAuthStateChanged फायर हुआ। उपयोगकर्ता:", user ? user.uid : "null");
+                    console.log("onAuthStateChanged fired. User:", user ? user.uid : "null");
                     if (user) {
-                        currentUser = user; // वैश्विक currentUser सेट करें
-                        await findAndLinkAppUserByAuthUid(currentUser.uid); // हमेशा ऐप उपयोगकर्ता को खोजने/लिंक करने का प्रयास करें
+                        currentUser = user;
+                        await findAndLinkAppUserByAuthUid(currentUser.uid);
                     } else {
-                        console.log("कोई Firebase उपयोगकर्ता नहीं, गुमनाम रूप से साइन इन कर रहा है।");
-                        // यदि कोई Firebase उपयोगकर्ता नहीं है, तो गुमनाम रूप से साइन इन करें। onAuthStateChanged फिर से फायर होगा।
+                        console.log("No Firebase user, signing in anonymously.");
                         await signInAnonymously(auth);
                     }
                 });
             } catch (error) { 
-                console.error("Firebase प्रारंभ त्रुटि:", error); 
-                showModal("ऐप शुरू नहीं हो सका। कृपया रीफ्रेश करें।", "त्रुटि"); // हिंदी शीर्षक जोड़ा गया
+                console.error("Firebase init error:", error); 
+                showModal("Could not initialize the app. Please refresh.", "Error");
             }
         }
         
         async function findAndLinkAppUserByAuthUid(authUid) {
-            console.log("authUid द्वारा ऐप उपयोगकर्ता को खोजने और लिंक करने का प्रयास कर रहा है:", authUid);
+            console.log("Attempting to find and link app user by authUid:", authUid);
             const storedAppUserId = localStorage.getItem('arvindAppUserId');
             let userDocFound = false;
 
@@ -806,17 +822,16 @@
                 if (userSnap.exists() && userSnap.data().authUid === authUid) {
                     userData = userSnap.data();
                     applicationUserId = storedAppUserId;
-                    currentUserName = userData.name || "उपयोगकर्ता";
+                    currentUserName = userData.name || "User";
                     userDocFound = true;
-                    console.log("भंडारित आईडी और मिलान authUid द्वारा ऐप उपयोगकर्ता मिला।");
+                    console.log("Found app user by stored ID and matching authUid.");
                 } else {
-                    console.warn("भंडारित ऐपयूजरआईडी अमान्य या वर्तमान authUid से मेल नहीं खा रहा है। स्थानीय भंडारण साफ़ कर रहा है।");
+                    console.warn("Stored appUserId is invalid or doesn't match current authUid. Clearing local storage.");
                     localStorage.removeItem('arvindAppUserId');
                 }
             }
 
             if (!userDocFound) {
-                // यदि भंडारित आईडी द्वारा नहीं मिला, तो Firestore में authUid द्वारा खोजें
                 const q = query(collection(db, "users"), where("authUid", "==", authUid), limit(1));
                 const querySnap = await getDocs(q);
 
@@ -824,37 +839,35 @@
                     const userDoc = querySnap.docs[0];
                     userData = userDoc.data();
                     applicationUserId = userDoc.id;
-                    currentUserName = userData.name || "उपयोगकर्ता";
-                    localStorage.setItem('arvindAppUserId', applicationUserId); // स्थानीय भंडारण में सहेजें
+                    currentUserName = userData.name || "User";
+                    localStorage.setItem('arvindAppUserId', applicationUserId);
                     userDocFound = true;
-                    console.log("Firestore में authUid द्वारा ऐप उपयोगकर्ता मिला।");
+                    console.log("Found app user by authUid in Firestore.");
                 }
             }
 
             if (userDocFound) {
                 setupAppForUser();
             } else {
-                // इस Firebase Auth UID के लिए कोई मौजूदा ऐप उपयोगकर्ता दस्तावेज़ नहीं मिला।
-                // इसका मतलब है कि यह एक नया Firebase Auth उपयोगकर्ता है (एक नया ईमेल साइनअप, या एक नया गुमनाम उपयोगकर्ता हो सकता है)।
-                console.log("इस Firebase Auth UID के लिए कोई मौजूदा ऐप उपयोगकर्ता दस्तावेज़ नहीं मिला। मुख्य स्क्रीन पर रीडायरेक्ट कर रहा है।");
+                console.log("No existing app user document found for this Firebase Auth UID. Redirecting to main screen.");
                 showScreen('main-screen');
             }
         }
 
 
         async function setupAppForUser() {
-            console.log("उपयोगकर्ता के लिए ऐप सेटअप कर रहा है:", currentUserName);
+            console.log("Setting up app for user:", currentUserName);
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
             try {
                 await loadPoll();
-                console.log("पोल सफलतापूर्वक लोड हुआ।");
+                console.log("Poll loaded successfully.");
             } catch (error) {
-                console.error("setupAppForUser में loadPoll के दौरान त्रुटि:", error);
-                showModal("पोल लोड करने में त्रुटि हुई।", "त्रुटि");
+                console.error("Error during loadPoll in setupAppForUser:", error);
+                showModal("Failed to load poll.", "Error");
             }
             bottomNav.classList.remove('hidden');
             appFooter.classList.remove('hidden');
-            console.log("होम स्क्रीन दिखा रहा है।");
+            console.log("Showing home screen.");
             showScreen('home-screen', true);
         }
         
@@ -864,19 +877,18 @@
         }
         
         async function loadPoll() {
-            console.log("पोल लोड कर रहा है...");
+            console.log("Loading poll...");
             try {
                 const q = query(collection(db, "polls"), orderBy("createdAt", "desc"), limit(1));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
                     const poll = querySnapshot.docs[0].data();
-                    currentPollId = querySnapshot.docs[0].id; // पोल आईडी स्टोर करें
+                    currentPollId = querySnapshot.docs[0].id;
                     pollQuestionText.textContent = poll.questionText;
                     thumbsUpCount.textContent = poll.thumbsUpCount || 0;
                     thumbsDownCount.textContent = poll.thumbsDownCount || 0;
                     pollBox.classList.remove('hidden');
 
-                    // जांचें कि क्या उपयोगकर्ता ने पहले ही वोट कर दिया है
                     const userRef = doc(db, "users", applicationUserId);
                     const userSnap = await getDoc(userRef);
                     if (userSnap.exists()) {
@@ -892,17 +904,17 @@
                         }
                     }
                 } else {
-                    pollBox.classList.add('hidden'); // यदि कोई पोल नहीं है तो छिपाएँ
-                    console.log("कोई पोल नहीं मिला, पोल बॉक्स छिपा रहा है।");
+                    pollBox.classList.add('hidden');
+                    console.log("No polls found, hiding poll box.");
                 }
             } catch (error) { 
-                console.error("पोल लोड करने में त्रुटि:", error); 
+                console.error("Error loading poll:", error); 
             }
         }
 
         async function submitVote(voteType) {
             if (!currentPollId || !applicationUserId) {
-                showModal("पोल या उपयोगकर्ता आईडी उपलब्ध नहीं है।");
+                showModal("Poll or user ID not available.");
                 return;
             }
 
@@ -913,79 +925,43 @@
                 const pollRef = doc(db, "polls", currentPollId);
                 const userRef = doc(db, "users", applicationUserId);
 
-                // रेस कंडीशन के मामले में फिर से जांचें (हालांकि Firestore नियम इसे रोकना चाहिए)
                 const userSnap = await getDoc(userRef);
                 const userVotedPolls = userSnap.data().votedPolls || {};
                 if (userVotedPolls[currentPollId]) {
-                    showModal("आपने इस पोल पर पहले ही वोट कर दिया है।", "वोट किया गया", null, 2000);
+                    showModal("आपने इस पोल पर पहले ही वोट कर दिया है।", "Voted", null, 2000);
                     voteStatusMessage.textContent = "आपने इस पोल पर पहले ही वोट कर दिया है।";
                     return;
                 }
 
-                // पोल काउंट अपडेट करें
                 await updateDoc(pollRef, {
                     [`${voteType}Count`]: increment(1)
                 });
 
-                // इस उपयोगकर्ता के लिए पोल को वोट के रूप में चिह्नित करें
                 await updateDoc(userRef, {
                     [`votedPolls.${currentPollId}`]: true
                 });
 
-                // UI को तुरंत अपडेट करें
                 if (voteType === 'thumbsUp') {
                     thumbsUpCount.textContent = parseInt(thumbsUpCount.textContent) + 1;
                 } else {
                     thumbsDownCount.textContent = parseInt(thumbsDownCount.textContent) + 1;
                 }
                 voteStatusMessage.textContent = "आपका वोट दर्ज कर लिया गया है!";
-                showModal("आपका वोट सफलतापूर्वक दर्ज कर लिया गया है!", "वोट सफल", null, 2000);
+                showModal("आपका वोट सफलतापूर्वक दर्ज कर लिया गया है!", "Vote Successful", null, 2000);
 
             } catch (error) {
-                console.error("वोट जमा करने में त्रुटि:", error);
-                showModal("वोट जमा करने में त्रुटि। कृपया पुनः प्रयास करें।", "त्रुटि");
-                thumbsUpBtn.disabled = false; // त्रुटि होने पर फिर से सक्षम करें
+                console.error("Error submitting vote:", error);
+                showModal("Error submitting vote. Please try again.", "Error");
+                thumbsUpBtn.disabled = false;
                 thumbsDownBtn.disabled = false;
-                voteStatusMessage.textContent = "वोट जमा करने में त्रुटि हुई।";
+                voteStatusMessage.textContent = "Error submitting vote.";
             }
         }
 
-        // विषय-वार पाठों का पूर्वनिर्धारित डेटा
         const JEE_LESSONS = {
-            "भौतिकी (Physics)": [
-                "गतिकी (Kinematics)", "न्यूटन के गति के नियम (Newton's Laws of Motion)", "कार्य, ऊर्जा और शक्ति (Work, Energy and Power)",
-                "घूर्णी गति (Rotational Motion)", "गुरुत्वाकर्षण (Gravitation)", "ठोसों के यांत्रिक गुण (Mechanical Properties of Solids)",
-                "तरलों के यांत्रिक गुण (Mechanical Properties of Fluids)", "ऊष्मागतिकी (Thermodynamics)", "गतिज सिद्धांत (Kinetic Theory)",
-                "दोलन (Oscillations)", "तरंगें (Waves)", "स्थिरविद्युतिकी (Electrostatics)", "विद्युत धारा (Current Electricity)",
-                "धारा का चुंबकीय प्रभाव (Magnetic Effects of Current)", "विद्युत चुम्बकीय प्रेरण (Electromagnetic Induction)",
-                "प्रत्यावर्ती धारा (Alternating Current)", "प्रकाशिकी (Optics)", "आधुनिक भौतिकी (Modern Physics)",
-                "अर्धचालक इलेक्ट्रॉनिक्स (Semiconductor Electronics)"
-            ],
-            "रसायन विज्ञान (Chemistry)": [
-                "रसायन विज्ञान की कुछ मूल अवधारणाएँ (Some Basic Concepts of Chemistry)", "परमाणु संरचना (Atomic Structure)",
-                "तत्वों का वर्गीकरण और गुणों में आवर्तिता (Classification of Elements and Periodicity in Properties)",
-                "रासायनिक बंधन और आणविक संरचना (Chemical Bonding and Molecular Structure)", "पदार्थ की अवस्थाएँ (States of Matter)",
-                "ऊष्मागतिकी (Thermodynamics)", "साम्यावस्था (Equilibrium)", "रेडॉक्स अभिक्रियाएँ (Redox Reactions)",
-                "हाइड्रोजन (Hydrogen)", "s-ब्लॉक तत्व (s-Block Elements)", "p-ब्लॉक तत्व (p-Block Elements)",
-                "कार्बनिक रसायन विज्ञान के कुछ मूल सिद्धांत और तकनीकें (Some Basic Principles and Techniques of Organic Chemistry)",
-                "हाइड्रोकार्बन (Hydrocarbons)", "पर्यावरण रसायन विज्ञान (Environmental Chemistry)", "ठोस अवस्था (Solid State)",
-                "विलयन (Solutions)", "विद्युत रसायन (Electrochemistry)", "रासायनिक बलगतिकी (Chemical Kinetics)",
-                "पृष्ठ रसायन (Surface Chemistry)", "d और f-ब्लॉक तत्व (d and f-Block Elements)", "उपसहसंयोजन यौगिक (Coordination Compounds)",
-                "हैलोएल्केन और हैलोएरीन (Haloalkanes and Haloarenes)", "एल्कोहल, फिनोल और ईथर (Alcohols, Phenols and Ethers)",
-                "एल्डिहाइड, कीटोन और कार्बोक्जिलिक एसिड (Aldehydes, Ketones and Carboxylic Acids)", "नाइट्रोजन युक्त कार्बनिक यौगिक (Organic Compounds Containing Nitrogen)",
-                "बायोमोलेक्यूल्स (Biomolecules)", "पॉलीमर (Polymers)", "दैनिक जीवन में रसायन विज्ञान (Chemistry in Everyday Life)"
-            ],
-            "गणित (Maths)": [
-                "समुच्चय, संबंध और फलन (Sets, Relations and Functions)", "जटिल संख्याएँ और द्विघात समीकरण (Complex Numbers and Quadratic Equations)",
-                "मैट्रिसेस और निर्धारक (Matrices and Determinants)", "क्रमचय और संचय (Permutations and Combinations)",
-                "गणितीय आगमन (Mathematical Induction)", "द्विपद प्रमेय और इसके अनुप्रयोग (Binomial Theorem and Its Applications)",
-                "अनुक्रम और श्रृंखला (Sequences and Series)", "सीमा, निरंतरता और अवकलनीयता (Limit, Continuity and Differentiability)",
-                "अवकलज के अनुप्रयोग (Applications of Derivatives)", "समाकलन (Integrals)", "समाकलन के अनुप्रयोग (Applications of Integrals)",
-                "अवकल समीकरण (Differential Equations)", "सीधी रेखाएँ (Straight Lines)", "शंकु परिच्छेद (Conic Sections)",
-                "त्रि-आयामी ज्यामिति का परिचय (Introduction to Three Dimensional Geometry)", "सदिश बीजगणित (Vector Algebra)",
-                "त्रि-आयामी ज्यामिति (Three Dimensional Geometry)", "सांख्यिकी और प्रायिकता (Statistics and Probability)",
-                "त्रिकोणमिति (Trigonometry)", "गणितीय तर्क (Mathematical Reasoning)"
-            ]
+            "भौतिकी (Physics)": ["गतिकी (Kinematics)", "न्यूटन के गति के नियम (Newton's Laws of Motion)", "कार्य, ऊर्जा और शक्ति (Work, Energy and Power)", "घूर्णी गति (Rotational Motion)", "गुरुत्वाकर्षण (Gravitation)", "ठोसों के यांत्रिक गुण (Mechanical Properties of Solids)", "तरलों के यांत्रिक गुण (Mechanical Properties of Fluids)", "ऊष्मागतिकी (Thermodynamics)", "गतिज सिद्धांत (Kinetic Theory)", "दोलन (Oscillations)", "तरंगें (Waves)", "स्थिरविद्युतिकी (Electrostatics)", "विद्युत धारा (Current Electricity)", "धारा का चुंबकीय प्रभाव (Magnetic Effects of Current)", "विद्युत चुम्बकीय प्रेरण (Electromagnetic Induction)", "प्रत्यावर्ती धारा (Alternating Current)", "प्रकाशिकी (Optics)", "आधुनिक भौतिकी (Modern Physics)", "अर्धचालक इलेक्ट्रॉनिक्स (Semiconductor Electronics)"],
+            "रसायन विज्ञान (Chemistry)": ["रसायन विज्ञान की कुछ मूल अवधारणाएँ (Some Basic Concepts of Chemistry)", "परमाणु संरचना (Atomic Structure)", "तत्वों का वर्गीकरण और गुणों में आवर्तिता (Classification of Elements and Periodicity in Properties)", "रासायनिक बंधन और आणविक संरचना (Chemical Bonding and Molecular Structure)", "पदार्थ की अवस्थाएँ (States of Matter)", "ऊष्मागतिकी (Thermodynamics)", "साम्यावस्था (Equilibrium)", "रेडॉक्स अभिक्रियाएँ (Redox Reactions)", "हाइड्रोजन (Hydrogen)", "s-ब्लॉक तत्व (s-Block Elements)", "p-ब्लॉक तत्व (p-Block Elements)", "कार्बनिक रसायन विज्ञान के कुछ मूल सिद्धांत और तकनीकें (Some Basic Principles and Techniques of Organic Chemistry)", "हाइड्रोकार्बन (Hydrocarbons)", "पर्यावरण रसायन विज्ञान (Environmental Chemistry)", "ठोस अवस्था (Solid State)", "विलयन (Solutions)", "विद्युत रसायन (Electrochemistry)", "रासायनिक बलगतिकी (Chemical Kinetics)", "पृष्ठ रसायन (Surface Chemistry)", "d और f-ब्लॉक तत्व (d and f-Block Elements)", "उपसहसंयोजन यौगिक (Coordination Compounds)", "हैलोएल्केन और हैलोएरीन (Haloalkanes and Haloarenes)", "एल्कोहल, फिनोल और ईथर (Alcohols, Phenols and Ethers)", "एल्डिहाइड, कीटोन और कार्बोक्जिलिक एसिड (Aldehydes, Ketones and Carboxylic Acids)", "नाइट्रोजन युक्त कार्बनिक यौगिक (Organic Compounds Containing Nitrogen)", "बायोमोलेक्यूल्स (Biomolecules)", "पॉलीमर (Polymers)", "दैनिक जीवन में रसायन विज्ञान (Chemistry in Everyday Life)"],
+            "गणित (Maths)": ["समुच्चय, संबंध और फलन (Sets, Relations and Functions)", "जटिल संख्याएँ और द्विघात समीकरण (Complex Numbers and Quadratic Equations)", "मैट्रिसेस और निर्धारक (Matrices and Determinants)", "क्रमचय और संचय (Permutations and Combinations)", "गणितीय आगमन (Mathematical Induction)", "द्विपद प्रमेय और इसके अनुप्रयोग (Binomial Theorem and Its Applications)", "अनुक्रम और श्रृंखला (Sequences and Series)", "सीमा, निरंतरता और अवकलनीयता (Limit, Continuity and Differentiability)", "अवकलज के अनुप्रयोग (Applications of Derivatives)", "समाकलन (Integrals)", "समाकलन के अनुप्रयोग (Applications of Integrals)", "अवकल समीकरण (Differential Equations)", "सीधी रेखाएँ (Straight Lines)", "शंकु परिच्छेद (Conic Sections)", "त्रि-आयामी ज्यामिति का परिचय (Introduction to Three Dimensional Geometry)", "सदिश बीजगणित (Vector Algebra)", "त्रि-आयामी ज्यामिति (Three Dimensional Geometry)", "सांख्यिकी और प्रायिकता (Statistics and Probability)", "त्रिकोणमिति (Trigonometry)", "गणितीय तर्क (Mathematical Reasoning)"]
         };
 
         function populateSubjects() {
@@ -997,10 +973,8 @@
                 label.innerHTML = `<input type="checkbox" name="subject" value="${subject}" class="mr-3 h-5 w-5 rounded text-indigo-600 focus:ring-indigo-500"><span class="font-semibold">${subject}</span>`;
                 container.appendChild(label);
             });
-
-            // विषय चयन में परिवर्तन होने पर पाठों को लोड करें
             container.addEventListener('change', updateLessonSelection);
-            updateLessonSelection(); // प्रारंभिक लोड पर पाठों को लोड करें
+            updateLessonSelection();
         }
 
         function updateLessonSelection() {
@@ -1031,76 +1005,148 @@
             }
         }
 
-
+        // UPDATED generateTest function
         async function generateTest(isPractice = true) {
-            const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
-            const selectedLessons = [...document.querySelectorAll('input[name="lesson"]:checked')].map(el => el.value);
-            
+            const selectedSubjects = isPractice ? [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value) : ["भौतिकी (Physics)", "रसायन विज्ञान (Chemistry)", "गणित (Maths)"];
+            const selectedLessons = isPractice ? [...document.querySelectorAll('input[name="lesson"]:checked')].map(el => el.value) : [];
             const difficulty = isPractice ? document.querySelector('input[name="difficulty"]:checked').value : 'JEE Main';
             const classSelection = isPractice ? document.getElementById('class-select').value : '11,12';
-            const questionCount = isPractice ? (25 * subjects.length) : 75;
             
-            let promptSubjectPart = subjects.join(', ');
-            if (selectedLessons.length > 0) {
-                promptSubjectPart += ` (focusing on these lessons: ${selectedLessons.join(', ')})`;
-            }
-
-            const prompt = `Generate a ${difficulty} level practice test for JEE Main in HINDI language.
-Class: ${classSelection}.
-Subjects: ${promptSubjectPart}.
-Total Questions: ${questionCount}.
-
-IMPORTANT: The questions must be calculative and numerical-based, requiring problem-solving skills, similar to the actual JEE exam pattern. Avoid purely theoretical questions.
-
-For each question, provide:
-1.  A question text in Hindi that involves a calculation or numerical problem.
-2.  Four options (A, B, C, D), also in Hindi.
-3.  The correct option letter (e.g., "A").
-4.  A detailed, step-by-step explanation in Hindi showing the calculation to reach the answer.`;
-
-            const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
-
+            let allQuestions = [];
             const btn = isPractice ? document.getElementById('generate-test-btn') : null;
+
             if (btn) {
                 btn.disabled = true;
                 btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> तैयार हो रहा है...`;
             }
 
-            let seconds = 0;
-            const baseText = "पेपर तैयार हो रहा है...";
-            showModal(`${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`, "टेस्ट बना रहा है", null);
-            generationTimerInterval = setInterval(() => {
-                seconds++;
-                if(!modalContainer.classList.contains('hidden')) {
-                    messageModal.text.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
-                } else {
-                    clearInterval(generationTimerInterval);
-                }
-            }, 1000);
+            const baseModalText = "पेपर तैयार हो रहा है...";
+            showModal(`${baseModalText}<br><br>विषय: कोई नहीं`, "टेस्ट बना रहा है", null);
+            const modalTextEl = document.getElementById('message-modal-text');
 
             try {
-                const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
-                if (!response.ok) throw new Error(`API त्रुटि: ${response.statusText}`);
-                const result = await response.json();
-                const parsedData = JSON.parse(result.candidates[0].content.parts[0].text);
+                for (let i = 0; i < selectedSubjects.length; i++) {
+                    const subject = selectedSubjects[i];
+                    const lessonsForSubject = selectedLessons.filter(lesson => JEE_LESSONS[subject]?.includes(lesson));
+                    let promptSubjectPart = subject;
+                    if (lessonsForSubject.length > 0) {
+                        promptSubjectPart += ` (focusing on these lessons: ${lessonsForSubject.join(', ')})`;
+                    }
+                    
+                    if (modalTextEl) {
+                         modalTextEl.innerHTML = `${baseModalText}<br><br>विषय: ${subject} (${i+1}/${selectedSubjects.length})`;
+                    }
+
+                    const prompt = `Generate exactly 25 ${difficulty} level practice test questions for JEE Main in HINDI language. Class: ${classSelection}. Subject: ${promptSubjectPart}. IMPORTANT: The questions must be calculative and numerical-based, requiring problem-solving skills, similar to the actual JEE exam pattern. Avoid purely theoretical questions. For each question, provide: 1. A question text in Hindi that involves a calculation or numerical problem. 2. Four options (A, B, C, D), also in Hindi. 3. The correct option letter (e.g., "A"). 4. A detailed, step-by-step explanation in Hindi showing the calculation to reach the answer.`;
+                    const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
+
+                    const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
+                    if (!response.ok) throw new Error(`API Error for ${subject}: ${response.statusText}`);
+                    
+                    const result = await response.json();
+                     if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts[0].text) {
+                        const parsedData = JSON.parse(result.candidates[0].content.parts[0].text);
+                        if (parsedData.questions && parsedData.questions.length > 0) {
+                             allQuestions.push(...parsedData.questions);
+                        } else {
+                            console.warn(`No questions generated for ${subject}.`);
+                        }
+                    } else {
+                         console.warn(`Empty or malformed response from API for ${subject}.`);
+                    }
+                }
+
+                if (allQuestions.length === 0) {
+                    throw new Error("No questions could be generated for any selected subject.");
+                }
+
+                // Shuffle the questions to mix subjects
+                for (let i = allQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+                }
+
+                const finalData = { questions: allQuestions };
                 
                 if (isPractice) {
-                    currentExamData = parsedData;
+                    currentExamData = finalData;
                     currentExamData.type = 'practice';
                 }
-                return parsedData;
+                
+                return finalData;
+
             } catch (error) { 
-                console.error("टेस्ट जनरेशन त्रुटि:", error); 
-                showModal("टेस्ट बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि");
+                console.error("Test generation error:", error); 
+                showModal("Failed to generate test. Please try again.", "Error");
                 return null;
             } finally {
-                clearInterval(generationTimerInterval);
+                if (generationTimerInterval) clearInterval(generationTimerInterval);
                 if (btn) {
                     btn.disabled = false;
                     btn.textContent = "टेस्ट बनाएँ";
                 }
             }
         }
+
+        // UPDATED generatePYQTest function
+        async function generatePYQTest(year, type) {
+            const subjects = ["भौतिकी (Physics)", "रसायन विज्ञान (Chemistry)", "गणित (Maths)"];
+            let allQuestions = [];
+            
+            const baseModalText = `${year} JEE ${type} का पेपर तैयार हो रहा है...`;
+            showModal(`${baseModalText}<br><br>विषय: कोई नहीं`, "टेस्ट बना रहा है", null);
+            const modalTextEl = document.getElementById('message-modal-text');
+
+            try {
+                for (let i = 0; i < subjects.length; i++) {
+                    const subject = subjects[i];
+                    console.log(`Generating questions for ${subject}...`);
+                    if (modalTextEl) {
+                         modalTextEl.innerHTML = `${baseModalText}<br><br>विषय: ${subject} (${i+1}/${subjects.length})`;
+                    }
+
+                    const prompt = `Generate exactly 25 practice questions simulating the official JEE ${type} paper from the year ${year} for the subject ${subject}. The language must be HINDI. The questions must be calculative and numerical-based, requiring problem-solving skills, similar to the actual JEE exam pattern. Avoid purely theoretical questions. For each question, provide: 1. A question text in Hindi. 2. Four options (A, B, C, D). 3. The correct option letter. 4. A detailed, step-by-step explanation in Hindi.`;
+                    const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
+
+                    const response = await fetch(GEMINI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } }) });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error for ${subject}: ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts[0].text) {
+                        const parsedData = JSON.parse(result.candidates[0].content.parts[0].text);
+                        if (parsedData.questions && parsedData.questions.length > 0) {
+                             allQuestions.push(...parsedData.questions);
+                        } else {
+                            console.warn(`No questions generated for ${subject}.`);
+                        }
+                    } else {
+                         console.warn(`Empty or malformed response from API for ${subject}.`);
+                    }
+                }
+
+                if (allQuestions.length === 0) {
+                    throw new Error("No questions could be generated for any subject.");
+                }
+                
+                // Shuffle the questions to mix subjects
+                for (let i = allQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [allQuestions[i], allQuestions[j]] = [allQuestions[j], allQuestions[i]];
+                }
+
+                console.log(`Total questions generated: ${allQuestions.length}`);
+                return { questions: allQuestions };
+
+            } catch (error) { 
+                console.error("PYQ generation error:", error); 
+                showModal("पेपर बनाने में विफल। कृपया फिर से प्रयास करें।", "त्रुटि");
+                return null;
+            }
+        }
+
 
         function startExam(examData) {
             document.getElementById('exam-content').innerHTML = '';
@@ -1113,7 +1159,7 @@ For each question, provide:
                 document.getElementById('exam-content').appendChild(qEl);
             });
             showScreen('exam-screen');
-            startTimer(180 * 60); // 3 घंटे
+            startTimer(180 * 60);
             if (examData.type === 'daily') {
                 tabSwitchCount = 0;
                 document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -1163,7 +1209,7 @@ For each question, provide:
             currentExamData.questions.forEach((q, i) => {
                 const sel = document.querySelector(`input[name="q${i}"]:checked`);
                 const userAnswer = sel ? sel.value : null;
-                q.user_answer = userAnswer; // Store user's answer for review
+                q.user_answer = userAnswer;
                 if (!userAnswer) { unanswered++; }
                 else if (userAnswer === q.correct_answer) { correct++; } 
                 else { incorrect++; }
@@ -1195,7 +1241,7 @@ For each question, provide:
         
         function startReview() {
             const reviewContent = document.getElementById('review-content');
-            reviewContent.innerHTML = ''; // Clear previous review
+            reviewContent.innerHTML = '';
             
             currentExamData.questions.forEach((q, i) => {
                 const qEl = document.createElement('div');
@@ -1211,11 +1257,11 @@ For each question, provide:
                     const isUserChoice = key === q.user_answer;
 
                     if (isCorrect) {
-                        labelClass += ' bg-green-100 border-green-500'; // Correct answer
+                        labelClass += ' bg-green-100 border-green-500';
                         indicator = '<span class="ml-auto text-green-600 font-bold">सही उत्तर</span>';
                     }
                     if (isUserChoice && !isCorrect) {
-                        labelClass += ' bg-red-100 border-red-500'; // User's incorrect answer
+                        labelClass += ' bg-red-100 border-red-500';
                         indicator = '<span class="ml-auto text-red-600 font-bold">आपका उत्तर</span>';
                     } else if (isUserChoice && isCorrect) {
                          indicator = '<span class="ml-auto text-green-600 font-bold">आपका सही उत्तर</span>';
@@ -1239,7 +1285,6 @@ For each question, provide:
 
             showScreen('review-screen');
         }
-
 
         async function startDailyTest() {
             const btn = document.getElementById('daily-rank-test-btn');
@@ -1265,24 +1310,8 @@ For each question, provide:
             if (paperSnap.exists()) {
                 paperData = paperSnap.data();
             } else {
-                const baseText = "आज के लिए एक नया टेस्ट पेपर बना रहा हूँ...";
-                showModal(baseText, "टेस्ट बना रहा है");
-                let seconds = 0;
-                const modalTextEl = document.getElementById('message-modal-text');
-                modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
-                generationTimerInterval = setInterval(() => {
-                    seconds++;
-                    if(!modalContainer.classList.contains('hidden')) {
-                       modalTextEl.innerHTML = `${baseText}<br><br>अनुमानित समय: ${seconds} सेकंड`;
-                    } else {
-                        clearInterval(generationTimerInterval);
-                    }
-                }, 1000);
-
                 paperData = await generateTest(false);
                 
-                clearInterval(generationTimerInterval);
-
                 if (paperData) {
                     await setDoc(paperRef, { ...paperData, createdAt: serverTimestamp() });
                 } else {
@@ -1343,8 +1372,8 @@ For each question, provide:
                     listEl.appendChild(itemEl);
                 });
             } catch (error) { 
-                console.error("स्कोरबोर्ड त्रुटि:", error); 
-                listEl.innerHTML = `<p class="text-center text-red-500 p-8">स्कोरबोर्ड लोड नहीं हो सका।</p>`;
+                console.error("Scoreboard error:", error); 
+                listEl.innerHTML = `<p class="text-center text-red-500 p-8">Could not load scoreboard.</p>`;
             }
         }
 
@@ -1352,7 +1381,7 @@ For each question, provide:
             const userDoc = await getDoc(doc(db, "users", applicationUserId));
             const lastFeedback = userDoc.data().lastFeedbackTimestamp;
             if (lastFeedback && (new Date() - lastFeedback.toDate()) / (1000 * 3600) < 24) {
-                showModal("आप प्रतिदिन केवल एक बार प्रतिक्रिया जमा कर सकते हैं।", "कूलडाउन"); return;
+                showModal("आप प्रतिदिन केवल एक बार प्रतिक्रिया जमा कर सकते हैं।", "Cooldown"); return;
             }
             feedbackModal.input.value = '';
             modalContainer.classList.remove('hidden');
@@ -1362,7 +1391,7 @@ For each question, provide:
 
         async function submitFeedback() {
             const text = feedbackModal.input.value.trim();
-            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।", "त्रुटि"); return; }
+            if (text.length < 10) { showModal("कृपया अधिक विस्तृत प्रतिक्रिया प्रदान करें।", "Error"); return; }
             feedbackModal.submitBtn.disabled = true;
             try {
                 await addDoc(collection(db, "feedback"), { 
@@ -1373,8 +1402,8 @@ For each question, provide:
                 });
                 await updateDoc(doc(db, "users", applicationUserId), { lastFeedbackTimestamp: serverTimestamp() });
                 hideModals();
-                showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "सफलता", null, 2000);
-            } catch (error) { console.error(error); showModal("प्रतिक्रिया जमा करने में त्रुटि।", "त्रुटि");
+                showModal("आपकी प्रतिक्रिया के लिए धन्यवाद!", "Success", null, 2000);
+            } catch (error) { console.error(error); showModal("Error submitting feedback.", "Error");
             } finally { feedbackModal.submitBtn.disabled = false; }
         }
 
@@ -1382,27 +1411,27 @@ For each question, provide:
 
         async function handleGuestSignIn() {
             const name = document.getElementById('new-user-name-input').value.trim();
-            if (!name) { showModal("कृपया अपना नाम दर्ज करें।", "त्रुटि"); return; }
+            if (!name) { showModal("कृपया अपना नाम दर्ज करें।", "Error"); return; }
 
             if (!auth.currentUser) {
-                console.log("handleGuestSignIn: कोई वर्तमान Firebase उपयोगकर्ता नहीं, गुमनाम साइन-इन का प्रयास कर रहा है।");
+                console.log("handleGuestSignIn: No current Firebase user, attempting anonymous sign-in.");
                 try {
                     await signInAnonymously(auth);
                     await new Promise(resolve => setTimeout(resolve, 500)); 
                 } catch (anonError) {
-                    console.error("गेस्ट उपयोगकर्ता के लिए गुमनाम रूप से साइन इन करने में त्रुटि:", anonError);
-                    showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
+                    console.error("Error signing in anonymously for guest user:", anonError);
+                    showModal("Failed to create guest account: Authentication failed.", "Error");
                     return;
                 }
             }
 
             if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("handleGuestSignIn: auth.currentUser या इसका UID साइन-इन प्रयास के बाद भी उपलब्ध नहीं है।");
-                showModal("गेस्ट खाता बनाने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं है। कृपया पुनः प्रयास करें।", "त्रुटि");
+                console.error("handleGuestSignIn: auth.currentUser or its UID is not available even after sign-in attempt.");
+                showModal("Failed to create guest account: Authentication data not available. Please try again.", "Error");
                 return;
             }
 
-            console.log("Firebase UID के साथ गेस्ट उपयोगकर्ता दस्तावेज़ बनाने का प्रयास कर रहा है:", auth.currentUser.uid);
+            console.log("Attempting to create guest user document with Firebase UID:", auth.currentUser.uid);
             try {
                 const newAppUserId = crypto.randomUUID();
                 const userDocRef = doc(db, "users", newAppUserId);
@@ -1422,8 +1451,8 @@ For each question, provide:
                 userData = { name: name, userId: newAppUserId, authUid: auth.currentUser.uid, authType: 'anonymous' };
                 setupAppForUser();
             } catch (error) {
-                console.error("Firestore में गेस्ट उपयोगकर्ता दस्तावेज़ बनाने में त्रुटि:", error);
-                showModal("गेस्ट खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि");
+                console.error("Error creating guest user document in Firestore:", error);
+                showModal("Failed to create guest account. Please try again.", "Account Creation Error");
             }
         }
 
@@ -1433,11 +1462,11 @@ For each question, provide:
             const password = document.getElementById('signup-password-input').value.trim();
 
             if (!name || !email || !password) {
-                showModal("कृपया सभी फ़ील्ड भरें।", "त्रुटि");
+                showModal("कृपया सभी फ़ील्ड भरें।", "Error");
                 return;
             }
             if (password.length < 6) {
-                showModal("पासवर्ड कम से कम 6 वर्णों का होना चाहिए।", "त्रुटि");
+                showModal("पासवर्ड कम से कम 6 वर्णों का होना चाहिए।", "Error");
                 return;
             }
 
@@ -1463,21 +1492,21 @@ For each question, provide:
                 currentUserName = name;
                 userData = { name: name, email: email, userId: newAppUserId, authUid: firebaseUser.uid, authType: 'email' };
                 
-                showModal("खाता सफलतापूर्वक बनाया गया!", "सफलता", () => {
+                showModal("खाता सफलतापूर्वक बनाया गया!", "Success", () => {
                     setupAppForUser();
                 });
 
             } catch (error) {
-                console.error("ईमेल साइनअप के दौरान त्रुटि:", error);
-                let errorMessage = "खाता बनाने में त्रुटि। कृपया पुनः प्रयास करें।";
+                console.error("Error during email signup:", error);
+                let errorMessage = "Failed to create account. Please try again.";
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = "यह ईमेल पहले से ही उपयोग में है। कृपया किसी अन्य ईमेल का उपयोग करें या लॉग इन करें।";
+                    errorMessage = "This email is already in use. Please use another email or log in.";
                 } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = "अमान्य ईमेल प्रारूप।";
+                    errorMessage = "Invalid email format.";
                 } else if (error.code === 'auth/weak-password') {
-                    errorMessage = "पासवर्ड बहुत कमजोर है। कृपया एक मजबूत पासवर्ड चुनें।";
+                    errorMessage = "Password is too weak. Please choose a stronger password.";
                 }
-                showModal(errorMessage, "साइन अप त्रुटि");
+                showModal(errorMessage, "Signup Error");
             }
         }
 
@@ -1486,7 +1515,7 @@ For each question, provide:
             const password = document.getElementById('login-password-input').value.trim();
 
             if (!email || !password) {
-                showModal("कृपया ईमेल और पासवर्ड दर्ज करें।", "त्रुटि");
+                showModal("कृपया ईमेल और पासवर्ड दर्ज करें।", "Error");
                 return;
             }
 
@@ -1494,49 +1523,49 @@ For each question, provide:
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const firebaseUser = userCredential.user;
                 await findAndLinkAppUserByAuthUid(firebaseUser.uid);
-                showModal("सफलतापूर्वक लॉग इन किया गया!", "सफलता", null, 2000);
+                showModal("Logged in successfully!", "Success", null, 2000);
 
             } catch (error) {
-                console.error("ईमेल लॉगिन के दौरान त्रुटि:", error);
-                let errorMessage = "लॉग इन करने में त्रुटि। कृपया पुनः प्रयास करें।";
+                console.error("Error during email login:", error);
+                let errorMessage = "Failed to log in. Please try again.";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    errorMessage = "अमान्य ईमेल या पासवर्ड।";
+                    errorMessage = "Invalid email or password.";
                 } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = "अमान्य ईमेल प्रारूप।";
+                    errorMessage = "Invalid email format.";
                 }
-                showModal(errorMessage, "लॉगिन त्रुटि");
+                showModal(errorMessage, "Login Error");
             }
         }
 
         async function loginExistingUser() {
             const userId = document.getElementById('existing-user-id-input').value.trim();
-            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।", "त्रुटि"); return; }
+            if (!userId) { showModal("कृपया अपनी आईडी दर्ज करें।", "Error"); return; }
             
             if (!auth.currentUser) {
-                console.log("loginExistingUser: कोई वर्तमान Firebase उपयोगकर्ता नहीं, गुमनाम साइन-इन का प्रयास कर रहा है।");
+                console.log("loginExistingUser: No current Firebase user, attempting anonymous sign-in.");
                 try {
                     await signInAnonymously(auth);
                     await new Promise(resolve => setTimeout(resolve, 500)); 
                 } catch (anonError) {
-                    console.error("मौजूदा उपयोगकर्ता लॉगिन के लिए गुमनाम साइन-इन के दौरान त्रुटि:", anonError);
-                    showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण विफल।", "त्रुटि");
+                    console.error("Error during anonymous sign-in for existing user login:", anonError);
+                    showModal("Failed to log in: Authentication failed.", "Error");
                     return;
                 }
             }
 
             if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("loginExistingUser: auth.currentUser या इसका UID साइन-इन प्रयास के बाद भी उपलब्ध नहीं है।");
-                showModal("लॉग इन करने में त्रुटि: प्रमाणीकरण डेटा उपलब्ध नहीं। कृपया पुनः प्रयास करें।", "त्रुटि");
+                console.error("loginExistingUser: auth.currentUser or its UID is not available even after sign-in attempt.");
+                showModal("Failed to log in: Authentication data not available. Please try again.", "Error");
                 return;
             }
 
-            console.log("उपयोगकर्ता आईडी के लिए उपयोगकर्ता दस्तावेज़ पढ़ने का प्रयास कर रहा है:", userId, "वर्तमान Firebase UID के साथ:", auth.currentUser.uid);
+            console.log("Attempting to read user document for user ID:", userId, "with current Firebase UID:", auth.currentUser.uid);
 
             try {
                 const userDocRef = doc(db, "users", userId);
                 const userDoc = await getDoc(userDocRef); 
                 if (!userDoc.exists()) {
-                    showModal("यह उपयोगकर्ता आईडी मौजूद नहीं है।", "त्रुटि");
+                    showModal("This user ID does not exist.", "Error");
                     return;
                 }
                 
@@ -1546,15 +1575,15 @@ For each question, provide:
 
                 if (storedAuthUid !== currentAuthUid) {
                     if (storedAuthType === 'anonymous' && auth.currentUser.isAnonymous) {
-                        console.warn(`ऐप आईडी ${userId} के लिए गुमनाम Auth UID बेमेल का पता चला। नई गुमनाम UID से फिर से संबद्ध कर रहा है: ${currentAuthUid}`);
+                        console.warn(`Anonymous Auth UID mismatch detected for app ID ${userId}. Re-associating with new anonymous UID: ${currentAuthUid}`);
                         await updateDoc(userDocRef, { authUid: currentAuthUid });
                         localStorage.setItem('arvindAppUserId', userId);
                         await findAndLinkAppUserByAuthUid(currentAuthUid);
-                        showModal("गेस्ट आईडी सफलतापूर्वक पुनः संबद्ध की गई।", "सफलता", null, 2000);
+                        showModal("Guest ID re-associated successfully.", "Success", null, 2000);
                         return;
                     } else {
-                        console.warn(`Auth UID बेमेल: भंडारित ${storedAuthUid}, वर्तमान ${currentAuthUid}। गुमनाम पुनः संबद्धता का परिदृश्य नहीं।`);
-                        showModal("यह आईडी आपके खाते से संबद्ध नहीं है।", "लॉगिन त्रुटि", () => {
+                        console.warn(`Auth UID mismatch: Stored ${storedAuthUid}, Current ${currentAuthUid}. Not an anonymous re-association scenario.`);
+                        showModal("This ID is not associated with your account.", "Login Error", () => {
                             showScreen('main-screen');
                         });
                         return;
@@ -1563,11 +1592,10 @@ For each question, provide:
                 localStorage.setItem('arvindAppUserId', userId);
                 await findAndLinkAppUserByAuthUid(auth.currentUser.uid);
             } catch (error) {
-                console.error("loginExistingUser के दौरान त्रुटि:", error);
-                showModal(`लॉग इन करने में त्रुटि: ${error.message}. कृपया पुनः प्रयास करें।`, "त्रुटि");
+                console.error("Error during loginExistingUser:", error);
+                showModal(`Failed to log in: ${error.message}. Please try again.`, "Error");
             }
         }
-
 
         function loadMessages() {
             const chatMessages = document.getElementById('chat-messages');
@@ -1576,7 +1604,6 @@ For each question, provide:
                 chatMessages.innerHTML = "";
                 querySnapshot.docs.forEach(doc => {
                     const msg = doc.data();
-                    const bubble = document.createElement('div');
                     const isMe = msg.senderId === applicationUserId;
                     bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
                     bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
@@ -1599,11 +1626,11 @@ For each question, provide:
         
         async function updateUserName() {
             const newName = document.getElementById('profile-name-input').value.trim();
-            if (!newName) { showModal("नाम खाली नहीं हो सकता।", "त्रुटि"); return; }
+            if (!newName) { showModal("Name cannot be empty.", "Error"); return; }
             await updateDoc(doc(db, "users", applicationUserId), { name: newName });
             currentUserName = newName;
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
-            showModal("नाम सफलतापूर्वक अपडेट किया गया!", "सफलता", null, 2000);
+            showModal("Name updated successfully!", "Success", null, 2000);
         }
         
         function handleLogout() {
@@ -1617,7 +1644,7 @@ For each question, provide:
         
         // --- EVENT LISTENERS ---
         window.addEventListener('load', () => {
-            console.log("विंडो लोड हुई। प्रारंभिक स्क्रीन अनुक्रम शुरू कर रहा है।");
+            console.log("Window loaded. Starting initial screen sequence.");
             document.getElementById('loading-screen').classList.add('active');
             setTimeout(() => {
                 document.getElementById('loading-screen').classList.remove('active');
@@ -1625,6 +1652,7 @@ For each question, provide:
                 initializeFirebase();
             }, 1000);
         });
+
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
 
@@ -1645,10 +1673,10 @@ For each question, provide:
             tempInput.select();
             try {
                 document.execCommand('copy');
-                showModal("आईडी कॉपी हो गया!", "सफलता", null, 2000);
+                showModal("आईडी कॉपी हो गया!", "Success", null, 2000);
             } catch (err) {
-                console.error('टेक्स्ट कॉपी करने में विफल:', err);
-                showModal("आईडी कॉपी करने में विफल। कृपया मैन्युअल रूप से कॉपी करें।", "त्रुटि");
+                console.error('Failed to copy text:', err);
+                showModal("Failed to copy ID. Please copy manually.", "Error");
             }
             document.body.removeChild(tempInput);
         });
@@ -1674,7 +1702,7 @@ For each question, provide:
         document.getElementById('generate-test-btn').addEventListener('click', async () => {
             const subjects = [...document.querySelectorAll('input[name="subject"]:checked')].map(el => el.value);
             if (subjects.length === 0) {
-                showModal("कृपया कम से कम एक विषय चुनें।", "त्रुटि");
+                showModal("कृपया कम से कम एक विषय चुनें।", "Error");
                 return;
             }
             const examData = await generateTest(true); 
@@ -1686,15 +1714,79 @@ For each question, provide:
 
         document.getElementById('submit-exam-btn').addEventListener('click', () => {
             if (currentExamData.type === 'daily') {
-                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "पुष्टि जमा करें", () => submitExam());
+                showModal("क्या आप वाकई टेस्ट जमा करना चाहते हैं?", "Submit Confirmation", () => submitExam());
             } else {
                 submitExam();
             }
         });
+
         document.getElementById('back-to-home-btn').addEventListener('click', () => showScreen('home-screen', true));
         document.getElementById('review-answers-btn').addEventListener('click', startReview);
         feedbackModal.cancelBtn.addEventListener('click', hideModals);
         feedbackModal.submitBtn.addEventListener('click', submitFeedback);
+
+        // PYQ Listeners
+        document.getElementById('pyq-btn').addEventListener('click', () => {
+            const yearGrid = document.getElementById('pyq-year-grid');
+            yearGrid.innerHTML = '';
+            const years = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+            years.forEach(year => {
+                const yearBtn = document.createElement('button');
+                yearBtn.className = 'button-secondary py-4 text-xl';
+                yearBtn.textContent = year;
+                yearBtn.dataset.year = year;
+                yearBtn.addEventListener('click', () => {
+                    selectedPYQYear = year;
+                    document.getElementById('pyq-type-title').textContent = `${year} - परीक्षा का प्रकार चुनें`;
+                    showScreen('pyq-type-screen');
+                });
+                yearGrid.appendChild(yearBtn);
+            });
+            showScreen('pyq-year-screen');
+        });
+
+        document.querySelectorAll('.pyq-type-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const type = e.target.dataset.pyqType;
+                const year = selectedPYQYear;
+                const paperId = `${year}-${type}`;
+                const paperRef = doc(db, "pyqPapers", paperId);
+
+                showModal("पेपर लोड हो रहा है...", "कृपया प्रतीक्षा करें");
+
+                try {
+                    const paperSnap = await getDoc(paperRef);
+                    let paperData;
+
+                    if (paperSnap.exists()) {
+                        console.log(`Loading PYQ paper ${paperId} from Firestore.`);
+                        paperData = paperSnap.data();
+                    } else {
+                        console.log(`PYQ paper ${paperId} not found in Firestore. Generating...`);
+                        paperData = await generatePYQTest(year, type);
+                        if (paperData) {
+                            console.log(`Saving generated PYQ paper ${paperId} to Firestore.`);
+                            await setDoc(paperRef, { ...paperData, createdAt: serverTimestamp() });
+                        }
+                    }
+
+                    if (paperData) {
+                        hideModals();
+                        currentExamData = paperData;
+                        currentExamData.type = 'practice'; // PYQs are for practice
+                        startExam(currentExamData);
+                    } else {
+                         hideModals();
+                         showModal("पेपर लोड करने में विफल।", "त्रुटि");
+                    }
+                } catch (error) {
+                    console.error("Error fetching/generating PYQ paper:", error);
+                    hideModals();
+                    showModal("पेपर लोड करने में एक त्रुटि हुई।", "त्रुटि");
+                }
+            });
+        });
+
     </script>
 </body>
 </html>
