@@ -106,7 +106,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.875rem; /* Smaller text for nav items */
+            font-size: 0.75rem; /* Smaller text for nav items */
         }
         .nav-item.active {
             color: #6366f1; /* Active color */
@@ -118,8 +118,8 @@
         }
         .nav-item svg {
             margin: 0 auto 0.25rem;
-            width: 1.75rem; /* Slightly larger icons */
-            height: 1.75rem;
+            width: 1.5rem; /* Smaller icons for 4 items */
+            height: 1.5rem;
         }
         
         /* Modal styling */
@@ -329,31 +329,32 @@
         }
 
         /* Chat bubble styling */
-        #chat-messages div {
+        #chat-messages div, #personal-chat-messages div {
             border-radius: 1.25rem; /* More rounded bubbles */
-            padding: 0.85rem 1.25rem;
+            padding: 0.75rem 1rem; /* Adjusted padding */
             max-width: 80%; /* Allow more space for messages */
             word-wrap: break-word; /* Ensure long words wrap */
+            font-size: 0.95rem; /* CHAT FONT FIX */
         }
-        #chat-messages div.bg-indigo-500 {
+        #chat-messages div.bg-indigo-500, #personal-chat-messages div.bg-indigo-500 {
             background-color: #6366f1; /* Primary color for sent messages */
         }
-        #chat-messages div.bg-slate-200 {
+        #chat-messages div.bg-slate-200, #personal-chat-messages div.bg-slate-200 {
             background-color: #e2e8f0; /* Lighter background for received messages */
         }
-        #chat-input {
+        #chat-input, #personal-chat-input {
             border-radius: 9999px; /* Pill shape for input */
             padding-left: 1.25rem;
             padding-right: 1.25rem;
         }
-        #chat-form button {
+        #chat-form button, #personal-chat-form button {
             background-color: #6366f1;
             border-radius: 9999px;
             padding: 0.75rem; /* Larger send button */
             box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
             transition: all 0.2s ease;
         }
-        #chat-form button:hover {
+        #chat-form button:hover, #personal-chat-form button:hover {
             background-color: #4f46e5;
             transform: translateY(-1px);
             box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
@@ -364,6 +365,29 @@
             background-color: #f59e0b; /* Tailwind amber-500 */
             box-shadow: 0 6px 12px rgba(245, 158, 11, 0.3);
             animation: pulse 2s infinite ease-in-out; /* Subtle pulse animation */
+        }
+        
+        /* XP Bar */
+        .xp-bar-container {
+            background-color: #e0e7ff;
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 10px;
+        }
+        .xp-bar {
+            background-color: #4f46e5;
+            height: 100%;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Level Up Modal Effect */
+        @keyframes levelUp {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        #level-up-modal {
+            animation: levelUp 0.5s ease-out forwards;
         }
     </style>
 </head>
@@ -485,12 +509,33 @@
                 </div>
             </div>
             
-            <!-- Chat Screen -->
+            <!-- Global Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
                 <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट</header>
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
+                    <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
+                </form>
+            </div>
+            
+            <!-- Users List Screen for Personal Chat -->
+            <div id="users-list-screen" class="screen flex-col">
+                <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">एक उपयोगकर्ता चुनें</header>
+                <div id="users-list-container" class="flex-grow p-4 space-y-2 overflow-y-auto">
+                    <!-- User list will be populated here -->
+                </div>
+            </div>
+
+            <!-- Personal Chat Screen -->
+            <div id="personal-chat-screen" class="screen flex-col">
+                <header class="p-4 border-b border-slate-200 flex items-center bg-white shadow-sm">
+                    <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <h1 id="personal-chat-header" class="font-bold text-xl text-slate-700">चैट</h1>
+                </header>
+                <div id="personal-chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
+                <form id="personal-chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
+                    <input type="text" id="personal-chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
                     <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
                 </form>
             </div>
@@ -505,10 +550,20 @@
                         <button id="copy-id-btn" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">कॉपी करें</button>
                     </div>
                 </div>
-                <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
+                 <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
                     <p class="font-semibold text-gray-700 mb-2 text-lg">आपका नाम:</p>
                     <input type="text" id="profile-name-input" class="p-3 border rounded-lg w-full mb-3 text-base">
                     <button id="save-name-btn" class="button-primary w-full text-base py-3">नाम सहेजें</button>
+                </div>
+                <!-- Leveling System UI -->
+                <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-700 text-lg">लेवल <span id="profile-level">0</span></p>
+                        <p id="profile-xp" class="text-sm text-gray-500">0 / 100 XP</p>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div id="profile-xp-bar" class="xp-bar" style="width: 0%;"></div>
+                    </div>
                 </div>
                 <div class="bg-slate-100 p-5 rounded-xl shadow-sm">
                     <p class="font-semibold text-gray-700 mb-2 text-lg">भाषा चुनें:</p>
@@ -640,7 +695,13 @@
             </div>
             <div id="nav-chat" class="nav-item">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                <span>चैट</span>
+                <span>वैश्विक चैट</span>
+            </div>
+             <div id="nav-users" class="nav-item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.125-1.273-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.125-1.273.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>मैसेज</span>
             </div>
             <div id="nav-profile" class="nav-item">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -667,6 +728,13 @@
                 <button id="feedback-submit-btn" class="flex-1 button-primary py-3 text-lg">जमा करें</button>
             </div>
         </div>
+        <!-- Level Up Modal -->
+        <div id="level-up-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-sm text-center hidden">
+            <i class="fas fa-arrow-up text-7xl text-yellow-400 mb-4"></i>
+            <h3 class="text-4xl font-bold mb-4 gradient-text">लेवल अप!</h3>
+            <p id="level-up-text" class="text-slate-600 mb-6 text-2xl"></p>
+            <button id="level-up-ok-btn" class="w-full button-primary py-3 text-lg">बहुत बढ़िया!</button>
+        </div>
     </div>
 
     <script type="module">
@@ -691,6 +759,8 @@
         let app, db, auth, currentUser, userData, applicationUserId, currentUserName;
         let screenHistory = [];
         let unsubscribeChat = null;
+        let unsubscribePersonalChat = null;
+        let currentPersonalChatRecipient = {};
         let currentExamData = null;
         let examTimerInterval = null;
         let generationTimerInterval = null;
@@ -707,6 +777,7 @@
         const modalContainer = document.getElementById('modal-container');
         const messageModal = { el: document.getElementById('message-modal'), title: document.getElementById('message-modal-title'), text: document.getElementById('message-modal-text'), okBtn: document.getElementById('message-modal-ok-btn') };
         const feedbackModal = { el: document.getElementById('feedback-modal'), input: document.getElementById('feedback-input'), submitBtn: document.getElementById('feedback-submit-btn'), cancelBtn: document.getElementById('feedback-cancel-btn') };
+        const levelUpModal = { el: document.getElementById('level-up-modal'), text: document.getElementById('level-up-text'), okBtn: document.getElementById('level-up-ok-btn') };
         const pollBox = document.getElementById('poll-box');
         const pollQuestionText = document.getElementById('poll-question-text');
         const thumbsUpBtn = document.getElementById('thumbs-up-btn');
@@ -731,23 +802,25 @@
 
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => item.classList.remove('active'));
-            let associatedNav = document.getElementById(`nav-${screenId.replace('-screen', '')}`);
+            
+            let associatedNav;
+            if (screenId === 'users-list-screen' || screenId === 'personal-chat-screen') {
+                associatedNav = document.getElementById('nav-users');
+            } else {
+                associatedNav = document.getElementById(`nav-${screenId.replace('-screen', '')}`);
+            }
+
             if(associatedNav) associatedNav.classList.add('active');
             else document.getElementById('nav-home').classList.add('active');
 
+            // Manage listeners
             if (screenId === 'chat-screen' && !unsubscribeChat) loadMessages();
-            if (screenId !== 'chat-screen' && unsubscribeChat) {
-                unsubscribeChat();
-                unsubscribeChat = null;
-            }
+            if (screenId !== 'chat-screen' && unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
 
-            if (screenId !== 'exam-screen' && examTimerInterval) {
-                clearInterval(examTimerInterval);
-                examTimerInterval = null;
-            }
-            else if (screenId === 'exam-screen' && remainingExamTime > 0 && !examTimerInterval) {
-                startTimer(remainingExamTime);
-            }
+            if (screenId !== 'personal-chat-screen' && unsubscribePersonalChat) { unsubscribePersonalChat(); unsubscribePersonalChat = null; }
+
+            if (screenId !== 'exam-screen' && examTimerInterval) { clearInterval(examTimerInterval); examTimerInterval = null; }
+            else if (screenId === 'exam-screen' && remainingExamTime > 0 && !examTimerInterval) { startTimer(remainingExamTime); }
         }
 
         function goBack() {
@@ -766,6 +839,7 @@
             modalContainer.classList.remove('hidden');
             messageModal.el.classList.remove('hidden');
             feedbackModal.el.classList.add('hidden');
+            levelUpModal.el.classList.add('hidden');
             modalOkCallback = onOk;
             
             if (duration) {
@@ -858,6 +932,7 @@
         async function setupAppForUser() {
             console.log("Setting up app for user:", currentUserName);
             document.getElementById('welcome-message').textContent = `नमस्ते, ${currentUserName}!`;
+            updateProfileUI();
             try {
                 await loadPoll();
                 console.log("Poll loaded successfully.");
@@ -1216,6 +1291,12 @@
             });
             const score = (correct * 4) - (incorrect * 1);
 
+            // Award XP for taking the test
+            const xpGained = correct * 10; // 10 XP for each correct answer
+            if (xpGained > 0) {
+                await addXp(xpGained);
+            }
+
             if (currentExamData.type === 'daily') {
                 const finalScore = cheated ? 0 : score;
                 try {
@@ -1442,13 +1523,15 @@
                     authUid: auth.currentUser.uid,
                     createdAt: serverTimestamp(),
                     lastActive: serverTimestamp(),
-                    authType: 'anonymous'
+                    authType: 'anonymous',
+                    level: 0,
+                    xp: 0
                 });
                 
                 localStorage.setItem('arvindAppUserId', newAppUserId);
                 applicationUserId = newAppUserId;
                 currentUserName = name;
-                userData = { name: name, userId: newAppUserId, authUid: auth.currentUser.uid, authType: 'anonymous' };
+                userData = { name: name, userId: newAppUserId, authUid: auth.currentUser.uid, authType: 'anonymous', level: 0, xp: 0 };
                 setupAppForUser();
             } catch (error) {
                 console.error("Error creating guest user document in Firestore:", error);
@@ -1483,14 +1566,16 @@
                     authUid: firebaseUser.uid,
                     createdAt: serverTimestamp(),
                     lastActive: serverTimestamp(),
-                    authType: 'email'
+                    authType: 'email',
+                    level: 0,
+                    xp: 0
                 });
 
                 localStorage.setItem('arvindAppUserId', newAppUserId);
                 currentUser = firebaseUser;
                 applicationUserId = newAppUserId;
                 currentUserName = name;
-                userData = { name: name, email: email, userId: newAppUserId, authUid: firebaseUser.uid, authType: 'email' };
+                userData = { name: name, email: email, userId: newAppUserId, authUid: firebaseUser.uid, authType: 'email', level: 0, xp: 0 };
                 
                 showModal("खाता सफलतापूर्वक बनाया गया!", "Success", () => {
                     setupAppForUser();
@@ -1643,6 +1728,134 @@
                 window.location.reload();
             });
         }
+
+        // --- LEVELING SYSTEM ---
+        function getXpForNextLevel(level) {
+            return (level + 1) * 100; // e.g., Level 0 -> 100 XP, Level 1 -> 200 XP
+        }
+
+        function updateProfileUI() {
+            const level = userData.level || 0;
+            const xp = userData.xp || 0;
+            const nextLevelXp = getXpForNextLevel(level);
+            
+            document.getElementById('profile-level').textContent = level;
+            document.getElementById('profile-xp').textContent = `${xp} / ${nextLevelXp} XP`;
+            const xpPercentage = (xp / nextLevelXp) * 100;
+            document.getElementById('profile-xp-bar').style.width = `${xpPercentage}%`;
+        }
+        
+        function showLevelUpModal(newLevel) {
+            levelUpModal.text.textContent = `आप लेवल ${newLevel} पर पहुंच गए हैं!`;
+            modalContainer.classList.remove('hidden');
+            levelUpModal.el.classList.remove('hidden');
+        }
+
+        async function addXp(xpGained) {
+            if (!applicationUserId) return;
+            const userRef = doc(db, "users", applicationUserId);
+            
+            await updateDoc(userRef, { xp: increment(xpGained) });
+
+            const updatedUserSnap = await getDoc(userRef);
+            userData = updatedUserSnap.data();
+            
+            let currentLevel = userData.level || 0;
+            let currentXp = userData.xp || 0;
+            let xpForNext = getXpForNextLevel(currentLevel);
+
+            if (currentXp >= xpForNext) {
+                currentLevel++;
+                await updateDoc(userRef, { level: currentLevel });
+                userData.level = currentLevel;
+                showLevelUpModal(currentLevel);
+            }
+            updateProfileUI();
+        }
+
+        // --- PERSONAL MESSAGING ---
+        async function loadUsersList() {
+            showScreen('users-list-screen');
+            const container = document.getElementById('users-list-container');
+            container.innerHTML = '<p class="text-center text-slate-500 p-8">उपयोगकर्ताओं को लोड किया जा रहा है...</p>';
+
+            const usersRef = collection(db, "users");
+            const q = query(usersRef, where("userId", "!=", applicationUserId));
+            const querySnapshot = await getDocs(q);
+            
+            container.innerHTML = '';
+            if (querySnapshot.empty) {
+                container.innerHTML = '<p class="text-center text-slate-500 p-8">चैट करने के लिए कोई अन्य उपयोगकर्ता नहीं मिला।</p>';
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const user = doc.data();
+                const userEl = document.createElement('div');
+                userEl.className = 'flex items-center p-4 bg-slate-100 rounded-lg cursor-pointer hover:bg-slate-200';
+                userEl.innerHTML = `
+                    <div class="flex-grow">
+                        <p class="font-bold">${user.name}</p>
+                        <p class="text-sm text-slate-500">लेवल ${user.level || 0}</p>
+                    </div>
+                    <i class="fas fa-comment-dots text-indigo-500"></i>
+                `;
+                userEl.addEventListener('click', () => openPersonalChat(user.userId, user.name));
+                container.appendChild(userEl);
+            });
+        }
+
+        function openPersonalChat(recipientId, recipientName) {
+            currentPersonalChatRecipient = { id: recipientId, name: recipientName };
+            document.getElementById('personal-chat-header').textContent = recipientName;
+            document.getElementById('personal-chat-messages').innerHTML = '';
+            showScreen('personal-chat-screen');
+            loadPersonalMessages(recipientId);
+        }
+
+        function loadPersonalMessages(recipientId) {
+            if (unsubscribePersonalChat) unsubscribePersonalChat();
+
+            const chatMessages = document.getElementById('personal-chat-messages');
+            const chatID = [applicationUserId, recipientId].sort().join('_');
+            const messagesRef = collection(db, "personalChats", chatID, "messages");
+            const q = query(messagesRef, orderBy("timestamp", "asc"), limit(50));
+
+            unsubscribePersonalChat = onSnapshot(q, (querySnapshot) => {
+                chatMessages.innerHTML = "";
+                querySnapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const bubble = document.createElement('div');
+                    const isMe = msg.senderId === applicationUserId;
+                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
+                    bubble.innerHTML = `<div>${msg.text}</div>`;
+                    chatMessages.appendChild(bubble);
+                });
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 0);
+            });
+        }
+
+        async function sendPersonalMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('personal-chat-input');
+            const text = input.value.trim();
+            if (text === "" || !currentPersonalChatRecipient.id) return;
+            
+            const recipientId = currentPersonalChatRecipient.id;
+            input.value = "";
+
+            const chatID = [applicationUserId, recipientId].sort().join('_');
+            const messagesRef = collection(db, "personalChats", chatID, "messages");
+            
+            await addDoc(messagesRef, {
+                text: text,
+                senderId: applicationUserId,
+                recipientId: recipientId,
+                timestamp: serverTimestamp()
+            });
+        }
         
         // --- EVENT LISTENERS ---
         window.addEventListener('load', () => {
@@ -1657,6 +1870,7 @@
 
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
+        levelUpModal.okBtn.addEventListener('click', hideModals);
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
         document.getElementById('email-signup-btn').addEventListener('click', () => showScreen('email-signup-screen'));
@@ -1668,6 +1882,8 @@
         document.getElementById('email-login-submit-btn').addEventListener('click', handleEmailLogin);
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
+        document.getElementById('personal-chat-form').addEventListener('submit', sendPersonalMessage);
+
         document.getElementById('copy-id-btn').addEventListener('click', () => {
             const tempInput = document.createElement('input');
             tempInput.value = applicationUserId;
@@ -1687,9 +1903,11 @@
 
         document.getElementById('nav-home').addEventListener('click', () => showScreen('home-screen', true));
         document.getElementById('nav-chat').addEventListener('click', () => showScreen('chat-screen', true));
+        document.getElementById('nav-users').addEventListener('click', () => loadUsersList());
         document.getElementById('nav-profile').addEventListener('click', () => {
             document.getElementById('display-user-id').textContent = applicationUserId;
             document.getElementById('profile-name-input').value = currentUserName;
+            updateProfileUI();
             showScreen('profile-screen', true);
         });
 
