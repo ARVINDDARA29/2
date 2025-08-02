@@ -1604,14 +1604,16 @@
                 chatMessages.innerHTML = "";
                 querySnapshot.docs.forEach(doc => {
                     const msg = doc.data();
+                    const bubble = document.createElement('div');
                     const isMe = msg.senderId === applicationUserId;
                     bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
                     bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
-                if(chatMessages.scrollHeight > chatMessages.clientHeight) {
-                  chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
+                // CHAT SCROLL FIX: Use setTimeout to ensure the DOM is updated before scrolling
+                setTimeout(() => {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 0);
             });
         }
 
