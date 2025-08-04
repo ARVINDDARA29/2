@@ -12,7 +12,7 @@
         /* Base styles for the body and app wrapper */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e0f2f7; /* Lighter, more inviting background */
+            background-color: #f0f9ff; /* THEME CHANGE: Lighter sky blue background */
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -40,7 +40,6 @@
         .screen {
             display: none;
             flex-direction: column;
-            /* flex-grow: 1; */ /* FIX: Removed flex-grow from individual screens */
             width: 100%;
             animation: fadeInScale 0.6s ease-out forwards; /* Smoother animation */
         }
@@ -49,36 +48,36 @@
         }
         /* Gradient text for titles */
         .gradient-text {
-            background: linear-gradient(45deg, #6366f1, #ec4899); /* Deeper indigo to vibrant pink */
+            background: linear-gradient(45deg, #14b8a6, #ec4899); /* THEME CHANGE: Teal to vibrant pink */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         /* Primary button styling */
         .button-primary {
-            background-color: #6366f1; /* Tailwind indigo-500 */
+            background-color: #14b8a6; /* THEME CHANGE: teal-500 */
             color: white;
             padding: 1rem 2rem; /* Larger padding */
             border-radius: 9999px; /* Fully rounded (pill shape) */
             font-weight: 700; /* Bolder text */
             transition: all 0.3s ease;
-            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.3); /* Shadow matching button color */
+            box-shadow: 0 6px 12px rgba(20, 184, 166, 0.3); /* Shadow matching button color */
             letter-spacing: 0.025em; /* Slight letter spacing */
             text-transform: uppercase; /* Uppercase text */
         }
         .button-primary:hover:not(:disabled) {
-            background-color: #4f46e5; /* Darker indigo on hover */
+            background-color: #0d9488; /* THEME CHANGE: Darker teal on hover */
             transform: translateY(-3px); /* More pronounced lift effect */
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 20px rgba(20, 184, 166, 0.4);
         }
         .button-primary:disabled {
-            background-color: #a5b4fc;
+            background-color: #5eead4; /* THEME CHANGE: teal-300 */
             cursor: not-allowed;
             box-shadow: none;
         }
         /* Secondary button styling */
         .button-secondary {
-            background-color: #e0e7ff; /* Lighter indigo background */
-            color: #4f46e5; /* Indigo text */
+            background-color: #ccfbf1; /* THEME CHANGE: Lighter teal background */
+            color: #0d9488; /* THEME CHANGE: Teal text */
             padding: 1rem 2rem;
             border-radius: 9999px;
             font-weight: 700;
@@ -86,7 +85,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .button-secondary:hover {
-            background-color: #c7d2fe;
+            background-color: #99f6e4; /* THEME CHANGE: teal-200 */
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
@@ -116,8 +115,8 @@
             position: relative; /* For notification badge */
         }
         .nav-item.active {
-            color: #6366f1; /* Active color */
-            border-top-color: #6366f1;
+            color: #14b8a6; /* THEME CHANGE: Active color */
+            border-top-color: #14b8a6;
             font-weight: 600;
         }
         .nav-item:hover {
@@ -219,8 +218,8 @@
         }
         input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: #6366f1; /* indigo-500 */
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* focus ring */
+            border-color: #14b8a6; /* THEME CHANGE: teal-500 */
+            box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2); /* focus ring */
         }
 
         /* Custom radio/checkbox styling */
@@ -240,8 +239,8 @@
             border-radius: 50%; /* fully rounded for radio */
         }
         input[type="radio"]:checked, input[type="checkbox"]:checked {
-            background-color: #6366f1; /* indigo-500 */
-            border-color: #6366f1;
+            background-color: #14b8a6; /* THEME CHANGE: teal-500 */
+            border-color: #14b8a6;
         }
         input[type="radio"]:checked::before {
             content: '';
@@ -270,13 +269,13 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         .subject-grid label:hover {
-            border-color: #a5b4fc; /* Light indigo on hover */
+            border-color: #5eead4; /* THEME CHANGE: Light teal on hover */
             transform: translateY(-1px);
         }
-        .subject-grid label.has-[:checked]:bg-indigo-100 {
-            background-color: #e0e7ff; /* Lighter indigo when checked */
-            border-color: #6366f1; /* Stronger border when checked */
-            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.2);
+        .subject-grid label.has-[:checked]:bg-teal-100 { /* THEME CHANGE */
+            background-color: #ccfbf1; /* Lighter teal when checked */
+            border-color: #14b8a6; /* Stronger border when checked */
+            box-shadow: 0 4px 8px rgba(20, 184, 166, 0.2);
         }
 
         /* Back button styling */
@@ -295,16 +294,16 @@
 
         /* Poll/Announcement Box */
         #poll-box {
-            background-color: #eef2ff; /* Lightest indigo */
-            border-left: 5px solid #6366f1; /* Stronger border */
-            color: #4338ca; /* Darker indigo text */
+            background-color: #f0fdfa; /* THEME CHANGE: Lightest teal */
+            border-left: 5px solid #14b8a6; /* THEME CHANGE: Stronger border */
+            color: #115e59; /* THEME CHANGE: Darker teal text */
             padding: 1.25rem;
             border-radius: 0.75rem;
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             animation: fadeIn 0.5s ease-in-out;
         }
         #poll-box .vote-btn {
-            background-color: #6366f1;
+            background-color: #14b8a6;
             color: white;
             padding: 0.75rem 1.25rem;
             border-radius: 9999px;
@@ -316,22 +315,22 @@
             transition: all 0.2s ease;
         }
         #poll-box .vote-btn:hover:not(:disabled) {
-            background-color: #4f46e5;
+            background-color: #0d9488;
             transform: translateY(-2px);
         }
         #poll-box .vote-btn:disabled {
-            background-color: #a5b4fc;
+            background-color: #5eead4;
             cursor: not-allowed;
             opacity: 0.7;
         }
         #poll-box .vote-count {
             font-weight: 700;
             font-size: 1.25rem;
-            color: #4f46e5;
+            color: #0d9488;
         }
         #poll-box .vote-status-message {
             font-style: italic;
-            color: #5a67d8;
+            color: #134e4a;
             font-size: 0.9rem;
             margin-top: 0.75rem;
         }
@@ -347,9 +346,9 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        #scoreboard-list div.bg-indigo-100 {
-             background-color: #e0e7ff; /* Lighter indigo for 'You' */
-             border-color: #6366f1;
+        #scoreboard-list div.bg-teal-100 { /* THEME CHANGE */
+             background-color: #ccfbf1; /* Lighter teal for 'You' */
+             border-color: #14b8a6;
         }
 
         /* Chat bubble styling */
@@ -360,8 +359,8 @@
             word-wrap: break-word; /* Ensure long words wrap */
             font-size: 0.95rem; /* CHAT FONT FIX */
         }
-        #chat-messages div.bg-indigo-500, #personal-chat-messages div.bg-indigo-500 {
-            background-color: #6366f1; /* Primary color for sent messages */
+        #chat-messages div.bg-teal-500, #personal-chat-messages div.bg-teal-500 { /* THEME CHANGE */
+            background-color: #14b8a6; /* Primary color for sent messages */
         }
         #chat-messages div.bg-slate-200, #personal-chat-messages div.bg-slate-200 {
             background-color: #e2e8f0; /* Lighter background for received messages */
@@ -372,16 +371,16 @@
             padding-right: 1.25rem;
         }
         #chat-form button, #personal-chat-form button {
-            background-color: #6366f1;
+            background-color: #14b8a6; /* THEME CHANGE */
             border-radius: 9999px;
             padding: 0.75rem; /* Larger send button */
-            box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+            box-shadow: 0 4px 8px rgba(20, 184, 166, 0.3);
             transition: all 0.2s ease;
         }
         #chat-form button:hover, #personal-chat-form button:hover {
-            background-color: #4f46e5;
+            background-color: #0d9488; /* THEME CHANGE */
             transform: translateY(-1px);
-            box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 6px 12px rgba(20, 184, 166, 0.4);
         }
 
         /* Countdown box for All India JEE+Advanced */
@@ -393,13 +392,13 @@
         
         /* XP Bar */
         .xp-bar-container {
-            background-color: #e0e7ff;
+            background-color: #ccfbf1; /* THEME CHANGE */
             border-radius: 9999px;
             overflow: hidden;
             height: 10px;
         }
         .xp-bar {
-            background-color: #4f46e5;
+            background-color: #0d9488; /* THEME CHANGE */
             height: 100%;
             transition: width 0.5s ease-in-out;
         }
@@ -424,12 +423,18 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
         .notification-item.unread {
-            border-left-color: #6366f1; /* indigo-500 */
-            background-color: #eef2ff; /* indigo-50 */
+            border-left-color: #14b8a6; /* THEME CHANGE: teal-500 */
+            background-color: #f0fdfa; /* THEME CHANGE: teal-50 */
         }
         .notification-item.read {
             border-left-color: #d1d5db; /* gray-300 */
             background-color: #f9fafb; /* gray-50 */
+        }
+        
+        /* Custom has-[:checked] styling for difficulty radio buttons */
+        .difficulty-label.has-[:checked]:bg-teal-100 {
+            background-color: #ccfbf1 !important;
+            border-color: #14b8a6 !important;
         }
     </style>
 </head>
@@ -438,7 +443,7 @@
         <main class="flex-grow flex flex-col overflow-y-auto">
             <!-- Loading Screen -->
             <div id="loading-screen" class="screen active flex-col justify-center items-center p-8">
-                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-indigo-600"></div>
+                <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-teal-600"></div>
                 <h1 class="text-4xl font-bold mt-8 gradient-text">Future JEE Crackers</h1>
                 <p class="text-slate-500 mt-3 text-lg">by ARVIND DARA BISHNOI</p>
             </div>
@@ -493,7 +498,7 @@
                     <i class="fas fa-graduation-cap text-5xl gradient-text opacity-80"></i>
                 </header>
                 <!-- Poll Box (formerly Announcement Box) -->
-                <div id="poll-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
+                <div id="poll-box" class="hidden">
                     <p class="font-bold mb-2">आज का पोल</p>
                     <p id="poll-question-text" class="text-lg mb-4"></p>
                     <div class="flex justify-around items-center gap-4">
@@ -507,10 +512,10 @@
                     <p id="vote-status-message" class="vote-status-message text-center"></p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-4">
-                    <button id="prep-by-syllabus-btn" class="bg-indigo-600 text-white p-7 rounded-2xl shadow-xl hover:bg-indigo-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                    <button id="prep-by-syllabus-btn" class="bg-teal-600 text-white p-7 rounded-2xl shadow-xl hover:bg-teal-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold">JEE मुख्य तैयारी</h2>
-                            <p class="text-indigo-200 text-base">पाठ्यक्रम के अनुसार अभ्यास टेस्ट।</p>
+                            <p class="text-teal-200 text-base">पाठ्यक्रम के अनुसार अभ्यास टेस्ट।</p>
                         </div>
                         <i class="fas fa-book-open text-4xl opacity-70"></i>
                     </button>
@@ -521,10 +526,10 @@
                         </div>
                         <i class="fas fa-trophy text-4xl opacity-70"></i>
                     </button>
-                     <button id="pyq-btn" class="bg-teal-600 text-white p-7 rounded-2xl shadow-xl hover:bg-teal-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
+                     <button id="pyq-btn" class="bg-sky-600 text-white p-7 rounded-2xl shadow-xl hover:bg-sky-700 transition text-left space-y-2 transform hover:scale-105 flex items-center justify-between">
                         <div>
                             <h2 class="text-2xl font-bold">पिछले वर्षों के प्रश्नपत्र</h2>
-                            <p class="text-teal-200 text-base">वास्तविक JEE प्रश्नपत्रों के साथ अभ्यास करें।</p>
+                            <p class="text-sky-200 text-base">वास्तविक JEE प्रश्नपत्रों के साथ अभ्यास करें।</p>
                         </div>
                         <i class="fas fa-history text-4xl opacity-70"></i>
                     </button>
@@ -557,7 +562,7 @@
                 <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
-                    <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
+                    <button type="submit" class="bg-teal-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-teal-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
                 </form>
             </div>
             
@@ -578,7 +583,7 @@
                 <div id="personal-chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
                 <form id="personal-chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="personal-chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
-                    <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
+                    <button type="submit" class="bg-teal-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-teal-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
                 </form>
             </div>
 
@@ -652,16 +657,16 @@
                     <div>
                         <h3 class="font-semibold mb-3 text-xl">4. कठिनाई चुनें</h3>
                         <div class="flex flex-wrap gap-4">
-                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
-                                <input type="radio" name="difficulty" value="Basic" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
+                            <label class="difficulty-label flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-teal-100 has-[:checked]:border-teal-500">
+                                <input type="radio" name="difficulty" value="Basic" class="mr-2 h-5 w-5 rounded-full text-teal-600 focus:ring-teal-500">
                                 <span class="font-semibold text-base">मूल</span>
                             </label>
-                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
-                                <input type="radio" name="difficulty" value="JEE Main" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500" checked>
+                            <label class="difficulty-label flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-teal-100 has-[:checked]:border-teal-500">
+                                <input type="radio" name="difficulty" value="JEE Main" class="mr-2 h-5 w-5 rounded-full text-teal-600 focus:ring-teal-500" checked>
                                 <span class="font-semibold text-base">JEE मुख्य</span>
                             </label>
-                            <label class="flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500">
-                                <input type="radio" name="difficulty" value="JEE Advanced" class="mr-2 h-5 w-5 rounded-full text-indigo-600 focus:ring-indigo-500">
+                            <label class="difficulty-label flex-1 min-w-[120px] flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-teal-100 has-[:checked]:border-teal-500">
+                                <input type="radio" name="difficulty" value="JEE Advanced" class="mr-2 h-5 w-5 rounded-full text-teal-600 focus:ring-teal-500">
                                 <span class="font-semibold text-base">JEE एडवांस्ड</span>
                             </label>
                         </div>
@@ -695,7 +700,7 @@
             <div id="exam-screen" class="screen flex-col">
                 <header class="sticky top-0 bg-white shadow-md z-10 p-4 flex justify-between items-center border-b border-slate-200">
                     <h1 id="exam-title" class="text-xl font-bold text-slate-800">टेस्ट प्रगति पर है</h1>
-                    <div id="exam-timer" class="font-bold text-2xl text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full shadow-inner">03:00:00</div>
+                    <div id="exam-timer" class="font-bold text-2xl text-teal-600 bg-teal-50 px-4 py-2 rounded-full shadow-inner">03:00:00</div>
                 </header>
                 <div id="exam-content" class="p-4 md:p-6 space-y-8 overflow-y-auto flex-grow bg-slate-50"></div>
                 <footer class="sticky bottom-0 bg-white p-4 border-t border-slate-200 shadow-md">
@@ -706,7 +711,7 @@
                  <h1 class="text-5xl font-bold mb-6 gradient-text">टेस्ट पूरा हुआ! 🎉</h1>
                  <div class="text-center bg-slate-100 p-10 rounded-3xl shadow-2xl w-full max-w-md">
                     <p class="text-xl text-slate-600 mb-2">आपका स्कोर</p>
-                    <p id="result-score" class="text-8xl font-extrabold my-4 text-indigo-600">--/300</p>
+                    <p id="result-score" class="text-8xl font-extrabold my-4 text-teal-600">--/300</p>
                     <div class="grid grid-cols-3 gap-4 text-center mt-6">
                         <div><p class="font-semibold text-slate-700">सही</p><p id="result-correct" class="text-3xl font-bold text-green-600">0</p></div>
                         <div><p class="font-semibold text-slate-700">गलत</p><p id="result-incorrect" class="text-3xl font-bold text-red-600">0</p></div>
@@ -799,7 +804,8 @@
         import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
-        const GEMINI_API_KEY = "AIzaSyCsxr987Sb41cI13aJ0PyfOYxCuNWH3p-0"; 
+        // FIX: Removed hardcoded API key. The execution environment will handle authentication.
+        const GEMINI_API_KEY = ""; 
         const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
         const firebaseConfig = {
             apiKey: "AIzaSyC3faZ16ZTsIUBEfI9dl55RnDklVeWIHts",
@@ -1105,8 +1111,8 @@
             container.innerHTML = '';
             ["भौतिकी (Physics)", "रसायन विज्ञान (Chemistry)", "गणित (Maths)"].forEach(subject => {
                 const label = document.createElement('label');
-                label.className = "flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-indigo-100 has-[:checked]:border-indigo-500";
-                label.innerHTML = `<input type="checkbox" name="subject" value="${subject}" class="mr-3 h-5 w-5 rounded text-indigo-600 focus:ring-indigo-500"><span class="font-semibold">${subject}</span>`;
+                label.className = "flex items-center p-3 border rounded-lg bg-white cursor-pointer has-[:checked]:bg-teal-100 has-[:checked]:border-teal-500";
+                label.innerHTML = `<input type="checkbox" name="subject" value="${subject}" class="mr-3 h-5 w-5 rounded text-teal-600 focus:ring-teal-500"><span class="font-semibold">${subject}</span>`;
                 container.appendChild(label);
             });
             container.addEventListener('change', updateLessonSelection);
@@ -1130,7 +1136,7 @@
                         lessons.forEach(lesson => {
                             const label = document.createElement('label');
                             label.className = "flex items-center p-2 border rounded-md bg-white cursor-pointer hover:bg-slate-50";
-                            label.innerHTML = `<input type="checkbox" name="lesson" value="${lesson}" data-subject="${subject}" class="mr-3 h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500"><span class="text-sm">${lesson}</span>`;
+                            label.innerHTML = `<input type="checkbox" name="lesson" value="${lesson}" data-subject="${subject}" class="mr-3 h-4 w-4 rounded text-teal-600 focus:ring-teal-500"><span class="text-sm">${lesson}</span>`;
                             lessonSelectionContainer.appendChild(label);
                         });
                     }
@@ -1188,7 +1194,7 @@
                             console.warn(`No questions generated for ${subject}.`);
                         }
                     } else {
-                         console.warn(`Empty or malformed response from API for ${subject}.`);
+                         console.warn(`Empty or malformed response from API for ${subject}.`, result);
                     }
                 }
 
@@ -1259,7 +1265,7 @@
                             console.warn(`No questions generated for ${subject}.`);
                         }
                     } else {
-                         console.warn(`Empty or malformed response from API for ${subject}.`);
+                         console.warn(`Empty or malformed response from API for ${subject}.`, result);
                     }
                 }
 
@@ -1291,7 +1297,8 @@
                 const qEl = document.createElement('div');
                 qEl.className = 'exam-question bg-white p-6 rounded-lg shadow-md';
                 qEl.id = `question-${i}`;
-                qEl.innerHTML = `<p class="font-bold text-lg mb-4">प्रश्न ${i + 1} (${q.subject})</p><p class="mb-6 text-lg">${q.question}</p><div class="space-y-3">${Object.entries(q.options).map(([k, v]) => `<label class="flex items-center p-3 border rounded-lg cursor-pointer has-[:checked]:bg-indigo-100"><input type="radio" name="q${i}" value="${k}" class="mr-4 h-5 w-5"><span><b>${k}.</b> ${v}</span></label>`).join('')}</div>`;
+                // FIX: Added fallbacks for question properties to prevent crashes from malformed data.
+                qEl.innerHTML = `<p class="font-bold text-lg mb-4">प्रश्न ${i + 1} (${q.subject || 'N/A'})</p><p class="mb-6 text-lg">${q.question || 'Question text not available.'}</p><div class="space-y-3">${Object.entries(q.options || {}).map(([k, v]) => `<label class="flex items-center p-3 border rounded-lg cursor-pointer has-[:checked]:bg-teal-100 has-[:checked]:border-teal-500"><input type="radio" name="q${i}" value="${k}" class="mr-4 h-5 w-5"><span><b>${k}.</b> ${v}</span></label>`).join('')}</div>`;
                 document.getElementById('exam-content').appendChild(qEl);
             });
             showScreen('exam-screen');
@@ -1391,7 +1398,8 @@
                 qEl.id = `review-question-${i}`;
 
                 let optionsHTML = '<div class="space-y-3">';
-                for (const [key, value] of Object.entries(q.options)) {
+                // FIX: Added fallback for q.options to prevent crash.
+                for (const [key, value] of Object.entries(q.options || {})) {
                     let labelClass = 'flex items-center p-3 border rounded-lg';
                     let indicator = '';
                     
@@ -1413,13 +1421,14 @@
                 }
                 optionsHTML += '</div>';
 
+                // FIX: Added fallbacks for other question properties.
                 qEl.innerHTML = `
-                    <p class="font-bold text-lg mb-4">प्रश्न ${i + 1} (${q.subject})</p>
-                    <p class="mb-6 text-lg">${q.question}</p>
+                    <p class="font-bold text-lg mb-4">प्रश्न ${i + 1} (${q.subject || 'N/A'})</p>
+                    <p class="mb-6 text-lg">${q.question || 'Question text not available.'}</p>
                     ${optionsHTML}
                     <div class="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
                         <p class="font-bold text-slate-700 mb-2">हल:</p>
-                        <p class="text-slate-600 whitespace-pre-wrap">${q.explanation}</p>
+                        <p class="text-slate-600 whitespace-pre-wrap">${q.explanation || 'Explanation not available.'}</p>
                     </div>
                 `;
                 reviewContent.appendChild(qEl);
@@ -1509,8 +1518,8 @@
                 scoresToShow.forEach((data, i) => {
                     const isMe = data.userId === currentUser.uid;
                     const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-indigo-100 border-2 border-indigo-500' : 'bg-slate-100'}`;
-                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(धोखाधड़ी)</span>' : ''}</span><span class="font-bold text-xl text-indigo-600">${data.score}</span>`;
+                    itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-teal-100 border-2 border-teal-500' : 'bg-slate-100'}`;
+                    itemEl.innerHTML = `<span class="font-bold w-12 text-lg">${i + 1}.</span><span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''} ${data.cheated ? '<span class=\"text-red-500 font-normal\">(धोखाधड़ी)</span>' : ''}</span><span class="font-bold text-xl text-teal-600">${data.score}</span>`;
                     listEl.appendChild(itemEl);
                 });
             } catch (error) { 
@@ -1752,8 +1761,8 @@
                     const msg = doc.data();
                     const bubble = document.createElement('div');
                     const isMe = msg.senderId === applicationUserId;
-                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
-                    bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
+                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-teal-500 text-white self-end' : 'bg-slate-200 self-start'}`;
+                    bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-teal-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
                 // CHAT SCROLL FIX: Use setTimeout to ensure the DOM is updated before scrolling
@@ -1860,7 +1869,7 @@
                         <p class="font-bold">${user.name}</p>
                         <p class="text-sm text-slate-500">लेवल ${user.level || 0}</p>
                     </div>
-                    <i class="fas fa-comment-dots text-indigo-500"></i>
+                    <i class="fas fa-comment-dots text-teal-500"></i>
                 `;
                 userEl.addEventListener('click', () => openPersonalChat(user));
                 container.appendChild(userEl);
@@ -1889,7 +1898,7 @@
                     const msg = doc.data();
                     const bubble = document.createElement('div');
                     const isMe = msg.senderId === applicationUserId;
-                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
+                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-teal-500 text-white self-end' : 'bg-slate-200 self-start'}`;
                     bubble.innerHTML = `<div>${msg.text}</div>`;
                     chatMessages.appendChild(bubble);
                 });
