@@ -53,6 +53,21 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
+        /* Shining text effect for Target */
+        .shining-text {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
         /* Primary button styling */
         .button-primary {
             background-color: #6366f1; /* Tailwind indigo-500 */
@@ -431,6 +446,15 @@
             border-left-color: #d1d5db; /* gray-300 */
             background-color: #f9fafb; /* gray-50 */
         }
+        /* Target Info Icon */
+        .info-icon {
+            cursor: pointer;
+            color: #9ca3af; /* gray-400 */
+            transition: color 0.2s ease;
+        }
+        .info-icon:hover {
+            color: #6b7280; /* gray-500 */
+        }
     </style>
 </head>
 <body>
@@ -492,6 +516,17 @@
                     </div>
                     <i class="fas fa-graduation-cap text-5xl gradient-text opacity-80"></i>
                 </header>
+
+                <!-- Target Section -->
+                <div id="target-section" class="bg-slate-50 p-5 rounded-2xl shadow-md text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <h2 class="shining-text">TARGET</h2>
+                        <i id="target-info-icon" class="fas fa-info-circle text-xl text-slate-400 cursor-pointer hover:text-slate-600 transition"></i>
+                    </div>
+                    <p id="target-count" class="text-5xl font-bold text-slate-700">0</p>
+                </div>
+
+
                 <!-- Poll Box (formerly Announcement Box) -->
                 <div id="poll-box" class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-800 p-4 rounded-r-lg shadow-sm hidden">
                     <p class="font-bold mb-2">आज का पोल</p>
@@ -553,8 +588,20 @@
             
             <!-- Global Chat Screen -->
             <div id="chat-screen" class="screen flex-col">
-                <header class="p-4 border-b border-slate-200 font-bold text-xl text-center text-slate-700 bg-white shadow-sm">वैश्विक चैट</header>
-                <div id="chat-messages" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col"></div>
+                 <header class="p-4 border-b border-slate-200 flex items-center justify-between bg-white shadow-sm">
+                    <h1 class="font-bold text-xl text-slate-700">वैश्विक चैट</h1>
+                    <div class="flex items-center gap-2">
+                        <label for="chat-filter" class="text-sm font-medium text-slate-500">Sort by:</label>
+                        <select id="chat-filter" class="p-1 border rounded-md text-sm">
+                            <option value="newest" selected>Newest</option>
+                            <option value="oldest">Oldest</option>
+                        </select>
+                    </div>
+                </header>
+                <div id="chat-messages-container" class="flex-grow p-4 space-y-4 overflow-y-auto flex flex-col-reverse">
+                    <div id="chat-messages" class="flex flex-col gap-4"></div>
+                    <button id="load-more-messages-btn" class="button-secondary mx-auto my-2 py-2 px-4 text-sm hidden">Load More</button>
+                </div>
                 <form id="chat-form" class="p-4 border-t border-slate-200 flex gap-3 bg-white">
                     <input type="text" id="chat-input" placeholder="एक संदेश टाइप करें..." class="flex-grow p-3 border rounded-full text-base">
                     <button type="submit" class="bg-indigo-600 text-white rounded-full p-3 flex-shrink-0 shadow-md hover:bg-indigo-700 transition"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V4.106A1 1 0 0010.894 2.553z" /></svg></button>
@@ -773,6 +820,13 @@
             <p id="message-modal-text" class="text-slate-600 mb-6 text-lg"></p>
             <button id="message-modal-ok-btn" class="w-full button-primary py-3 text-lg">ठीक है</button>
         </div>
+         <div id="target-info-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-md hidden">
+             <h3 class="text-2xl font-bold mb-4 text-slate-800">Target Information</h3>
+             <p class="text-slate-600 mb-4 text-base">
+                यह टारगेट सेक्शन ऐप में उपस्थित नए उपयोगकर्ताओं के लिए है जिन्होंने अभी लॉग इन किया है। अगर 1000 टारगेट पूरे होते हैं, तो ऐप में कई सारे रोमांचक टेस्ट चालू होंगे, जैसे कि माइंड आईक्यू टेस्ट, रीजनिंग पहेलियाँ, और भी बहुत कुछ।
+             </p>
+             <button id="target-info-ok-btn" class="w-full button-primary py-3 text-lg mt-4">समझ गया</button>
+        </div>
         <div id="feedback-modal" class="modal bg-white rounded-2xl shadow-2xl p-8 w-11/12 max-w-md hidden">
              <h3 class="text-2xl font-bold mb-4 text-slate-800">आपकी प्रतिक्रिया</h3>
              <p class="text-slate-600 mb-4 text-base">आप कौन सी नई सुविधाएँ या सुधार चाहते हैं? (प्रति दिन एक बार)</p>
@@ -796,7 +850,7 @@
         console.log("Script parsing started."); 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, updateDoc, query, where, onSnapshot, addDoc, getDocs, orderBy, serverTimestamp, limit, increment, startAfter, endBefore } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
         // --- CONFIG & GLOBAL VARS ---
         const GEMINI_API_KEY = "AIzaSyCsxr987Sb41cI13aJ0PyfOYxCuNWH3p-0"; 
@@ -815,6 +869,7 @@
         let unsubscribeChat = null;
         let unsubscribePersonalChat = null;
         let unsubscribeNotifications = null;
+        let unsubscribeUserCount = null;
         let currentPersonalChatRecipient = {};
         let currentExamData = null;
         let examTimerInterval = null;
@@ -824,6 +879,8 @@
         let currentPollId = null;
         let remainingExamTime = 0;
         let selectedPYQYear = null; // To store selected PYQ year
+        let lastVisibleMessage = null; // For chat pagination
+        let isFetchingMessages = false; // To prevent multiple fetches
 
         // --- DOM ELEMENTS ---
         const allScreens = document.querySelectorAll('.screen');
@@ -831,6 +888,7 @@
         const appFooter = document.getElementById('app-footer');
         const modalContainer = document.getElementById('modal-container');
         const messageModal = { el: document.getElementById('message-modal'), title: document.getElementById('message-modal-title'), text: document.getElementById('message-modal-text'), okBtn: document.getElementById('message-modal-ok-btn') };
+        const targetInfoModal = { el: document.getElementById('target-info-modal'), okBtn: document.getElementById('target-info-ok-btn')};
         const feedbackModal = { el: document.getElementById('feedback-modal'), input: document.getElementById('feedback-input'), submitBtn: document.getElementById('feedback-submit-btn'), cancelBtn: document.getElementById('feedback-cancel-btn') };
         const levelUpModal = { el: document.getElementById('level-up-modal'), text: document.getElementById('level-up-text'), okBtn: document.getElementById('level-up-ok-btn') };
         const pollBox = document.getElementById('poll-box');
@@ -842,6 +900,7 @@
         const voteStatusMessage = document.getElementById('vote-status-message');
         const lessonSelectionSection = document.getElementById('lesson-selection-section');
         const lessonSelectionContainer = document.getElementById('lesson-selection-container');
+        const loadMoreBtn = document.getElementById('load-more-messages-btn');
 
         // --- CORE APP FLOW ---
         function showScreen(screenId, isNav = false) {
@@ -869,7 +928,7 @@
             else document.getElementById('nav-home').classList.add('active');
 
             // Manage listeners
-            if (screenId === 'chat-screen' && !unsubscribeChat) loadMessages();
+            if (screenId === 'chat-screen' && !unsubscribeChat) loadMessages(true);
             if (screenId !== 'chat-screen' && unsubscribeChat) { unsubscribeChat(); unsubscribeChat = null; }
 
             if (screenId !== 'personal-chat-screen' && unsubscribePersonalChat) { unsubscribePersonalChat(); unsubscribePersonalChat = null; }
@@ -895,6 +954,7 @@
             messageModal.el.classList.remove('hidden');
             feedbackModal.el.classList.add('hidden');
             levelUpModal.el.classList.add('hidden');
+            targetInfoModal.el.classList.add('hidden');
             modalOkCallback = onOk;
             
             if (duration) {
@@ -995,6 +1055,7 @@
             updateProfileUI();
             try {
                 await loadPoll();
+                listenForUserCount(); // Start listening for user count
                 listenForNotifications(); // Start listening for notifications
                 console.log("Poll loaded and notification listener attached.");
             } catch (error) {
@@ -1743,24 +1804,77 @@
             }
         }
 
-        function loadMessages() {
-            const chatMessages = document.getElementById('chat-messages');
-            const q = query(collection(db, "chats"), orderBy("timestamp", "asc"), limit(50));
-            unsubscribeChat = onSnapshot(q, (querySnapshot) => {
-                chatMessages.innerHTML = "";
-                querySnapshot.docs.forEach(doc => {
-                    const msg = doc.data();
-                    const bubble = document.createElement('div');
-                    const isMe = msg.senderId === applicationUserId;
-                    bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
-                    bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
-                    chatMessages.appendChild(bubble);
-                });
-                // CHAT SCROLL FIX: Use setTimeout to ensure the DOM is updated before scrolling
-                setTimeout(() => {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, 0);
+        function listenForUserCount() {
+            if (unsubscribeUserCount) unsubscribeUserCount();
+            const usersRef = collection(db, "users");
+            unsubscribeUserCount = onSnapshot(usersRef, (snapshot) => {
+                const userCount = snapshot.size;
+                document.getElementById('target-count').textContent = userCount;
             });
+        }
+        
+        function loadMessages(isInitialLoad = false) {
+            if (isFetchingMessages) return;
+            isFetchingMessages = true;
+
+            const chatMessages = document.getElementById('chat-messages');
+            const chatFilter = document.getElementById('chat-filter').value;
+            const sortDirection = chatFilter === 'newest' ? 'desc' : 'asc';
+            const messagesRef = collection(db, "chats");
+            let q;
+
+            if (isInitialLoad) {
+                chatMessages.innerHTML = '';
+                lastVisibleMessage = null;
+                q = query(messagesRef, orderBy("timestamp", sortDirection), limit(5));
+            } else {
+                if (!lastVisibleMessage) {
+                    loadMoreBtn.classList.add('hidden');
+                    isFetchingMessages = false;
+                    return;
+                }
+                q = query(messagesRef, orderBy("timestamp", sortDirection), startAfter(lastVisibleMessage), limit(5));
+            }
+
+            getDocs(q).then(querySnapshot => {
+                if (isInitialLoad) {
+                    // Reverse the array for newest first to display correctly
+                    const docs = sortDirection === 'desc' ? querySnapshot.docs.reverse() : querySnapshot.docs;
+                    docs.forEach(doc => displayMessage(doc.data(), false));
+                } else {
+                    querySnapshot.docs.forEach(doc => displayMessage(doc.data(), true));
+                }
+
+                if (querySnapshot.docs.length > 0) {
+                    lastVisibleMessage = querySnapshot.docs[querySnapshot.docs.length - 1];
+                    loadMoreBtn.classList.remove('hidden');
+                } else {
+                    loadMoreBtn.classList.add('hidden');
+                }
+                
+                if (isInitialLoad) {
+                    document.getElementById('chat-messages-container').scrollTop = document.getElementById('chat-messages-container').scrollHeight;
+                }
+                
+                isFetchingMessages = false;
+            }).catch(error => {
+                console.error("Error fetching messages:", error);
+                isFetchingMessages = false;
+            });
+        }
+
+        function displayMessage(msg, prepend = false) {
+            const chatMessages = document.getElementById('chat-messages');
+            const bubble = document.createElement('div');
+            const isMe = msg.senderId === applicationUserId;
+            bubble.className = `p-3 rounded-xl max-w-xs ${isMe ? 'bg-indigo-500 text-white self-end' : 'bg-slate-200 self-start'}`;
+            bubble.innerHTML = `${!isMe ? `<div class="font-bold text-xs text-indigo-600">${msg.senderName}</div>` : ''}<div>${msg.text}</div>`;
+            
+            if (prepend) {
+                chatMessages.prepend(bubble);
+            } else {
+                chatMessages.appendChild(bubble);
+            }
         }
 
         async function sendMessage(e) {
@@ -1769,7 +1883,14 @@
             const text = input.value.trim();
             if (text === "") return;
             input.value = "";
-            await addDoc(collection(db, "chats"), { text: text, senderId: applicationUserId, senderName: currentUserName, timestamp: serverTimestamp() });
+            const newMessage = { text: text, senderId: applicationUserId, senderName: currentUserName, timestamp: serverTimestamp() };
+            await addDoc(collection(db, "chats"), newMessage);
+            
+            // Only add the message visually if sorted by newest
+            if (document.getElementById('chat-filter').value === 'newest') {
+                displayMessage({ ...newMessage, timestamp: { toDate: () => new Date() } });
+                document.getElementById('chat-messages-container').scrollTop = document.getElementById('chat-messages-container').scrollHeight;
+            }
         }
         
         async function updateUserName() {
@@ -1787,6 +1908,7 @@
                 currentUser = null;
                 applicationUserId = null;
                 if (unsubscribeNotifications) unsubscribeNotifications();
+                if (unsubscribeUserCount) unsubscribeUserCount();
                 window.location.reload();
             });
         }
@@ -2016,6 +2138,18 @@
         document.querySelectorAll('.back-btn').forEach(btn => btn.addEventListener('click', goBack));
         messageModal.okBtn.addEventListener('click', hideModals);
         levelUpModal.okBtn.addEventListener('click', hideModals);
+        targetInfoModal.okBtn.addEventListener('click', () => {
+            modalContainer.classList.add('hidden');
+            targetInfoModal.el.classList.add('hidden');
+        });
+
+        document.getElementById('target-info-icon').addEventListener('click', () => {
+             modalContainer.classList.remove('hidden');
+             targetInfoModal.el.classList.remove('hidden');
+             messageModal.el.classList.add('hidden');
+             feedbackModal.el.classList.add('hidden');
+             levelUpModal.el.classList.add('hidden');
+        });
 
         document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
         document.getElementById('email-signup-btn').addEventListener('click', () => showScreen('email-signup-screen'));
@@ -2028,6 +2162,9 @@
         document.getElementById('login-btn').addEventListener('click', loginExistingUser);
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('personal-chat-form').addEventListener('submit', sendPersonalMessage);
+        loadMoreBtn.addEventListener('click', () => loadMessages(false));
+        document.getElementById('chat-filter').addEventListener('change', () => loadMessages(true));
+
 
         document.getElementById('copy-id-btn').addEventListener('click', () => {
             const tempInput = document.createElement('input');
