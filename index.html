@@ -35,6 +35,7 @@
         main {
             flex-grow: 1;
             overflow-y: auto;
+            position: relative;
         }
         /* Screen transitions */
         .screen {
@@ -387,6 +388,18 @@
             border: 2px solid #f6e05e;
         }
 
+        /* NEW: Sticky user rank on scoreboard */
+        #user-rank-sticky {
+            position: sticky;
+            top: -1px; /* To sit just below the header */
+            z-index: 10;
+            background-color: white;
+            padding: 1rem;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem; /* Adjust to screen padding */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 1px solid #e5e7eb;
+        }
+
         /* Chat bubble styling */
         #chat-messages div, #personal-chat-messages div {
             border-radius: 1.25rem; /* More rounded bubbles */
@@ -492,10 +505,10 @@
                 <h1 class="text-6xl font-extrabold gradient-text text-center leading-tight">ARVIND DARA BISHNOI</h1>
                 <p class="text-slate-600 text-center mt-4 text-lg">JEE में सफलता का आपका मार्ग यहाँ से शुरू होता है।</p>
             </div>
+            <!-- LOGIN FIX: Simplified main screen -->
             <div id="main-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
                 <h2 class="text-4xl font-bold text-gray-800 mb-8">स्वागत है! 👋</h2>
-                <button id="have-account-btn" class="button-primary w-full max-w-sm">मौजूदा खाता (ऐप आईडी)</button>
-                <button id="email-signup-btn" class="button-secondary w-full max-w-sm">साइन अप करें (ईमेल/पासवर्ड)</button>
+                <button id="email-signup-btn" class="button-primary w-full max-w-sm">साइन अप करें (ईमेल/पासवर्ड)</button>
                 <button id="email-login-btn" class="button-secondary w-full max-w-sm">लॉग इन करें (ईमेल/पासवर्ड)</button>
                 <button id="continue-as-guest-btn" class="button-secondary w-full max-w-sm">गेस्ट के रूप में जारी रखें</button>
             </div>
@@ -520,13 +533,7 @@
                 <input type="password" id="login-password-input" placeholder="पासवर्ड दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
                 <button id="email-login-submit-btn" class="button-primary w-full max-w-sm">लॉग इन करें</button>
             </div>
-            <div id="have-account-screen" class="screen flex-col justify-center items-center p-8 space-y-6">
-                <button class="back-btn absolute top-6 left-6 p-3 rounded-full hover:bg-slate-200"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
-                <h2 class="text-3xl font-bold text-gray-800">अपनी आईडी दर्ज करें</h2>
-                <input type="text" id="existing-user-id-input" placeholder="अपनी उपयोगकर्ता आईडी दर्ज करें" class="p-4 border rounded-xl w-full max-w-sm text-lg">
-                <button id="login-btn" class="button-primary w-full max-w-sm">लॉग इन करें</button>
-            </div>
-
+            
             <!-- Home Screen -->
             <div id="home-screen" class="screen flex-col p-6 md:p-8 space-y-6 overflow-y-auto">
                 <header class="pb-4 border-b border-slate-100 flex items-center justify-between">
@@ -856,6 +863,8 @@
                     <button class="back-btn p-3 rounded-full hover:bg-slate-200 mr-3"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
                     <h1 class="text-3xl font-bold">JEE Main स्कोरबोर्ड</h1>
                 </header>
+                <!-- SCOREBOARD FIX: Sticky container for user's rank -->
+                <div id="user-rank-sticky" class="hidden"></div>
                 <div id="external-scoreboard-list" class="space-y-3 overflow-y-auto flex-grow"><p class="text-center text-slate-500 p-8">स्कोरबोर्ड लोड हो रहा है...</p></div>
             </div>
             <!-- New Review Screen -->
@@ -1078,8 +1087,9 @@
                         currentUser = user;
                         await findAndLinkAppUserByAuthUid(currentUser.uid);
                     } else {
-                        console.log("No Firebase user, signing in anonymously.");
-                        await signInAnonymously(auth);
+                        // LOGIN FIX: If no user is logged in (e.g., after logout or first visit), show the main login/signup screen.
+                        console.log("No Firebase user. Showing main screen.");
+                        showScreen('main-screen');
                     }
                 });
             } catch (error) { 
@@ -1123,7 +1133,10 @@
             if (userDocSnap) {
                 await setupAppForUser(userDocSnap.data(), userDocSnap.id);
             } else {
-                console.log("No existing app user document found for this Firebase Auth UID. Redirecting to main screen.");
+                // This can happen if a user is authenticated with Firebase (e.g., from a previous session)
+                // but doesn't have a corresponding user document in Firestore yet.
+                // This is a valid state before they complete the signup/guest flow.
+                console.log("No existing app user document found for this Firebase Auth UID. Redirecting to main screen for profile creation.");
                 showScreen('main-screen');
             }
         }
@@ -1730,50 +1743,41 @@
             const name = document.getElementById('new-user-name-input').value.trim();
             if (!name) { showModal("कृपया अपना नाम दर्ज करें।", "Error"); return; }
 
-            if (!auth.currentUser) {
-                console.log("handleGuestSignIn: No current Firebase user, attempting anonymous sign-in.");
-                try {
-                    await signInAnonymously(auth);
-                    await new Promise(resolve => setTimeout(resolve, 500)); 
-                } catch (anonError) {
-                    console.error("Error signing in anonymously for guest user:", anonError);
-                    showModal("Failed to create guest account: Authentication failed.", "Error");
-                    return;
-                }
-            }
-
-            if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("handleGuestSignIn: auth.currentUser or its UID is not available even after sign-in attempt.");
-                showModal("Failed to create guest account: Authentication data not available. Please try again.", "Error");
-                return;
-            }
-
-            console.log("Attempting to create guest user document with Firebase UID:", auth.currentUser.uid);
             try {
+                // Ensure we have an anonymous Firebase user session
+                if (!auth.currentUser || auth.currentUser.isAnonymous === false) {
+                     await signInAnonymously(auth);
+                }
+                
+                const firebaseUser = auth.currentUser;
+                if (!firebaseUser) throw new Error("Anonymous authentication failed.");
+
                 const newAppUserId = crypto.randomUUID();
                 const userDocRef = doc(db, "users", newAppUserId);
 
                 const userDataPayload = {
                     name: name,
                     userId: newAppUserId,
-                    authUid: auth.currentUser.uid,
+                    authUid: firebaseUser.uid,
                     createdAt: serverTimestamp(),
                     lastActive: serverTimestamp(),
                     authType: 'anonymous',
                     level: 0,
                     xp: 0
                 };
+                // This write will succeed because the authUid matches the current user's UID
                 await setDoc(userDocRef, userDataPayload);
                 
                 localStorage.setItem('arvindAppUserId', newAppUserId);
                 
+                // Use a local version of the user data to avoid another read
                 const localUserData = { ...userDataPayload, createdAt: new Date(), lastActive: new Date() };
                 setupAppForUser(localUserData, newAppUserId);
 
             } catch (error) {
-                console.error("Error creating guest user document in Firestore:", error);
+                console.error("Error creating guest user:", error);
                 if (error.code === 'permission-denied') {
-                    showModal("खाता बनाने में विफल: सर्वर अनुमति त्रुटि। यह एक कॉन्फ़िगरेशन समस्या हो सकती है।", "खाता निर्माण त्रुटि");
+                    showModal("खाता बनाने में विफल: सर्वर अनुमति त्रुटि।", "खाता निर्माण त्रुटि");
                 } else {
                     showModal("गेस्ट खाता बनाने में विफल। कृपया पुनः प्रयास करें।", "खाता निर्माण त्रुटि");
                 }
@@ -1811,6 +1815,7 @@
                     level: 0,
                     xp: 0
                 };
+                // This write will succeed because the authUid matches the new user's UID
                 await setDoc(userDocRef, userDataPayload);
 
                 localStorage.setItem('arvindAppUserId', newAppUserId);
@@ -1824,19 +1829,17 @@
 
             } catch (error) {
                 console.error("Error during email signup:", error);
-                if (error.code === 'permission-denied') {
-                    showModal("खाता बनाने में विफल: सर्वर अनुमति त्रुटि। यह एक कॉन्फ़िगरेशन समस्या हो सकती है।", "साइनअप त्रुटि");
-                    return;
-                }
-                let errorMessage = "Failed to create account. Please try again.";
+                let errorMessage = "खाता बनाने में विफल। कृपया पुनः प्रयास करें।";
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMessage = "This email is already in use. Please use another email or log in.";
+                    errorMessage = "यह ईमेल पहले से उपयोग में है। कृपया कोई अन्य ईमेल का उपयोग करें या लॉग इन करें।";
                 } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = "Invalid email format.";
+                    errorMessage = "अमान्य ईमेल प्रारूप।";
                 } else if (error.code === 'auth/weak-password') {
-                    errorMessage = "Password is too weak. Please choose a stronger password.";
+                    errorMessage = "पासवर्ड बहुत कमजोर है। कृपया एक मजबूत पासवर्ड चुनें।";
+                } else if (error.code === 'permission-denied') {
+                    errorMessage = "खाता बनाने में विफल: सर्वर अनुमति त्रुटि।";
                 }
-                showModal(errorMessage, "Signup Error");
+                showModal(errorMessage, "साइनअप त्रुटि");
             }
         }
 
@@ -1851,88 +1854,18 @@
 
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const firebaseUser = userCredential.user;
-                await findAndLinkAppUserByAuthUid(firebaseUser.uid);
-                showModal("Logged in successfully!", "Success", null, 2000);
+                // onAuthStateChanged will handle the rest of the login flow by calling findAndLinkAppUserByAuthUid
+                showModal("सफलतापूर्वक लॉग इन किया गया!", "Success", null, 2000);
 
             } catch (error) {
                 console.error("Error during email login:", error);
-                let errorMessage = "Failed to log in. Please try again.";
+                let errorMessage = "लॉग इन करने में विफल। कृपया पुनः प्रयास करें।";
                 if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    errorMessage = "Invalid email or password.";
+                    errorMessage = "अमान्य ईमेल या पासवर्ड।";
                 } else if (error.code === 'auth/invalid-email') {
-                    errorMessage = "Invalid email format.";
+                    errorMessage = "अमान्य ईमेल प्रारूप।";
                 }
                 showModal(errorMessage, "Login Error");
-            }
-        }
-
-        async function loginExistingUser() {
-            const userId = document.getElementById('existing-user-id-input').value.trim();
-            if (!userId) { 
-                showModal("कृपया अपनी आईडी दर्ज करें।", "Error"); 
-                return; 
-            }
-            
-            if (!auth.currentUser) {
-                console.log("loginExistingUser: No current Firebase user, attempting anonymous sign-in first.");
-                try {
-                    await signInAnonymously(auth);
-                    await new Promise(resolve => setTimeout(resolve, 500)); 
-                } catch (anonError) {
-                    console.error("Error during anonymous sign-in for existing user login:", anonError);
-                    showModal("Failed to log in: Authentication failed.", "Error");
-                    return;
-                }
-            }
-
-            if (!auth.currentUser || !auth.currentUser.uid) {
-                console.error("loginExistingUser: auth.currentUser or its UID is not available even after sign-in attempt.");
-                showModal("Failed to log in: Authentication data not available. Please try again.", "Error");
-                return;
-            }
-
-            console.log("Attempting to read user document for user ID:", userId, "with current Firebase UID:", auth.currentUser.uid);
-
-            try {
-                const userDocRef = doc(db, "users", userId);
-                const userDoc = await getDoc(userDocRef); 
-                
-                if (!userDoc.exists()) {
-                    showModal("This user ID does not exist.", "Error");
-                    return;
-                }
-                
-                const fetchedUserData = userDoc.data();
-                const storedAuthUid = fetchedUserData.authUid;
-                const currentAuthUid = auth.currentUser.uid;
-
-                if (storedAuthUid === currentAuthUid) {
-                    console.log("Auth UID matches. Proceeding with login.");
-                    localStorage.setItem('arvindAppUserId', userId);
-                    await setupAppForUser(fetchedUserData, userId);
-                    return;
-                }
-
-                console.warn(`Auth UID mismatch. Stored: ${storedAuthUid}, Current: ${currentAuthUid}.`);
-                showModal(
-                    "यह आईडी किसी दूसरे डिवाइस या खाते से जुड़ी है। अपने खाते तक पहुंचने के लिए, कृपया ईमेल और पासवर्ड से लॉग इन करें।", 
-                    "Account Mismatch", 
-                    () => {
-                        signOut(auth).then(() => {
-                            console.log("Signed out anonymous user. Redirecting to main screen.");
-                            showScreen('main-screen', true); 
-                        });
-                    }
-                );
-
-            } catch (error) {
-                console.error("Error during loginExistingUser:", error);
-                if (error.code === 'permission-denied') {
-                     showModal(`लॉग इन करने में विफल: अनुमति नहीं है। कृपया सुनिश्चित करें कि आप सही खाते में लॉग इन हैं।`, "Error");
-                } else {
-                     showModal(`लॉग इन करने में विफल: ${error.message}. कृपया पुनः प्रयास करें।`, "Error");
-                }
             }
         }
 
@@ -2041,6 +1974,7 @@
                 applicationUserId = null;
                 if (unsubscribeNotifications) unsubscribeNotifications();
                 if (unsubscribeUserCount) unsubscribeUserCount();
+                // onAuthStateChanged will detect the signed-out state and show the main screen
                 window.location.reload();
             });
         }
@@ -2259,14 +2193,29 @@
             btn.disabled = true;
             btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div> सबमिट हो रहा है...`;
 
-            const studentInfo = {
-                name: document.getElementById('real-jee-name').value,
-                class: document.getElementById('real-jee-class').value,
-                targetYear: document.getElementById('real-jee-target').value,
-                submittedAt: serverTimestamp()
-            };
-
             try {
+                // REAL JEE RANK ONCE FIX: Check if user has already taken the test
+                const scoresRef = collection(db, "jeeScores");
+                const q = query(scoresRef, where("userId", "==", applicationUserId), where("isReal", "==", true), limit(1));
+                const existingSubmission = await getDocs(q);
+
+                if (!existingSubmission.empty) {
+                    const prevData = existingSubmission.docs[0].data();
+                    const score = prevData.score;
+                    const status = score >= 50 ? "PASS" : "FAIL";
+                    showModal(`आप यह टेस्ट पहले ही दे चुके हैं।<br><br>आपका स्कोर: <b>${score}</b><br>परिणाम: <b>${status}</b>`, "Test Already Taken");
+                    btn.disabled = false;
+                    btn.textContent = "टेस्ट शुरू करें";
+                    return;
+                }
+
+                const studentInfo = {
+                    name: document.getElementById('real-jee-name').value,
+                    class: document.getElementById('real-jee-class').value,
+                    targetYear: document.getElementById('real-jee-target').value,
+                    submittedAt: serverTimestamp()
+                };
+
                 // Save user info
                 await setDoc(doc(db, "userInfo", applicationUserId), studentInfo, { merge: true });
                 
@@ -2291,7 +2240,6 @@
             }
         }
 
-        // CORRECTED: Real JEE Test Generation Function
         async function generateRealJeeTest() {
             const subjects = ["भौतिकी (Physics)", "रसायन विज्ञान (Chemistry)", "गणित (Maths)"];
             let allQuestions = [];
@@ -2322,7 +2270,6 @@
                          document.getElementById('message-modal-text').innerHTML = `${baseModalText}<br><br>विषय: ${subject} (${i+1}/${subjects.length})<span id="generation-status">.</span>`;
                     }
 
-                    // CORRECTED PROMPT
                     const prompt = `Generate exactly 25 practice questions for a REAL JEE MAIN TEST in HINDI for the subject ${subject}. The questions must be high-quality, calculative, and numerical-based, matching the difficulty and pattern of the actual JEE Main exam. Avoid simple theoretical questions. For each question, provide: 1. A unique question text in Hindi. 2. Four distinct options (A, B, C, D) in Hindi. 3. The correct option letter (e.g., "A"). 4. A detailed, step-by-step explanation in Hindi showing the calculation to reach the answer.`;
                     const schema = { type: "OBJECT", properties: { "questions": { "type": "ARRAY", "items": { "type": "OBJECT", "properties": { "subject": {"type": "STRING"}, "question": {"type": "STRING"}, "options": { "type": "OBJECT", "properties": { "A": {"type": "STRING"}, "B": {"type": "STRING"}, "C": {"type": "STRING"}, "D": {"type": "STRING"} } }, "correct_answer": {"type": "STRING"}, "explanation": {"type": "STRING"} } } } } };
                     
@@ -2362,10 +2309,11 @@
         async function loadExternalScoreboard() {
             showScreen('external-scoreboard-screen');
             const listEl = document.getElementById('external-scoreboard-list');
+            const stickyRankEl = document.getElementById('user-rank-sticky');
             listEl.innerHTML = `<p class="text-center p-8">स्कोरबोर्ड लोड हो रहा है...</p>`;
+            stickyRankEl.classList.add('hidden');
 
             try {
-                // First, check if fake data needs to be populated
                 await populateFakeScoreboardIfNeeded();
 
                 const q = query(collection(db, "jeeScores"), orderBy("score", "desc"));
@@ -2377,12 +2325,40 @@
                 }
 
                 listEl.innerHTML = '';
+                let myRankData = null;
+                let myRank = -1;
+
+                // First pass: find current user's rank
+                snap.docs.forEach((doc, index) => {
+                    const data = doc.data();
+                    if (data.isReal && data.userId === applicationUserId) {
+                        myRankData = data;
+                        myRank = index + 1;
+                    }
+                });
+                
+                // SCOREBOARD FIX: Display sticky user rank
+                if (myRankData) {
+                    const status = myRankData.score >= 50 ? "PASS" : "FAIL";
+                    const statusColor = status === "PASS" ? "text-green-600" : "text-red-600";
+                    stickyRankEl.innerHTML = `
+                        <div class="flex items-center justify-between font-bold text-lg">
+                            <span>आपकी रैंक: #${myRank}</span>
+                            <span>स्कोर: ${myRankData.score}</span>
+                            <span class="${statusColor}">${status}</span>
+                        </div>
+                    `;
+                    stickyRankEl.classList.remove('hidden');
+                }
+
+
+                // Second pass: render the full list
                 let rank = 1;
                 snap.docs.forEach(docSnap => {
                     const data = docSnap.data();
                     const isMe = data.isReal && data.userId === applicationUserId;
                     const itemEl = document.createElement('div');
-                    itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-yellow-100' : 'bg-slate-100'}`;
+                    itemEl.className = `flex items-center p-4 rounded-lg ${isMe ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-slate-100'}`;
                     itemEl.innerHTML = `
                         <span class="font-bold w-16 text-lg">#${rank}</span>
                         <span class="flex-grow font-semibold">${data.userName} ${isMe ? '(आप)' : ''}</span>
@@ -2462,8 +2438,8 @@
              levelUpModal.el.classList.add('hidden');
              lucide.createIcons();
         });
-
-        document.getElementById('have-account-btn').addEventListener('click', () => showScreen('have-account-screen'));
+        
+        // LOGIN FIX: Removed listener for have-account-btn
         document.getElementById('email-signup-btn').addEventListener('click', () => showScreen('email-signup-screen'));
         document.getElementById('email-login-btn').addEventListener('click', () => showScreen('email-login-screen'));
         document.getElementById('continue-as-guest-btn').addEventListener('click', () => showScreen('new-user-screen'));
@@ -2471,7 +2447,7 @@
         document.getElementById('create-guest-user-btn').addEventListener('click', handleGuestSignIn);
         document.getElementById('signup-btn').addEventListener('click', handleEmailSignup);
         document.getElementById('email-login-submit-btn').addEventListener('click', handleEmailLogin);
-        document.getElementById('login-btn').addEventListener('click', loginExistingUser);
+        // LOGIN FIX: Removed listener for login-btn
         document.getElementById('chat-form').addEventListener('submit', sendMessage);
         document.getElementById('personal-chat-form').addEventListener('submit', sendPersonalMessage);
         loadMoreBtn.addEventListener('click', () => loadMessages(false));
