@@ -2089,71 +2089,48 @@
             });
         }
 
-        // BUG FIX: Replaced with atomic batch write to prevent permission errors
         async function sendPersonalMessage(e) {
             e.preventDefault();
             const input = document.getElementById('personal-chat-input');
             const text = input.value.trim();
-            if (text === "" || !currentPersonalChatRecipient.userId || !currentUser) {
-                console.error("Cannot send message: Missing recipient or current user info.");
-                return;
-            }
+            if (text === "" || !currentPersonalChatRecipient.userId) return;
             
             const recipientId = currentPersonalChatRecipient.userId;
             const recipientUid = currentPersonalChatRecipient.authUid;
-            if (!recipientUid) {
-                showModal("Could not send message. Recipient data is incomplete.", "Error");
-                return;
-            }
+            const recipientName = currentPersonalChatRecipient.name;
             input.value = "";
 
             const chatID = [applicationUserId, recipientId].sort().join('_');
+            const messagesRef = collection(db, "personalChats", chatID, "messages");
+            const chatDocRef = doc(db, "personalChats", chatID);
             
-            try {
-                // Use a batch to perform multiple writes atomically
-                const batch = writeBatch(db);
+            // 1. Add the message
+            await addDoc(messagesRef, {
+                text: text,
+                senderId: applicationUserId,
+                recipientId: recipientId,
+                timestamp: serverTimestamp()
+            });
 
-                // 1. Define the parent chat document reference
-                const chatDocRef = doc(db, "personalChats", chatID);
-                // Set/update the main chat document. This ensures it exists before the message is added.
-                batch.set(chatDocRef, {
-                    lastMessage: text,
-                    lastMessageTimestamp: serverTimestamp(),
-                    participantUids: [currentUser.uid, recipientUid],
-                    participantIds: [applicationUserId, recipientId] // Also useful to store app IDs
-                }, { merge: true });
+            // 2. Create a notification for the recipient
+            const notificationsColRef = collection(db, "notifications", recipientId, "userNotifications");
+            const messagePreview = text.substring(0, 40) + (text.length > 40 ? "..." : "");
+            await addDoc(notificationsColRef, {
+                fromId: applicationUserId,
+                fromName: currentUserName,
+                text: `ne aapko ek sandesh bheja hai: "${messagePreview}"`,
+                timestamp: serverTimestamp(),
+                type: 'personal_message',
+                relatedId: applicationUserId, 
+                read: false
+            });
 
-                // 2. Define the new message document reference in the subcollection
-                const newMessageRef = doc(collection(db, "personalChats", chatID, "messages"));
-                // Add the message to the subcollection
-                batch.set(newMessageRef, {
-                    text: text,
-                    senderId: applicationUserId,
-                    recipientId: recipientId,
-                    timestamp: serverTimestamp()
-                });
-
-                // 3. Define the notification document reference for the recipient
-                const notificationRef = doc(collection(db, "notifications", recipientId, "userNotifications"));
-                const messagePreview = text.substring(0, 40) + (text.length > 40 ? "..." : "");
-                // Add the notification
-                batch.set(notificationRef, {
-                    fromId: applicationUserId,
-                    fromName: currentUserName,
-                    text: `ne aapko ek sandesh bheja hai: "${messagePreview}"`,
-                    timestamp: serverTimestamp(),
-                    type: 'personal_message',
-                    relatedId: applicationUserId, 
-                    read: false
-                });
-
-                // 4. Commit the batch
-                await batch.commit();
-
-            } catch (error) {
-                console.error("Error sending personal message:", error);
-                showModal("संदेश भेजने में विफल। कृपया पुनः प्रयास करें।", "त्रुटि");
-            }
+            // 3. Update the chat document with last message info
+            await setDoc(chatDocRef, {
+                lastMessage: text,
+                lastMessageTimestamp: serverTimestamp(),
+                participantUids: [currentUser.uid, recipientUid]
+            }, { merge: true });
         }
         
         function listenForNotifications() {
@@ -2187,14 +2164,12 @@
                         <p class="text-xs text-slate-400 mt-1">${new Date(notification.timestamp?.toDate()).toLocaleString()}</p>
                     `;
                     itemEl.addEventListener('click', async () => {
-                        // Mark as read first
-                        await updateDoc(doc(db, "notifications", applicationUserId, "userNotifications", docSnap.id), { read: true });
-                        // Then navigate
                         const userRef = doc(db, "users", notification.relatedId);
                         const userSnap = await getDoc(userRef);
                         if (userSnap.exists()) {
                             openPersonalChat(userSnap.data());
                         }
+                        await updateDoc(doc(db, "notifications", applicationUserId, "userNotifications", docSnap.id), { read: true });
                     });
                     notificationsContainer.appendChild(itemEl);
                 });
