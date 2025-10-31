@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adcash Interstitial Test</title>
 
   <!-- Step 1: Include Adcash library -->
@@ -11,13 +11,20 @@
 <body>
 
   <h1>Welcome to My Website</h1>
-  <p>Ad will load shortly...</p>
+  <p>Interstitial ad will appear shortly...</p>
 
-  <!-- Step 2: Put the tag script on the page -->
+  <!-- Step 2: Run Interstitial Ad -->
   <script type="text/javascript">
-    aclib.runInterstitial({
-      zoneId: '10576126',
-    });
+    // Wait for the Adcash library to load completely
+    window.onload = function () {
+      if (typeof aclib !== 'undefined' && aclib.runInterstitial) {
+        aclib.runInterstitial({
+          zoneId: '10576138',
+        });
+      } else {
+        console.error("Adcash library failed to load.");
+      }
+    };
   </script>
 
 </body>
