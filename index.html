@@ -1,1 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ExoClick Auto Reload VAST</title>
+<script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+<style>
+  body {
+    background: #000;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  video {
+    width: 80%;
+    max-width: 720px;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+  <video id="video-ad" controls preload="auto">
+    <source src="https://cdn.fluidplayer.com/videos/valerian-1080p.mp4" type="video/mp4" />
+  </video>
+
+<script>
+function initPlayer() {
+  var player = fluidPlayer('video-ad', {
+    layoutControls: {
+      autoPlay: true,
+      mute: false,
+      fillToContainer: true,
+      controlBar: { autoHideTimeout: 3, animated: true }
+    },
+    vastOptions: {
+      adList: [
+        {
+          roll: "preRoll",
+          vastTag: "https://s.magsrv.com/v1/vast.php?idzone=5761420",
+          adText: "Sponsored Ad",
+          timer: true
+        }
+      ],
+      skipButtonCaption: "Skip ad in [seconds]",
+      skipButtonClickCaption: "Skip Ad »",
+      vastAdvanced: {
+        noVastVideoCallback: function() {
+          console.log("No Ad this time");
+        }
+      }
+    }
+  });
+
+  // जब वीडियो खत्म हो जाए तो दोबारा reload करे
+  document.getElementById('video-ad').addEventListener('ended', function() {
+    console.log("Video ended, restarting...");
+    setTimeout(() => {
+      document.getElementById('video-ad').load();
+      initPlayer(); // दोबारा VAST load
+    }, 3000);
+  });
+}
+
+initPlayer();
+</script>
+</body>
+</html>
 
