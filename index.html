@@ -1,83 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TensorArt Text-to-Image</title>
-  <style>
-    body { background:#111; color:#fff; font-family:Arial; text-align:center; padding:30px; }
-    textarea,button { width:90%; max-width:500px; margin:10px auto; padding:10px; border-radius:8px; font-size:16px; border:none; }
-    button { background:#28a745; color:#fff; cursor:pointer; }
-    img { margin-top:20px; border-radius:10px; width:512px; height:auto; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adcash Ad Page</title>
+    <!-- Step 1: Include Adcash library -->
+    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #ffffff;
+        }
+    </style>
 </head>
 <body>
-  <h1>🧠 TensorArt Text → Image Generator</h1>
-  <textarea id="prompt" rows="3" placeholder="Enter your prompt..."></textarea><br>
-  <button onclick="generateImage()">Generate Image</button>
-  <div id="result"></div>
-
-  <script>
-    async function generateImage() {
-      const prompt = document.getElementById("prompt").value.trim();
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "⏳ Generating image... Please wait...";
-
-      const endpoint = "https://ap-east-1.tensorart.cloud/v1/workflow/run";
-      const apiKey = "e8c0108d-b0d9-44ef-a029-b998db223c10";
-      const appId = "mFNVxzutx";
-      const modelId = "603269903807549991";
-
-      const body = {
-        request_id: "req_" + Date.now(),
-        app_id: appId,
-        stages: [
-          {
-            type: "INPUT_INITIALIZE",
-            inputInitialize: { seed: -1, count: 1 }
-          },
-          {
-            type: "DIFFUSION",
-            diffusion: {
-              width: 512,
-              height: 512,
-              prompts: [{ text: prompt }],
-              sampler: "DPM++ 2M Karras",
-              sdVae: "Automatic",
-              steps: 20,
-              sd_model: modelId,
-              clip_skip: 2,
-              cfg_scale: 7
-            }
-          }
-        ]
-      };
-
-      try {
-        const response = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`,
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(body)
+    <!-- Step 2: Run Adcash Interstitial Ad -->
+    <script type="text/javascript">
+        aclib.runInterstitial({
+            zoneId: '10608190',
         });
-
-        const data = await response.json();
-        console.log(data);
-
-        if (data?.result?.[0]?.url) {
-          resultDiv.innerHTML = `<img src="${data.result[0].url}" alt="Generated Image">`;
-        } else {
-          resultDiv.innerHTML = "⚠️ No image returned.<br><pre>" + JSON.stringify(data, null, 2) + "</pre>";
-        }
-
-      } catch (err) {
-        resultDiv.innerHTML = "❌ Error: " + err.message;
-        console.error(err);
-      }
-    }
-  </script>
+    </script>
 </body>
 </html>
