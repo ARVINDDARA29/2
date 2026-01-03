@@ -1,619 +1,820 @@
-import React, { useState, useEffect } from 'react';
-import { BookOpen, AlertCircle, Check, Wand2, Clock, ArrowLeft, ArrowRight, CheckCircle, Download, School } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arvind Bishnoi Preparation - Exam Portal</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts (Hindi Support) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-const App = () => {
-    // --- State ---
-    const [apiKey, setApiKey] = useState('');
-    const [step, setStep] = useState('setup'); // setup, loading, exam, result
-    const [selectedClass, setSelectedClass] = useState('10'); // '10' or '12'
-    const [selectedSubject, setSelectedSubject] = useState('');
-    const [selectedChapters, setSelectedChapters] = useState([]);
-    const [questionCount, setQuestionCount] = useState(5);
-    const [questions, setQuestions] = useState([]);
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [userAnswers, setUserAnswers] = useState({}); // { questionId: selectedOptionIndex }
-    const [score, setScore] = useState(0);
-    const [loadingMessage, setLoadingMessage] = useState('');
-    const [error, setError] = useState('');
-    const [examStartTime, setExamStartTime] = useState(null);
-    const [timeTaken, setTimeTaken] = useState(0);
-
-    // --- Mock Data for RBSE Subjects & Chapters ---
-    const SUBJECT_DATA = {
-        "10": {
-            "विज्ञान (Science)": [
-                "पाठ 1: रासायनिक अभिक्रियाएँ एवं समीकरण",
-                "पाठ 2: अम्ल, क्षारक एवं लवण",
-                "पाठ 3: धातु एवं अधातु",
-                "पाठ 4: कार्बन एवं उसके यौगिक",
-                "पाठ 6: जैव प्रक्रम",
-                "पाठ 10: प्रकाश – परावर्तन तथा अपवर्तन",
-                "पाठ 12: विद्युत"
-            ],
-            "सामाजिक विज्ञान (Social Science)": [
-                "यूरोप में राष्ट्रवाद का उदय",
-                "भारत में राष्ट्रवाद",
-                "संसाधन एवं विकास",
-                "कृषि",
-                "संघवाद",
-                "लोकतंत्र और विविधता",
-                "विकास (अर्थशास्त्र)"
-            ],
-            "गणित (Mathematics)": [
-                "पाठ 1: वास्तविक संख्याएँ",
-                "पाठ 2: बहुपद",
-                "पाठ 3: दो चर वाले रैखिक समीकरण",
-                "पाठ 5: समांतर श्रेढ़ियाँ",
-                "पाठ 8: त्रिकोणमिति का परिचय",
-                "पाठ 14: सांख्यिकी"
-            ],
-            "हिंदी (Hindi)": [
-                "सूरदास के पद",
-                "राम-लक्ष्मण-परशुराम संवाद",
-                "नेताजी का चश्मा",
-                "बालगोबिन भगत",
-                "लखनवी अंदाज़",
-                "माता का अंचल"
-            ]
-        },
-        "12": {
-            "भौतिक विज्ञान (Physics)": [
-                "पाठ 1: विद्युत आवेश तथा क्षेत्र",
-                "पाठ 2: स्थिर वैद्युत विभव तथा धारिता",
-                "पाठ 3: विद्युत धारा",
-                "पाठ 4: गतिमान आवेश और चुंबकत्व",
-                "पाठ 9: किरण प्रकाशिकी एवं प्रकाशिक यंत्र",
-                "पाठ 14: अर्धचालक इलेक्ट्रॉनिकी"
-            ],
-            "रसायन विज्ञान (Chemistry)": [
-                "पाठ 1: विलयन",
-                "पाठ 2: वैद्युतरसायन",
-                "पाठ 3: रासायनिक बलगतिकी",
-                "पाठ 4: d- एवं f- ब्लॉक के तत्व",
-                "पाठ 8: ऐल्डिहाइड, कीटोन एवं कार्बोक्सिलिक अम्ल"
-            ],
-            "जीव विज्ञान (Biology)": [
-                "पाठ 2: मानव जनन",
-                "पाठ 3: जनन स्वास्थ्य",
-                "पाठ 5: वंशागति और विविधता के सिद्धांत",
-                "पाठ 8: मानव स्वास्थ्य तथा रोग",
-                "पाठ 11: जैव प्रौद्योगिकी - सिद्धांत व प्रक्रम"
-            ],
-            "हिंदी अनिवार्य (Hindi Comp.)": [
-                "आत्मपरिचय (हरिवंश राय बच्चन)",
-                "पतंग (आलोक धन्वा)",
-                "भक्तिन (महादेवी वर्मा)",
-                "बाज़ार दर्शन (जैनेंद्र कुमार)",
-                "काले मेघा पानी दे"
-            ],
-            "इतिहास (History)": [
-                "ईंटें, मनके तथा अस्थियाँ (हड़प्पा सभ्यता)",
-                "राजा, किसान और नगर",
-                "भक्ति-सूफी परंपराएँ",
-                "विद्रोही और राज (1857 का आंदोलन)",
-                "महात्मा गाँधी और राष्ट्रीय आंदोलन"
-            ],
-            "भूगोल (Geography)": [
-                "मानव भूगोल - प्रकृति एवं विषय क्षेत्र",
-                "विश्व जनसंख्या - वितरण, घनत्व और वृद्धि",
-                "प्राथमिक क्रियाएँ",
-                "भारत: जनसंख्या वितरण",
-                "भू-संसाधन तथा कृषि"
-            ],
-            "राजनीति विज्ञान (Pol. Science)": [
-                "राष्ट्र निर्माण की चुनौतियाँ",
-                "एक दल के प्रभुत्व का दौर",
-                "नियोजित विकास की राजनीति",
-                "कांग्रेस प्रणाली: चुनौतियाँ और पुनर्स्थापना",
-                "जनआंदोलनों का उदय"
-            ]
+    <style>
+        body {
+            font-family: 'Noto Sans Devanagari', sans-serif;
+            background-color: #f3f4f6;
         }
-    };
+        .print-only { display: none; }
+        
+        /* --- CRITICAL PRINT FIXES --- */
+        @media print {
+            /* Hide non-printable elements */
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
 
-    // --- Handlers ---
+            /* Reset body and html height to allow full content printing */
+            html, body, #root {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow: visible !important;
+                background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
 
-    const handleClassChange = (cls) => {
-        setSelectedClass(cls);
-        setSelectedSubject('');
-        setSelectedChapters([]);
-    };
+            /* Ensure background colors (for correct/incorrect answers) show up */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
 
-    const toggleChapter = (chapter) => {
-        if (selectedChapters.includes(chapter)) {
-            setSelectedChapters(selectedChapters.filter(c => c !== chapter));
-        } else {
-            setSelectedChapters([...selectedChapters, chapter]);
-        }
-    };
-
-    const generateExam = async () => {
-        if (!apiKey) {
-            setError("कृपया अपनी Gemini API Key दर्ज करें।");
-            return;
-        }
-        if (!selectedSubject) {
-            setError("कृपया एक विषय चुनें।");
-            return;
-        }
-        if (selectedChapters.length === 0) {
-            setError("कृपया कम से कम एक पाठ चुनें।");
-            return;
+            /* Ensure page breaks happen cleanly */
+            .page-break { page-break-after: always; }
+            .question-block { 
+                break-inside: avoid; 
+                page-break-inside: avoid;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
         }
 
-        setStep('loading');
-        setLoadingMessage('RBSE ब्लूप्रिंट का विश्लेषण किया जा रहा है...');
-        setError('');
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-        const prompt = `
-            Create a quiz in JSON format for RBSE (Rajasthan Board) Class ${selectedClass} Hindi Medium.
-            Subject: ${selectedSubject}
-            Chapters: ${selectedChapters.join(', ')}
-            Number of Questions: ${questionCount}
-            Type: Multiple Choice Questions (MCQ)
-            Language: Hindi (Devanagari) strictly.
-
-            OUTPUT FORMAT MUST BE A RAW JSON ARRAY WITHOUT MARKDOWN.
-            Example format:
-            [
-                {
-                    "id": 1,
-                    "question": "प्रश्न का पाठ यहाँ...",
-                    "options": ["विकल्प अ", "विकल्प ब", "विकल्प स", "विकल्प द"],
-                    "correctAnswer": 0,
-                    "explanation": "सही उत्तर का विस्तृत विवरण हिंदी में..."
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Icon Component Wrapper
+        const Icon = ({ name, size = 20, className }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
                 }
-            ]
+            }, [name]);
+            return <i data-lucide={name} className={className} style={{ width: size, height: size, display: 'inline-block', verticalAlign: 'middle' }}></i>;
+        };
+
+        const App = () => {
+            // --- State ---
+            const [apiKey, setApiKey] = useState('');
+            const [step, setStep] = useState('setup'); // setup, loading, exam, result
+            const [selectedClass, setSelectedClass] = useState('10'); // '10' or '12'
+            const [selectedSubject, setSelectedSubject] = useState('');
+            const [selectedChapters, setSelectedChapters] = useState([]);
+            const [questionCount, setQuestionCount] = useState(5);
             
-            The 'correctAnswer' should be the index (0-3) of the correct option.
-            Make questions challenging and exam-oriented for Class ${selectedClass}.
-        `;
+            // User Details State
+            const [studentName, setStudentName] = useState('');
+            const [fatherName, setFatherName] = useState('');
 
-        try {
-            setLoadingMessage('प्रश्न पत्र तैयार किया जा रहा है... (AI सोच रहा है)');
-            
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            });
+            const [questions, setQuestions] = useState([]);
+            const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+            const [userAnswers, setUserAnswers] = useState({}); 
+            const [score, setScore] = useState(0);
+            const [loadingMessage, setLoadingMessage] = useState('');
+            const [error, setError] = useState('');
+            const [examStartTime, setExamStartTime] = useState(null);
+            const [timeTaken, setTimeTaken] = useState(0);
+            const [generationTime, setGenerationTime] = useState('');
 
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.error.message);
-            }
-
-            let text = data.candidates[0].content.parts[0].text;
-            
-            // Clean markdown if present
-            text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            
-            const parsedQuestions = JSON.parse(text);
-            
-            if (!Array.isArray(parsedQuestions)) {
-                throw new Error("Invalid format received from AI");
-            }
-
-            setQuestions(parsedQuestions);
-            setStep('exam');
-            setExamStartTime(Date.now());
-            
-        } catch (err) {
-            console.error(err);
-            setError("पेपर बनाने में त्रुटि हुई: " + err.message + ". कृपया पुनः प्रयास करें।");
-            setStep('setup');
-        }
-    };
-
-    const handleAnswer = (qIndex, optionIndex) => {
-        setUserAnswers(prev => ({
-            ...prev,
-            [qIndex]: optionIndex
-        }));
-    };
-
-    const submitExam = () => {
-        let calculatedScore = 0;
-        questions.forEach((q, index) => {
-            if (userAnswers[index] === q.correctAnswer) {
-                calculatedScore++;
-            }
-        });
-        setScore(calculatedScore);
-        setTimeTaken(Math.floor((Date.now() - examStartTime) / 1000));
-        setStep('result');
-    };
-
-    const downloadPDF = () => {
-        window.print();
-    };
-
-    const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins} मिनट ${secs} सेकंड`;
-    };
-
-    // --- Components within App ---
-
-    return (
-        <div className="font-sans bg-gray-50 min-h-screen text-gray-900">
-            {/* Inject Styles and Fonts */}
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
-                
-                body {
-                    font-family: 'Noto Sans Devanagari', sans-serif;
+            // --- COMPLETE Data for RBSE Subjects & Chapters ---
+            const SUBJECT_DATA = {
+                "10": {
+                    "विज्ञान (Science)": [
+                        "पाठ 1: रासायनिक अभिक्रियाएँ एवं समीकरण",
+                        "पाठ 2: अम्ल, क्षारक एवं लवण",
+                        "पाठ 3: धातु एवं अधातु",
+                        "पाठ 4: कार्बन एवं उसके यौगिक",
+                        "पाठ 6: जैव प्रक्रम",
+                        "पाठ 7: नियंत्रण एवं समन्वय",
+                        "पाठ 8: जीव जनन कैसे करते हैं?",
+                        "पाठ 9: आनुवंशिकता एवं जैव विकास",
+                        "पाठ 10: प्रकाश – परावर्तन तथा अपवर्तन",
+                        "पाठ 11: मानव नेत्र तथा रंगबिरंगा संसार",
+                        "पाठ 12: विद्युत",
+                        "पाठ 13: विद्युत धारा के चुंबकीय प्रभाव",
+                        "पाठ 15: हमारा पर्यावरण"
+                    ],
+                    "सामाजिक विज्ञान (Social Science)": [
+                        "इतिहास - पाठ 1: यूरोप में राष्ट्रवाद का उदय",
+                        "इतिहास - पाठ 2: भारत में राष्ट्रवाद",
+                        "इतिहास - पाठ 3: भूमंडलीकृत विश्व का बनना",
+                        "इतिहास - पाठ 4: औद्योगीकरण का युग",
+                        "इतिहास - पाठ 5: मुद्रण संस्कृति और आधुनिक दुनिया",
+                        "भूगोल - पाठ 1: संसाधन एवं विकास",
+                        "भूगोल - पाठ 2: वन और वन्यजीव संसाधन",
+                        "भूगोल - पाठ 3: जल संसाधन",
+                        "भूगोल - पाठ 4: कृषि",
+                        "भूगोल - पाठ 5: खनिज तथा ऊर्जा संसाधन",
+                        "भूगोल - पाठ 6: विनिर्माण उद्योग",
+                        "भूगोल - पाठ 7: राष्ट्रीय अर्थव्यवस्था की जीवन रेखाएँ",
+                        "राजनीति - पाठ 1: सत्ता की साझेदारी",
+                        "राजनीति - पाठ 2: संघवाद",
+                        "राजनीति - पाठ 3: जाति, धर्म और लैंगिक मसले",
+                        "राजनीति - पाठ 4: राजनीतिक दल",
+                        "राजनीति - पाठ 5: लोकतंत्र के परिणाम",
+                        "अर्थशास्त्र - पाठ 1: विकास",
+                        "अर्थशास्त्र - पाठ 2: भारतीय अर्थव्यवस्था के क्षेत्रक",
+                        "अर्थशास्त्र - पाठ 3: मुद्रा और साख",
+                        "अर्थशास्त्र - पाठ 4: वैश्वीकरण और भारतीय अर्थव्यवस्था",
+                        "अर्थशास्त्र - पाठ 5: उपभोक्ता अधिकार"
+                    ],
+                    "गणित (Mathematics)": [
+                        "पाठ 1: वास्तविक संख्याएँ",
+                        "पाठ 2: बहुपद",
+                        "पाठ 3: दो चर वाले रैखिक समीकरण युग्म",
+                        "पाठ 4: द्विघात समीकरण",
+                        "पाठ 5: समांतर श्रेढ़ियाँ",
+                        "पाठ 6: त्रिभुज",
+                        "पाठ 7: निर्देशांक ज्यामिति",
+                        "पाठ 8: त्रिकोणमिति का परिचय",
+                        "पाठ 9: त्रिकोणमिति के कुछ अनुप्रयोग",
+                        "पाठ 10: वृत्त",
+                        "पाठ 12: वृत्तों से संबंधित क्षेत्रफल",
+                        "पाठ 13: पृष्ठीय क्षेत्रफल और आयतन",
+                        "पाठ 14: सांख्यिकी",
+                        "पाठ 15: प्रायिकता"
+                    ],
+                    "हिंदी (Hindi)": [
+                        "गद्य - नेताजी का चश्मा",
+                        "गद्य - बालगोबिन भगत",
+                        "गद्य - लखनवी अंदाज़",
+                        "गद्य - मानवीय करुणा की दिव्या चमक",
+                        "गद्य - एक कहानी यह भी",
+                        "गद्य - स्त्री शिक्षा के विरोधी कुतर्कों का खंडन",
+                        "गद्य - नौबतखाने में इबादत",
+                        "गद्य - संस्कृति",
+                        "काव्य - पद (सूरदास)",
+                        "काव्य - राम-लक्ष्मण-परशुराम संवाद",
+                        "काव्य - सवैया और कवित्त (देव)",
+                        "काव्य - आत्मकथ्य (प्रसाद)",
+                        "काव्य - उत्साह, अट नहीं रही है (निराला)",
+                        "काव्य - यह दंतुरित मुसकान, फसल (नागार्जुन)",
+                        "काव्य - छाया मत छूना",
+                        "काव्य - कन्यादान",
+                        "काव्य - संगतकार",
+                        "कृतिका - माता का अंचल",
+                        "कृतिका - जॉर्ज पंचम की नाक",
+                        "कृतिका - साना-साना हाथ जोड़ि...",
+                        "कृतिका - एही ठैयाँ झुलनी हेरानी हो रामा!",
+                        "कृतिका - मैं क्यों लिखता हूँ?"
+                    ]
+                },
+                "12": {
+                    "भौतिक विज्ञान (Physics)": [
+                        "पाठ 1: विद्युत आवेश तथा क्षेत्र",
+                        "पाठ 2: स्थिर वैद्युत विभव तथा धारिता",
+                        "पाठ 3: विद्युत धारा",
+                        "पाठ 4: गतिमान आवेश और चुंबकत्व",
+                        "पाठ 5: चुंबकत्व एवं द्रव्य",
+                        "पाठ 6: वैद्युतचुंबकीय प्रेरण",
+                        "पाठ 7: प्रत्यावर्ती धारा",
+                        "पाठ 8: वैद्युतचुंबकीय तरंगें",
+                        "पाठ 9: किरण प्रकाशिकी एवं प्रकाशिक यंत्र",
+                        "पाठ 10: तरंग-प्रकाशिकी",
+                        "पाठ 11: विकिरण तथा द्रव्य की द्वैत प्रकृति",
+                        "पाठ 12: परमाणु",
+                        "पाठ 13: नाभिक",
+                        "पाठ 14: अर्धचालक इलेक्ट्रॉनिकी"
+                    ],
+                    "रसायन विज्ञान (Chemistry)": [
+                        "पाठ 1: विलयन",
+                        "पाठ 2: वैद्युतरसायन",
+                        "पाठ 3: रासायनिक बलगतिकी",
+                        "पाठ 4: d- एवं f- ब्लॉक के तत्व",
+                        "पाठ 5: उपसहसंयोजन यौगिक",
+                        "पाठ 6: हैलोऐल्केन तथा हैलोऐरीन",
+                        "पाठ 7: ऐल्कोहॉल, फ़ीनॉल एवं ईथर",
+                        "पाठ 8: ऐल्डिहाइड, कीटोन एवं कार्बोक्सिलिक अम्ल",
+                        "पाठ 9: ऐमीन",
+                        "पाठ 10: जैव-अणु"
+                    ],
+                    "जीव विज्ञान (Biology)": [
+                        "पाठ 2: मानव जनन",
+                        "पाठ 3: जनन स्वास्थ्य",
+                        "पाठ 4: वंशागति और विविधता के सिद्धांत",
+                        "पाठ 5: वंशागति के आणविक आधार",
+                        "पाठ 6: विकास",
+                        "पाठ 7: मानव स्वास्थ्य तथा रोग",
+                        "पाठ 8: मानव कल्याण में सूक्ष्मजीव",
+                        "पाठ 9: जैव प्रौद्योगिकी - सिद्धांत व प्रक्रम",
+                        "पाठ 10: जैव प्रौद्योगिकी एवं उसके उपयोग",
+                        "पाठ 11: जीव और समष्टियाँ",
+                        "पाठ 12: पारितंत्र",
+                        "पाठ 13: जैव विविधता एवं संरक्षण"
+                    ],
+                    "हिंदी अनिवार्य (Hindi Comp.)": [
+                        "आरोह - आत्मपरिचय, एक गीत",
+                        "आरोह - पतंग",
+                        "आरोह - कविता के बहाने",
+                        "आरोह - कैमरे में बंद अपाहिज",
+                        "आरोह - सहर्ष स्वीकारा है",
+                        "आरोह - उषा",
+                        "आरोह - बादल राग",
+                        "आरोह - कवितावली",
+                        "आरोह - रुबाइयाँ",
+                        "आरोह - छोटा मेरा खेत",
+                        "आरोह - भक्तिन",
+                        "आरोह - बाज़ार दर्शन",
+                        "आरोह - काले मेघा पानी दे",
+                        "आरोह - पहलवान की ढोलक",
+                        "आरोह - चार्ली चैप्लिन यानी हम सब",
+                        "आरोह - नमक",
+                        "आरोह - शिरीष के फूल",
+                        "आरोह - श्रम विभाजन और जाति-प्रथा",
+                        "वितान - सिल्वर वेडिंग",
+                        "वितान - जूझ",
+                        "वितान - अतीत में दबे पाँव"
+                    ],
+                    "इतिहास (History)": [
+                        "भाग 1 - ईंटें, मनके तथा अस्थियाँ",
+                        "भाग 1 - राजा, किसान और नगर",
+                        "भाग 1 - बंधुत्व, जाति तथा वर्ग",
+                        "भाग 1 - विचारक, विश्वास और इमारतें",
+                        "भाग 2 - यात्रियों के नज़रिए",
+                        "भाग 2 - भक्ति-सूफी परंपराएँ",
+                        "भाग 2 - एक साम्राज्य की राजधानी: विजयनगर",
+                        "भाग 2 - किसान, जमींदार और राज्य",
+                        "भाग 3 - उपनिवेशवाद और देहात",
+                        "भाग 3 - विद्रोही और राज",
+                        "भाग 3 - महात्मा गाँधी और राष्ट्रीय आंदोलन",
+                        "भाग 3 - संविधान का निर्माण"
+                    ],
+                    "भूगोल (Geography)": [
+                        "मानव भूगोल - प्रकृति एवं विषय क्षेत्र",
+                        "विश्व जनसंख्या - वितरण, घनत्व और वृद्धि",
+                        "मानव विकास",
+                        "प्राथमिक क्रियाएँ",
+                        "द्वितीयक क्रियाएँ",
+                        "तृतीयक और चतुर्थ क्रियाकलाप",
+                        "परिवहन एवं संचार",
+                        "अंतर्राष्ट्रीय व्यापार",
+                        "भारत - जनसंख्या: वितरण",
+                        "भारत - प्रवास",
+                        "भारत - मानव विकास",
+                        "भारत - मानव बस्तियाँ",
+                        "भारत - भू-संसाधन तथा कृषि",
+                        "भारत - जल संसाधन",
+                        "भारत - खनिज तथा ऊर्जा संसाधन",
+                        "भारत - निर्माण उद्योग",
+                        "भारत - भारत के संदर्भ में नियोजन"
+                    ],
+                    "राजनीति विज्ञान (Pol. Science)": [
+                        "दो ध्रुवीयता का अंत",
+                        "समकालीन दक्षिण एशिया",
+                        "अंतर्राष्ट्रीय संगठन",
+                        "समकालीन विश्व में सुरक्षा",
+                        "पर्यावरण और प्राकृतिक संसाधन",
+                        "वैश्वीकरण",
+                        "राष्ट्र निर्माण की चुनौतियाँ",
+                        "एक दल के प्रभुत्व का दौर",
+                        "नियोजित विकास की राजनीति",
+                        "भारत के विदेश संबंध",
+                        "कांग्रेस प्रणाली: चुनौतियाँ",
+                        "लोकतांत्रिक व्यवस्था का संकट",
+                        "जनआंदोलनों का उदय",
+                        "क्षेत्रीय आकांक्षाएँ",
+                        "भारतीय राजनीति: नए बदलाव"
+                    ]
                 }
-                .print-only { display: none; }
-                
-                @media print {
-                    .no-print { display: none !important; }
-                    .print-only { display: block !important; }
-                    body { background-color: white; height: auto; overflow: visible; }
-                    .page-break { page-break-after: always; }
+            };
+
+            // --- Handlers ---
+
+            const handleClassChange = (cls) => {
+                setSelectedClass(cls);
+                setSelectedSubject('');
+                setSelectedChapters([]);
+            };
+
+            const toggleChapter = (chapter) => {
+                if (selectedChapters.includes(chapter)) {
+                    setSelectedChapters(selectedChapters.filter(c => c !== chapter));
+                } else {
+                    setSelectedChapters([...selectedChapters, chapter]);
+                }
+            };
+
+            const generateExam = async () => {
+                if (!apiKey) {
+                    setError("कृपया अपनी Gemini API Key दर्ज करें।");
+                    return;
+                }
+                if (!studentName || !fatherName) {
+                    setError("कृपया अपना नाम और पिता का नाम दर्ज करें।");
+                    return;
+                }
+                if (!selectedSubject) {
+                    setError("कृपया एक विषय चुनें।");
+                    return;
+                }
+                if (selectedChapters.length === 0) {
+                    setError("कृपया कम से कम एक पाठ चुनें।");
+                    return;
+                }
+
+                setStep('loading');
+                setLoadingMessage('RBSE ब्लूप्रिंट का विश्लेषण किया जा रहा है...');
+                setError('');
+
+                const prompt = `
+                    Create a quiz in JSON format for RBSE (Rajasthan Board) Class ${selectedClass} Hindi Medium.
+                    Subject: ${selectedSubject}
+                    Chapters: ${selectedChapters.join(', ')}
+                    Number of Questions: ${questionCount}
+                    Type: Multiple Choice Questions (MCQ)
+                    Language: Hindi (Devanagari) strictly.
+
+                    OUTPUT FORMAT MUST BE A RAW JSON ARRAY WITHOUT MARKDOWN.
+                    Example format:
+                    [
+                        {
+                            "id": 1,
+                            "question": "प्रश्न का पाठ यहाँ...",
+                            "options": ["विकल्प अ", "विकल्प ब", "विकल्प स", "विकल्प द"],
+                            "correctAnswer": 0,
+                            "explanation": "सही उत्तर का विस्तृत विवरण हिंदी में..."
+                        }
+                    ]
                     
-                    /* Fix for some browsers cutting off content */
-                    #root, .min-h-screen { height: auto !important; min-height: 0 !important; }
+                    The 'correctAnswer' should be the index (0-3) of the correct option.
+                    Make questions challenging and exam-oriented for Class ${selectedClass}.
+                `;
+
+                try {
+                    setLoadingMessage('प्रश्न पत्र तैयार किया जा रहा है... (AI सोच रहा है)');
+                    
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }]
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error.message);
+                    }
+
+                    let text = data.candidates[0].content.parts[0].text;
+                    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const parsedQuestions = JSON.parse(text);
+                    
+                    if (!Array.isArray(parsedQuestions)) {
+                        throw new Error("Invalid format received from AI");
+                    }
+
+                    setQuestions(parsedQuestions);
+                    setGenerationTime(new Date().toLocaleString('hi-IN'));
+                    setStep('exam');
+                    setExamStartTime(Date.now());
+                    
+                } catch (err) {
+                    console.error(err);
+                    setError("पेपर बनाने में त्रुटि हुई: " + err.message + ". कृपया पुनः प्रयास करें।");
+                    setStep('setup');
                 }
+            };
 
-                /* Custom Scrollbar */
-                ::-webkit-scrollbar { width: 8px; }
-                ::-webkit-scrollbar-track { background: #f1f1f1; }
-                ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-                ::-webkit-scrollbar-thumb:hover { background: #555; }
-            `}</style>
+            const handleAnswer = (qIndex, optionIndex) => {
+                setUserAnswers(prev => ({
+                    ...prev,
+                    [qIndex]: optionIndex
+                }));
+            };
 
-            {/* 1. Setup View */}
-            {step === 'setup' && (
-                <div className="min-h-screen p-4 flex items-center justify-center">
-                    <div className="bg-white max-w-2xl w-full rounded-2xl shadow-xl p-6 md:p-8">
-                        <div className="flex items-center gap-3 mb-6 border-b pb-4">
-                            <div className="bg-blue-600 p-2 rounded-lg text-white">
-                                <BookOpen size={24} />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-800">RBSE परीक्षा साथी</h1>
-                                <p className="text-gray-500 text-sm">कक्षा 10वीं और 12वीं • हिंदी माध्यम • AI पावर्ड</p>
-                            </div>
-                        </div>
+            const submitExam = () => {
+                let calculatedScore = 0;
+                questions.forEach((q, index) => {
+                    if (userAnswers[index] === q.correctAnswer) {
+                        calculatedScore++;
+                    }
+                });
+                setScore(calculatedScore);
+                setTimeTaken(Math.floor((Date.now() - examStartTime) / 1000));
+                setStep('result');
+            };
 
-                        {error && (
-                            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm flex items-center gap-2">
-                                <AlertCircle size={16} /> {error}
-                            </div>
-                        )}
+            const downloadPDF = () => {
+                window.print();
+            };
 
-                        <div className="space-y-6">
-                            {/* API Key */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
-                                <input 
-                                    type="password" 
-                                    placeholder="यहाँ अपनी API Key पेस्ट करें"
-                                    className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                                    value={apiKey}
-                                    onChange={(e) => setApiKey(e.target.value)}
-                                />
-                                <p className="text-xs text-gray-400 mt-1">आपकी Key सुरक्षित है और केवल ब्राउज़र में उपयोग होती है।</p>
-                            </div>
+            const formatTime = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${mins} मिनट ${secs} सेकंड`;
+            };
 
-                            {/* Class Selection */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">कक्षा चुनें (Class)</label>
-                                <div className="flex gap-4">
-                                    <button 
-                                        onClick={() => handleClassChange('10')}
-                                        className={`flex-1 py-3 px-4 rounded-xl border-2 flex items-center justify-center gap-2 transition-all
-                                            ${selectedClass === '10' 
-                                                ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm' 
-                                                : 'border-gray-200 hover:border-blue-300 text-gray-600'
-                                            }`}
-                                    >
-                                        <School size={20} /> कक्षा 10वीं
-                                    </button>
-                                    <button 
-                                        onClick={() => handleClassChange('12')}
-                                        className={`flex-1 py-3 px-4 rounded-xl border-2 flex items-center justify-center gap-2 transition-all
-                                            ${selectedClass === '12' 
-                                                ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm' 
-                                                : 'border-gray-200 hover:border-blue-300 text-gray-600'
-                                            }`}
-                                    >
-                                        <School size={20} /> कक्षा 12वीं
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Subject Selection */}
-                            <div className="animate-fade-in">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">विषय चुनें (Subject) - कक्षा {selectedClass}</label>
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                                    {Object.keys(SUBJECT_DATA[selectedClass]).map(sub => (
-                                        <button 
-                                            key={sub}
-                                            onClick={() => { setSelectedSubject(sub); setSelectedChapters([]); }}
-                                            className={`p-3 rounded-lg border text-sm font-medium transition-all ${selectedSubject === sub ? 'bg-blue-50 border-blue-500 text-blue-700' : 'hover:bg-gray-50'}`}
-                                        >
-                                            {sub.split('(')[0]}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Chapter Selection */}
-                            {selectedSubject && (
-                                <div className="animate-fade-in">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        पाठ चुनें (Chapters) 
-                                        <span className="text-blue-600 text-xs ml-2">({selectedChapters.length} चयनित)</span>
-                                    </label>
-                                    <div className="max-h-48 overflow-y-auto border rounded-lg p-2 space-y-1">
-                                        {SUBJECT_DATA[selectedClass][selectedSubject].map(chapter => (
-                                            <div 
-                                                key={chapter} 
-                                                onClick={() => toggleChapter(chapter)}
-                                                className={`flex items-center p-2 rounded cursor-pointer ${selectedChapters.includes(chapter) ? 'bg-green-50 text-green-800' : 'hover:bg-gray-50'}`}
-                                            >
-                                                <div className={`w-4 h-4 rounded border flex items-center justify-center mr-3 ${selectedChapters.includes(chapter) ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
-                                                    {selectedChapters.includes(chapter) && <Check size={12} className="text-white" />}
-                                                </div>
-                                                <span className="text-sm">{chapter}</span>
-                                            </div>
-                                        ))}
+            // --- Render Logic ---
+            return (
+                <div className="font-sans bg-gray-50 min-h-screen text-gray-900" id="main-container">
+                    
+                    {/* 1. Setup View */}
+                    {step === 'setup' && (
+                        <div className="min-h-screen p-4 flex items-center justify-center">
+                            <div className="bg-white max-w-2xl w-full rounded-2xl shadow-xl p-6 md:p-8">
+                                <div className="flex items-center gap-3 mb-6 border-b pb-4">
+                                    <div className="bg-blue-600 p-2 rounded-lg text-white">
+                                        <Icon name="book-open" size={24} />
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-800">Arvind Bishnoi Preparation</h1>
+                                        <p className="text-gray-500 text-sm">RBSE Exam Series • Class 10 & 12</p>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* Question Count */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">प्रश्नों की संख्या: {questionCount}</label>
-                                <input 
-                                    type="range" 
-                                    min="5" 
-                                    max="30" 
-                                    step="5"
-                                    value={questionCount}
-                                    onChange={(e) => setQuestionCount(Number(e.target.value))}
-                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                />
-                                <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                    <span>5</span>
-                                    <span>15</span>
-                                    <span>30</span>
-                                </div>
-                            </div>
+                                {error && (
+                                    <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm flex items-center gap-2">
+                                        <Icon name="alert-circle" size={16} /> {error}
+                                    </div>
+                                )}
 
-                            <button 
-                                onClick={generateExam}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2"
-                            >
-                                <Wand2 size={20} />
-                                पेपर बनाएँ (Generate Paper)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* 2. Loading View */}
-            {step === 'loading' && (
-                <div className="min-h-screen flex flex-col items-center justify-center p-4">
-                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-                    <h2 className="text-xl font-bold text-gray-800 mb-2">पेपर तैयार हो रहा है...</h2>
-                    <p className="text-gray-500 text-center max-w-md animate-pulse">{loadingMessage}</p>
-                    <p className="text-xs text-gray-400 mt-8">जैसे ही प्रश्न तैयार होंगे, परीक्षा अपने आप शुरू हो जाएगी।</p>
-                </div>
-            )}
-
-            {/* 3. Exam View */}
-            {step === 'exam' && (
-                <div className="min-h-screen bg-gray-50 flex flex-col">
-                    {/* Exam Header */}
-                    <div className="bg-white shadow-sm px-4 py-3 sticky top-0 z-10 flex justify-between items-center">
-                        <div>
-                            <h2 className="font-bold text-gray-800 text-sm md:text-base">{selectedSubject.split('(')[0]} ({selectedClass}वीं) - ऑनलाइन परीक्षा</h2>
-                            <p className="text-xs text-gray-500">प्रश्न {currentQuestionIndex + 1} / {questions.length}</p>
-                        </div>
-                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                            <Clock size={14} />
-                            लाइव
-                        </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="h-1 w-full bg-gray-200">
-                        <div className="h-1 bg-blue-600 transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
-                    </div>
-
-                    {/* Question Area */}
-                    <div className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-                            <span className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded mb-3">
-                                प्रश्न {currentQuestionIndex + 1}
-                            </span>
-                            <h3 className="text-xl font-medium text-gray-900 mb-6 leading-relaxed">
-                                {questions[currentQuestionIndex].question}
-                            </h3>
-
-                            <div className="space-y-3">
-                                {questions[currentQuestionIndex].options.map((opt, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handleAnswer(currentQuestionIndex, idx)}
-                                        className={`w-full text-left p-4 rounded-xl border transition-all flex items-center group
-                                            ${userAnswers[currentQuestionIndex] === idx 
-                                                ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' 
-                                                : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                                            }`}
-                                    >
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-4 transition-colors
-                                            ${userAnswers[currentQuestionIndex] === idx ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}
-                                        `}>
-                                            {['अ', 'ब', 'स', 'द'][idx]}
-                                        </div>
-                                        <span className="text-gray-800">{opt}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Exam Footer Navigation */}
-                    <div className="bg-white border-t p-4 flex justify-between items-center max-w-3xl mx-auto w-full sticky bottom-0">
-                        <button 
-                            onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                            disabled={currentQuestionIndex === 0}
-                            className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${currentQuestionIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
-                        >
-                            <ArrowLeft size={18} /> पीछे
-                        </button>
-
-                        {currentQuestionIndex === questions.length - 1 ? (
-                            <button 
-                                onClick={submitExam}
-                                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-md flex items-center gap-2"
-                            >
-                                जमा करें (Submit) <CheckCircle size={18} />
-                            </button>
-                        ) : (
-                            <button 
-                                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
-                                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-md flex items-center gap-2"
-                            >
-                                अगला (Next) <ArrowRight size={18} />
-                            </button>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* 4. Result View (With Print Layout) */}
-            {step === 'result' && (
-                <div className="min-h-screen bg-gray-100">
-                    {/* Print Only Header */}
-                    <div className="print-only p-8">
-                        <h1 className="text-3xl font-bold text-center mb-2">RBSE मॉडल पेपर ({selectedClass}वीं) - 2024-25</h1>
-                        <div className="flex justify-between border-b-2 border-black pb-2 mb-6">
-                            <span>विषय: {selectedSubject}</span>
-                            <span>पूर्णांक: {questions.length}</span>
-                            <span>समय: 30 मिनट</span>
-                        </div>
-                        <div className="mb-4">
-                            <h3 className="font-bold mb-2">महत्वपूर्ण निर्देश:</h3>
-                            <ul className="list-disc pl-5 text-sm">
-                                <li>सभी प्रश्न हल करना अनिवार्य है।</li>
-                                <li>प्रत्येक प्रश्न 1 अंक का है।</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Screen Header */}
-                    <div className="no-print bg-white shadow py-4 px-6 mb-6">
-                        <div className="max-w-4xl mx-auto flex justify-between items-center">
-                            <h1 className="text-xl font-bold">परिणाम (Result)</h1>
-                            <button onClick={() => setStep('setup')} className="text-blue-600 text-sm font-medium hover:underline">
-                                नया टेस्ट दें
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="max-w-4xl mx-auto px-4 pb-12">
-                        {/* Score Card (Screen Only) */}
-                        <div className="no-print bg-white rounded-2xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="text-center md:text-left">
-                                <h2 className="text-gray-500 text-sm mb-1">आपका स्कोर</h2>
-                                <div className="text-5xl font-bold text-gray-900 mb-2">{score}<span className="text-2xl text-gray-400">/{questions.length}</span></div>
-                                <div className={`font-bold ${
-                                    Math.round((score / questions.length) * 100) >= 80 ? 'text-green-600' :
-                                    Math.round((score / questions.length) * 100) >= 60 ? 'text-blue-600' : 'text-orange-600'
-                                }`}>
-                                    {Math.round((score / questions.length) * 100) >= 80 ? 'उत्कृष्ट (Excellent)' :
-                                     Math.round((score / questions.length) * 100) >= 60 ? 'अच्छा (Good)' : 'सुधार की आवश्यकता'}
-                                </div>
-                            </div>
-                            <div className="bg-gray-50 p-4 rounded-xl flex gap-8">
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-gray-800">{formatTime(timeTaken)}</div>
-                                    <div className="text-xs text-gray-500">लिया गया समय</div>
-                                </div>
-                                <div className="text-center">
-                                    <div className="text-2xl font-bold text-gray-800">{Math.round((score / questions.length) * 100)}%</div>
-                                    <div className="text-xs text-gray-500">प्रतिशत</div>
-                                </div>
-                            </div>
-                            <button 
-                                onClick={downloadPDF}
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1"
-                            >
-                                <Download size={20} /> PDF डाउनलोड (Print to Save)
-                            </button>
-                        </div>
-
-                        {/* Question Analysis */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 print:shadow-none print:p-0">
-                            <h2 className="text-xl font-bold mb-6 no-print border-b pb-4">उत्तर कुंजी एवं व्याख्या</h2>
-                            
-                            <div className="space-y-8">
-                                {questions.map((q, idx) => {
-                                    const userAnswer = userAnswers[idx];
-                                    const isCorrect = userAnswer === q.correctAnswer;
-                                    
-                                    return (
-                                        <div key={q.id} className="border-b last:border-0 pb-6 print:break-inside-avoid">
-                                            <div className="flex gap-3 mb-2">
-                                                <span className="font-bold text-gray-700">Q.{idx + 1}</span>
-                                                <p className="text-gray-900 font-medium">{q.question}</p>
+                                <div className="space-y-6">
+                                    {/* User Details */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">विद्यार्थी का नाम (Student Name)</label>
+                                            <div className="relative flex items-center">
+                                                <div className="absolute left-3 text-gray-400"><Icon name="user" size={16} /></div>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="अपना नाम लिखें"
+                                                    className="w-full border rounded-lg p-2.5 pl-10 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    value={studentName}
+                                                    onChange={(e) => setStudentName(e.target.value)}
+                                                />
                                             </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">पिता का नाम (Father's Name)</label>
+                                            <div className="relative flex items-center">
+                                                <div className="absolute left-3 text-gray-400"><Icon name="user-check" size={16} /></div>
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="पिता का नाम लिखें"
+                                                    className="w-full border rounded-lg p-2.5 pl-10 focus:ring-2 focus:ring-blue-500 outline-none"
+                                                    value={fatherName}
+                                                    onChange={(e) => setFatherName(e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                            {/* Options Grid */}
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ml-8 mb-3 print:grid-cols-2">
-                                                {q.options.map((opt, optIdx) => (
-                                                    <div key={optIdx} className={`text-sm px-3 py-1.5 rounded border 
-                                                        ${optIdx === q.correctAnswer ? 'bg-green-100 border-green-300 font-medium' : ''}
-                                                        ${(optIdx === userAnswer && !isCorrect) ? 'bg-red-100 border-red-300' : 'border-gray-100'}
-                                                        print:border-gray-300 print:bg-white
-                                                    `}>
-                                                        <span className="mr-2">({['अ', 'ब', 'स', 'द'][optIdx]})</span>
-                                                        {opt}
-                                                        {optIdx === q.correctAnswer && <span className="no-print float-right text-green-700">✓</span>}
-                                                        {(optIdx === userAnswer && !isCorrect) && <span className="no-print float-right text-red-600">✗</span>}
+                                    {/* API Key */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
+                                        <input 
+                                            type="password" 
+                                            placeholder="यहाँ अपनी API Key पेस्ट करें"
+                                            className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
+                                            value={apiKey}
+                                            onChange={(e) => setApiKey(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Class Selection */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">कक्षा चुनें (Class)</label>
+                                        <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => handleClassChange('10')}
+                                                className={`flex-1 py-3 px-4 rounded-xl border-2 flex items-center justify-center gap-2 transition-all
+                                                    ${selectedClass === '10' 
+                                                        ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm' 
+                                                        : 'border-gray-200 hover:border-blue-300 text-gray-600'
+                                                    }`}
+                                            >
+                                                <Icon name="school" size={20} className="mr-2" /> कक्षा 10वीं
+                                            </button>
+                                            <button 
+                                                onClick={() => handleClassChange('12')}
+                                                className={`flex-1 py-3 px-4 rounded-xl border-2 flex items-center justify-center gap-2 transition-all
+                                                    ${selectedClass === '12' 
+                                                        ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-sm' 
+                                                        : 'border-gray-200 hover:border-blue-300 text-gray-600'
+                                                    }`}
+                                            >
+                                                <Icon name="school" size={20} className="mr-2" /> कक्षा 12वीं
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Subject Selection */}
+                                    <div className="animate-fade-in">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">विषय चुनें (Subject) - कक्षा {selectedClass}</label>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            {Object.keys(SUBJECT_DATA[selectedClass]).map(sub => (
+                                                <button 
+                                                    key={sub}
+                                                    onClick={() => { setSelectedSubject(sub); setSelectedChapters([]); }}
+                                                    className={`p-3 rounded-lg border text-sm font-medium transition-all ${selectedSubject === sub ? 'bg-blue-50 border-blue-500 text-blue-700' : 'hover:bg-gray-50'}`}
+                                                >
+                                                    {sub.split('(')[0]}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chapter Selection */}
+                                    {selectedSubject && (
+                                        <div className="animate-fade-in">
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                पाठ चुनें (Chapters) 
+                                                <span className="text-blue-600 text-xs ml-2">({selectedChapters.length} चयनित)</span>
+                                            </label>
+                                            <div className="max-h-48 overflow-y-auto border rounded-lg p-2 space-y-1">
+                                                {SUBJECT_DATA[selectedClass][selectedSubject].map(chapter => (
+                                                    <div 
+                                                        key={chapter} 
+                                                        onClick={() => toggleChapter(chapter)}
+                                                        className={`flex items-center p-2 rounded cursor-pointer ${selectedChapters.includes(chapter) ? 'bg-green-50 text-green-800' : 'hover:bg-gray-50'}`}
+                                                    >
+                                                        <div className={`w-4 h-4 rounded border flex items-center justify-center mr-3 ${selectedChapters.includes(chapter) ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                                                            {selectedChapters.includes(chapter) && <Icon name="check" size={12} className="text-white" />}
+                                                        </div>
+                                                        <span className="text-sm">{chapter}</span>
                                                     </div>
                                                 ))}
                                             </div>
-
-                                            {/* Explanation */}
-                                            <div className="ml-8 bg-blue-50 p-3 rounded-lg text-sm text-blue-900 border border-blue-100 print:bg-gray-50 print:border-gray-300 print:mt-2">
-                                                <span className="font-bold block mb-1">व्याख्या (Explanation):</span>
-                                                {q.explanation}
-                                            </div>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                    )}
 
-                            {/* Print Only Answer Key Summary */}
-                            <div className="print-only mt-8 pt-4 border-t-2 border-black page-break">
-                                <h3 className="text-center font-bold text-xl mb-4">उत्तर तालिका (Answer Key)</h3>
-                                <div className="grid grid-cols-5 gap-4">
-                                    {questions.map((q, idx) => (
-                                        <div key={idx} className="border p-2 text-center text-sm">
-                                            {idx + 1}. {['अ', 'ब', 'स', 'द'][q.correctAnswer]}
+                                    {/* Question Count */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">प्रश्नों की संख्या: {questionCount}</label>
+                                        <input 
+                                            type="range" 
+                                            min="5" 
+                                            max="30" 
+                                            step="5"
+                                            value={questionCount}
+                                            onChange={(e) => setQuestionCount(Number(e.target.value))}
+                                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                        />
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>5</span>
+                                            <span>15</span>
+                                            <span>30</span>
                                         </div>
-                                    ))}
-                                </div>
-                                <div className="mt-8 text-center text-sm text-gray-500">
-                                    Generative AI द्वारा निर्मित • RBSE परीक्षा साथी
+                                    </div>
+
+                                    <button 
+                                        onClick={generateExam}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow-lg transform transition active:scale-95 flex items-center justify-center gap-2"
+                                    >
+                                        <Icon name="wand-2" size={20} />
+                                        पेपर बनाएँ (Generate Paper)
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
+                    )}
 
-export default App;
+                    {/* 2. Loading View */}
+                    {step === 'loading' && (
+                        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                            <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                            <h2 className="text-xl font-bold text-gray-800 mb-2">पेपर तैयार हो रहा है...</h2>
+                            <p className="text-gray-500 text-center max-w-md animate-pulse">{loadingMessage}</p>
+                        </div>
+                    )}
+
+                    {/* 3. Exam View */}
+                    {step === 'exam' && (
+                        <div className="min-h-screen bg-gray-50 flex flex-col">
+                            {/* Exam Header */}
+                            <div className="bg-white shadow-sm px-4 py-3 sticky top-0 z-10 flex justify-between items-center">
+                                <div>
+                                    <h2 className="font-bold text-gray-800 text-sm md:text-base">{selectedSubject.split('(')[0]} - परीक्षा</h2>
+                                    <p className="text-xs text-gray-500">उम्मीदवार: {studentName}</p>
+                                </div>
+                                <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                                    <Icon name="clock" size={14} /> लाइव
+                                </div>
+                            </div>
+
+                            <div className="h-1 w-full bg-gray-200">
+                                <div className="h-1 bg-blue-600 transition-all duration-300" style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}></div>
+                            </div>
+
+                            <div className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full">
+                                <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+                                    <span className="inline-block bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded mb-3">
+                                        प्रश्न {currentQuestionIndex + 1} / {questions.length}
+                                    </span>
+                                    <h3 className="text-xl font-medium text-gray-900 mb-6 leading-relaxed">
+                                        {questions[currentQuestionIndex].question}
+                                    </h3>
+
+                                    <div className="space-y-3">
+                                        {questions[currentQuestionIndex].options.map((opt, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => handleAnswer(currentQuestionIndex, idx)}
+                                                className={`w-full text-left p-4 rounded-xl border transition-all flex items-center group
+                                                    ${userAnswers[currentQuestionIndex] === idx 
+                                                        ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' 
+                                                        : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                                                    }`}
+                                            >
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold mr-4 transition-colors
+                                                    ${userAnswers[currentQuestionIndex] === idx ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-500 group-hover:bg-gray-200'}
+                                                `}>
+                                                    {['अ', 'ब', 'स', 'द'][idx]}
+                                                </div>
+                                                <span className="text-gray-800">{opt}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white border-t p-4 flex justify-between items-center max-w-3xl mx-auto w-full sticky bottom-0">
+                                <button 
+                                    onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
+                                    disabled={currentQuestionIndex === 0}
+                                    className={`px-4 py-2 rounded-lg font-medium flex items-center gap-2 ${currentQuestionIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-100'}`}
+                                >
+                                    <Icon name="arrow-left" size={18} /> पीछे
+                                </button>
+
+                                {currentQuestionIndex === questions.length - 1 ? (
+                                    <button 
+                                        onClick={submitExam}
+                                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-md flex items-center gap-2"
+                                    >
+                                        जमा करें <Icon name="check-circle" size={18} />
+                                    </button>
+                                ) : (
+                                    <button 
+                                        onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold shadow-md flex items-center gap-2"
+                                    >
+                                        अगला <Icon name="arrow-right" size={18} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 4. Result View (With Professional Print Layout) */}
+                    {step === 'result' && (
+                        <div className="min-h-screen bg-gray-100">
+                            
+                            {/* --- PROFESSIONAL PRINT HEADER --- */}
+                            <div className="print-only w-full max-w-4xl mx-auto p-8">
+                                <div className="text-center border-b-2 border-black pb-4 mb-6">
+                                    <h1 className="text-4xl font-extrabold uppercase tracking-wide text-gray-900 mb-2">Arvind Bishnoi Preparation</h1>
+                                    <p className="text-sm text-gray-600 font-medium">Excellence in Education • RBSE Board Exam Series • {selectedClass}th Grade</p>
+                                </div>
+                                
+                                <div className="flex justify-between border-2 border-gray-200 bg-gray-50 p-4 rounded-lg mb-8">
+                                    <div className="space-y-1">
+                                        <p className="text-sm"><span className="font-bold text-gray-700 w-24 inline-block">विद्यार्थी:</span> {studentName}</p>
+                                        <p className="text-sm"><span className="font-bold text-gray-700 w-24 inline-block">पिता का नाम:</span> {fatherName}</p>
+                                        <p className="text-sm"><span className="font-bold text-gray-700 w-24 inline-block">दिनांक:</span> {generationTime}</p>
+                                    </div>
+                                    <div className="space-y-1 text-right">
+                                        <p className="text-sm"><span className="font-bold text-gray-700">विषय:</span> {selectedSubject}</p>
+                                        <p className="text-sm"><span className="font-bold text-gray-700">कुल प्रश्न:</span> {questions.length}</p>
+                                        <p className="text-lg font-bold text-blue-800 mt-2">प्राप्तांक: {score}/{questions.length}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="text-center mb-6">
+                                    <h2 className="text-xl font-bold border-b inline-block pb-1">विस्तृत परिणाम और उत्तर कुंजी</h2>
+                                </div>
+                            </div>
+
+                            {/* Screen Header */}
+                            <div className="no-print bg-white shadow py-4 px-6 mb-6">
+                                <div className="max-w-4xl mx-auto flex justify-between items-center">
+                                    <h1 className="text-xl font-bold">परिणाम (Result)</h1>
+                                    <button onClick={() => setStep('setup')} className="text-blue-600 text-sm font-medium hover:underline">
+                                        नया टेस्ट दें
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="max-w-4xl mx-auto px-4 pb-12">
+                                {/* Score Card (Screen Only) */}
+                                <div className="no-print bg-white rounded-2xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="text-center md:text-left">
+                                        <h2 className="text-gray-500 text-sm mb-1">प्रिय {studentName}, आपका स्कोर</h2>
+                                        <div className="text-5xl font-bold text-gray-900 mb-2">{score}<span className="text-2xl text-gray-400">/{questions.length}</span></div>
+                                        <div className={`font-bold ${
+                                            Math.round((score / questions.length) * 100) >= 80 ? 'text-green-600' :
+                                            Math.round((score / questions.length) * 100) >= 60 ? 'text-blue-600' : 'text-orange-600'
+                                        }`}>
+                                            {Math.round((score / questions.length) * 100) >= 80 ? 'उत्कृष्ट (Excellent)' :
+                                             Math.round((score / questions.length) * 100) >= 60 ? 'अच्छा (Good)' : 'सुधार की आवश्यकता'}
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-xl flex gap-8">
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-gray-800">{formatTime(timeTaken)}</div>
+                                            <div className="text-xs text-gray-500">समय</div>
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-gray-800">{Math.round((score / questions.length) * 100)}%</div>
+                                            <div className="text-xs text-gray-500">प्रतिशत</div>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={downloadPDF}
+                                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-transform hover:-translate-y-1"
+                                    >
+                                        <Icon name="download" size={20} /> PDF डाउनलोड करें
+                                    </button>
+                                </div>
+
+                                {/* Question Analysis (Visible in Print) */}
+                                <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 print:shadow-none print:p-0">
+                                    <h2 className="text-xl font-bold mb-6 no-print border-b pb-4">उत्तर कुंजी एवं व्याख्या</h2>
+                                    
+                                    <div className="space-y-6">
+                                        {questions.map((q, idx) => {
+                                            const userAnswer = userAnswers[idx];
+                                            const isCorrect = userAnswer === q.correctAnswer;
+                                            
+                                            return (
+                                                <div key={q.id} className="question-block border-b last:border-0 pb-6 mb-4">
+                                                    <div className="flex gap-3 mb-2">
+                                                        <span className="font-bold text-gray-700">Q.{idx + 1}</span>
+                                                        <p className="text-gray-900 font-medium text-lg">{q.question}</p>
+                                                    </div>
+
+                                                    {/* Options Grid */}
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ml-8 mb-3 print:grid-cols-2">
+                                                        {q.options.map((opt, optIdx) => (
+                                                            <div key={optIdx} className={`text-sm px-3 py-2 rounded border 
+                                                                ${optIdx === q.correctAnswer ? 'bg-green-100 border-green-300 font-medium print:bg-gray-100 print:border-gray-400' : ''}
+                                                                ${(optIdx === userAnswer && !isCorrect) ? 'bg-red-100 border-red-300 print:border-gray-300' : 'border-gray-100 print:border-gray-200'}
+                                                            `}>
+                                                                <span className="mr-2 font-bold">({['अ', 'ब', 'स', 'द'][optIdx]})</span>
+                                                                {opt}
+                                                                {optIdx === q.correctAnswer && <span className="float-right text-green-700 font-bold">✓ (सही उत्तर)</span>}
+                                                                {(optIdx === userAnswer && !isCorrect) && <span className="float-right text-red-600 font-bold">✗ (आपका उत्तर)</span>}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Explanation */}
+                                                    <div className="ml-8 bg-blue-50 p-3 rounded-lg text-sm text-blue-900 border border-blue-100 print:bg-gray-50 print:border-gray-300 print:mt-2">
+                                                        <span className="font-bold block mb-1 text-black">व्याख्या (Explanation):</span>
+                                                        {q.explanation}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Print Footer */}
+                                    <div className="print-only mt-8 text-center text-xs text-gray-400 border-t pt-4">
+                                        © Arvind Bishnoi Preparation • Generated via AI Exam Tool
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
